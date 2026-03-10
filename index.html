@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080c12">
+<title>Surge Warning · PED</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080c12;
+  --surface:  #0f1520;
+  --surface2: #161d2e;
+  --border:   #1e2a3d;
+  --border2:  #253044;
+  --text:     #e8edf5;
+  --muted:    #5a6a82;
+  --dim:      #2e3d52;
+
+  --green:  #22c55e;
+  --yellow: #eab308;
+  --amber:  #f59e0b;
+  --orange: #f97316;
+  --red:    #ef4444;
+
+  --tier-color: var(--green);
+  --tier-bg:    rgba(34,197,94,0.08);
+
+  --radius: 18px;
+  --tab-h:  64px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%; width: 100%; max-width: 430px; margin: 0 auto;
+  background: var(--bg); color: var(--text);
+  font-family: 'DM Mono', monospace; font-size: 13px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── STATUS BAR SPACER ── */
+.status-bar {
+  height: env(safe-area-inset-top, 44px);
+  background: var(--bg);
+  position: fixed; top: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto;
+  z-index: 100;
+}
+
+/* ── TOP NAV ── */
+.topnav {
+  position: fixed; top: env(safe-area-inset-top, 44px);
+  left: 0; right: 0; max-width: 430px; margin: 0 auto;
+  height: 56px; z-index: 100;
+  background: rgba(8,12,18,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px;
+  justify-content: space-between;
+}
+.topnav-title {
+  font-family: 'Instrument Serif', serif; font-size: 18px;
+  color: var(--text); letter-spacing: -0.01em;
+}
+.topnav-badge {
+  font-size: 10px; color: var(--muted); letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.live-dot {
+  display: inline-block; width: 6px; height: 6px;
+  background: var(--green); border-radius: 50%;
+  margin-right: 5px;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── SCROLL AREA ── */
+.scroll-area {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 44px) + 56px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tab-h));
+  left: 0; right: 0; max-width: 430px; margin: 0 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 16px 16px 24px; animation: fadeIn 0.2s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── RESULT CARDS ── */
+.result-card {
+  background: var(--tier-bg);
+  border: 1.5px solid var(--tier-color);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: all 0.35s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--tier-color);
+  transition: background 0.35s;
+}
+.result-card-label {
+  font-size: 10px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-bottom: 10px;
+}
+.result-card-horizon {
+  font-size: 11px; color: var(--muted);
+  margin-bottom: 6px;
+}
+.result-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.result-prob {
+  font-family: 'Instrument Serif', serif; font-size: 64px;
+  line-height: 1; color: var(--tier-color);
+  transition: color 0.35s;
+}
+.result-prob sup { font-size: 28px; }
+.tier-badge {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 5px 14px;
+  border-radius: 20px; border: 1.5px solid var(--tier-color);
+  color: var(--tier-color); background: rgba(0,0,0,0.3);
+  transition: all 0.35s; white-space: nowrap;
+}
+.result-action {
+  font-size: 11px; color: var(--muted); line-height: 1.7;
+  border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px;
+}
+.result-action b { color: var(--text); }
+
+/* Gauge */
+.gauge-wrap { display: flex; justify-content: center; margin: 6px 0 2px; }
+
+/* AUC note */
+.auc-note { font-size: 10px; color: var(--dim); text-align: right; margin-top: 4px; }
+
+/* ── DUAL SUMMARY (home screen) ── */
+.dual-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 16px;
+  cursor: pointer; transition: border-color 0.2s;
+  text-decoration: none;
+}
+.dual-card:active { opacity: 0.8; }
+.dual-num {
+  font-family: 'Instrument Serif', serif; font-size: 44px;
+  line-height: 1; min-width: 80px; text-align: center;
+  transition: color 0.35s;
+}
+.dual-right { flex: 1; }
+.dual-horizon { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+.dual-tier { font-size: 14px; font-weight: 500; transition: color 0.35s; }
+.dual-action { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.6; }
+.dual-arrow { font-size: 18px; color: var(--dim); }
+
+/* ── DRIVERS ── */
+.drivers-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.drivers-title { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+.driver-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.driver-name { font-size: 10px; color: var(--muted); width: 120px; flex-shrink: 0; }
+.driver-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: visible; position: relative; }
+.driver-bar { height: 4px; border-radius: 2px; transition: width 0.4s cubic-bezier(.4,0,.2,1), background 0.4s; min-width: 2px; }
+.driver-val { font-size: 10px; color: var(--muted); width: 38px; text-align: right; flex-shrink: 0; }
+
+/* ── INPUTS ── */
+.section-label {
+  font-size: 10px; color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.14em; margin: 20px 0 10px;
+}
+.input-group {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
+}
+.input-row {
+  display: flex; align-items: center;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.input-row:last-child { border-bottom: none; }
+.input-label { flex: 1; }
+.input-label-main { font-size: 13px; color: var(--text); }
+.input-label-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.stepper {
+  display: flex; align-items: center; gap: 0;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; overflow: hidden;
+}
+.step-btn {
+  width: 36px; height: 36px; border: none; background: transparent;
+  color: var(--text); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; font-family: 'DM Mono', monospace;
+  -webkit-tap-highlight-color: transparent;
+}
+.step-btn:active { background: var(--border); }
+.step-val {
+  min-width: 52px; text-align: center; font-size: 13px;
+  color: var(--text); font-family: 'DM Mono', monospace;
+  cursor: text; outline: none; border: none; background: transparent;
+  padding: 0 4px;
+}
+.step-val:focus { color: #58a6ff; }
+
+/* ── ABOUT ── */
+.about-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 12px;
+}
+.about-title { font-family: 'Instrument Serif', serif; font-size: 18px; margin-bottom: 8px; }
+.about-body { font-size: 12px; color: var(--muted); line-height: 1.8; }
+.about-body b { color: var(--text); }
+.eq-block {
+  background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 12px 14px; margin: 10px 0;
+  font-size: 11px; color: #7d8fa8; line-height: 2;
+}
+.eq-block b { color: #a0b4cc; }
+.tier-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.tier-pip { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── BOTTOM TAB BAR ── */
+.tabbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  max-width: 430px; margin: 0 auto;
+  height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+  background: rgba(8,12,18,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start; padding-top: 8px;
+  z-index: 100;
+}
+.tab-btn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; padding: 4px 0;
+  border: none; background: transparent; cursor: pointer;
+  color: var(--muted); transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-btn.active { color: var(--text); }
+.tab-icon { font-size: 22px; line-height: 1; }
+.tab-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; }
+
+/* ── ALERTS BANNER ── */
+.alert-banner {
+  background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4);
+  border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: #fca5a5; display: none;
+}
+.alert-banner.show { display: flex; }
+.alert-icon { font-size: 20px; flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR SPACER -->
+<div class="status-bar"></div>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="topnav-title">Surge Warning</div>
+  <div class="topnav-badge"><span class="live-dot"></span>PED · 2025</div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll-area" id="scroll-area">
+
+  <!-- ══ HOME SCREEN ══ -->
+  <div class="screen active" id="screen-home">
+    <div style="height:8px"></div>
+
+    <!-- Conflict banner -->
+    <div class="alert-banner" id="conflict-banner">
+      <div class="alert-icon">⚡</div>
+      <div>12h and 24h signals diverge — review inputs screen for detail.</div>
+    </div>
+
+    <!-- 12h card -->
+    <div class="dual-card" onclick="switchTab('results')">
+      <div class="dual-num" id="home-prob-12" style="color:var(--green)">—</div>
+      <div class="dual-right">
+        <div class="dual-horizon">12-Hour Warning</div>
+        <div class="dual-tier" id="home-tier-12" style="color:var(--green)">—</div>
+        <div class="dual-action" id="home-action-12">—</div>
+      </div>
+      <div class="dual-arrow">›</div>
+    </div>
+
+    <!-- 24h card -->
+    <div class="dual-card" onclick="switchTab('results')">
+      <div class="dual-num" id="home-prob-24" style="color:var(--green)">—</div>
+      <div class="dual-right">
+        <div class="dual-horizon">24-Hour Warning</div>
+        <div class="dual-tier" id="home-tier-24" style="color:var(--green)">—</div>
+        <div class="dual-action" id="home-action-24">—</div>
+      </div>
+      <div class="dual-arrow">›</div>
+    </div>
+
+    <!-- Key inputs snapshot -->
+    <div class="section-label">Current inputs snapshot</div>
+    <div class="about-card" style="padding:14px 16px;">
+      <div id="snapshot" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;font-size:12px;"></div>
+    </div>
+
+    <div style="font-size:10px;color:var(--dim);text-align:center;margin-top:8px;line-height:1.7;">
+      Base rate 12.2% · 12h AUC 0.77 · 24h AUC 0.83<br>
+      Trained on 8,748 hours · 2025 data
+    </div>
+  </div>
+
+  <!-- ══ RESULTS SCREEN ══ -->
+  <div class="screen" id="screen-results">
+    <div style="height:8px"></div>
+
+    <!-- 12h full result -->
+    <div class="result-card" id="rc-12">
+      <div class="result-card-label">12-Hour Surge Warning · AUC 0.77</div>
+      <div class="gauge-wrap"><canvas id="gauge-12" width="200" height="100"></canvas></div>
+      <div class="result-row">
+        <div class="result-prob" id="rp-12">—</div>
+        <div class="tier-badge" id="rt-12">—</div>
+      </div>
+      <div class="result-action" id="ra-12">—</div>
+    </div>
+
+    <!-- 12h drivers -->
+    <div class="drivers-wrap">
+      <div class="drivers-title">Score drivers · 12h model</div>
+      <div id="drv-12"></div>
+    </div>
+
+    <!-- 24h full result -->
+    <div class="result-card" id="rc-24" style="margin-top:20px;">
+      <div class="result-card-label">24-Hour Surge Warning · AUC 0.83</div>
+      <div class="gauge-wrap"><canvas id="gauge-24" width="200" height="100"></canvas></div>
+      <div class="result-row">
+        <div class="result-prob" id="rp-24">—</div>
+        <div class="tier-badge" id="rt-24">—</div>
+      </div>
+      <div class="result-action" id="ra-24">—</div>
+    </div>
+
+    <!-- 24h drivers -->
+    <div class="drivers-wrap">
+      <div class="drivers-title">Score drivers · 24h model</div>
+      <div id="drv-24"></div>
+    </div>
+  </div>
+
+  <!-- ══ INPUTS SCREEN ══ -->
+  <div class="screen" id="screen-inputs">
+    <div style="height:8px"></div>
+    <div class="section-label">Inpatient backlog</div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Backlog (current)</div>
+          <div class="input-label-sub">Running IPS admits − discharges</div>
+        </div>
+        <div class="stepper" data-id="in_backlog" data-step="1" data-min="0" data-max="100"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Backlog trend (12h)</div>
+          <div class="input-label-sub">Backlog now − 12h ago</div>
+        </div>
+        <div class="stepper" data-id="in_bl_trend" data-step="1" data-min="-30" data-max="30"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Backlog trend (24h)</div>
+          <div class="input-label-sub">Backlog now − 24h ago</div>
+        </div>
+        <div class="stepper" data-id="in_bl_trend24" data-step="1" data-min="-30" data-max="30"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Inpatient flow</div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Admits − Discharges (12h)</div>
+          <div class="input-label-sub">Net inpatient flow last 12h</div>
+        </div>
+        <div class="stepper" data-id="in_imbal" data-step="1" data-min="-30" data-max="30"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Admits − Discharges (24h)</div>
+          <div class="input-label-sub">Net inpatient flow last 24h</div>
+        </div>
+        <div class="stepper" data-id="in_imbal24" data-step="1" data-min="-40" data-max="40"></div>
+      </div>
+    </div>
+
+    <div class="section-label">ED state</div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS (current)</div>
+          <div class="input-label-sub">Live score from dashboard</div>
+        </div>
+        <div class="stepper" data-id="in_mpedocs" data-step="5" data-min="0" data-max="260"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS 6h average</div>
+          <div class="input-label-sub">Rolling mean, last 6 readings</div>
+        </div>
+        <div class="stepper" data-id="in_mp_roll6" data-step="5" data-min="0" data-max="260"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS trend (3h)</div>
+          <div class="input-label-sub">Current − 3h ago</div>
+        </div>
+        <div class="stepper" data-id="in_mp_trend" data-step="5" data-min="-100" data-max="100"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Arrivals</div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">ED arrivals (3h avg)</div>
+          <div class="input-label-sub">Mean per hour, last 3h</div>
+        </div>
+        <div class="stepper" data-id="in_arrivals" data-step="1" data-min="0" data-max="25"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">ED arrivals (6h avg)</div>
+          <div class="input-label-sub">Mean per hour, last 6h</div>
+        </div>
+        <div class="stepper" data-id="in_arrivals6" data-step="1" data-min="0" data-max="25"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Time</div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Hour of day</div>
+          <div class="input-label-sub">0 = midnight · 23 = 11 pm</div>
+        </div>
+        <div class="stepper" data-id="in_hour" data-step="1" data-min="0" data-max="23"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Day of week</div>
+          <div class="input-label-sub">Mon=0  Tue=1 ··· Sun=6</div>
+        </div>
+        <div class="stepper" data-id="in_dow" data-step="1" data-min="0" data-max="6"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ABOUT SCREEN ══ -->
+  <div class="screen" id="screen-about">
+    <div style="height:8px"></div>
+
+    <div class="about-card">
+      <div class="about-title">What is this?</div>
+      <div class="about-body">
+        A logistic regression model predicting whether <b>mPEDOCS will cross 100</b> — the ED tipping point — within the next 12 or 24 hours. Trained on <b>8,748 hours of 2025 data</b> from a pediatric ED.
+        <br><br>
+        mPEDOCS ≥ 100 is where median Arrival-to-Room time jumps from 22 → 32 min and the 90th percentile crosses 2 hours. It marks the transition from a manageable queue to a decompensating one.
+      </div>
+    </div>
+
+    <div class="about-card">
+      <div class="about-title">12-Hour Model</div>
+      <div class="about-body">
+        <b>AUC 0.77</b> · At p ≥ 0.15: sensitivity 62%, specificity 75%, ~2,500 alerts/yr.
+      </div>
+      <div class="eq-block">
+        <b>log-odds =</b> −3.307<br>
+        + 0.0524 × Backlog<br>
+        + 0.0583 × BL trend 12h<br>
+        + 0.0583 × Admits−Discharges 12h<br>
+        − 0.0211 × mPEDOCS<br>
+        + 0.0059 × mPEDOCS trend 3h<br>
+        + 0.3025 × ED arrivals 3h avg<br>
+        − 0.1124 × Hour of day<br>
+        − 0.0674 × Day of week
+      </div>
+    </div>
+
+    <div class="about-card">
+      <div class="about-title">24-Hour Model</div>
+      <div class="about-body">
+        <b>AUC 0.83</b> · At p ≥ 0.15: sensitivity 72%, specificity 81%, ~2,250 alerts/yr. Outperforms 12h due to the 24h circadian periodicity of mPEDOCS — today's state predicts tomorrow's same-hour state better than what happens at the midpoint.
+      </div>
+      <div class="eq-block">
+        <b>log-odds =</b> −6.357<br>
+        + 0.0101 × Backlog<br>
+        − 0.0160 × BL trend 24h<br>
+        − 0.0160 × Admits−Discharges 24h<br>
+        + 0.0026 × mPEDOCS<br>
+        + 0.0184 × mPEDOCS 6h average<br>
+        + 0.3437 × ED arrivals 6h avg<br>
+        − 0.0051 × Hour of day<br>
+        + 0.0842 × Day of week
+      </div>
+    </div>
+
+    <div class="about-card">
+      <div class="about-title">Alert Tiers</div>
+      <div class="about-body">
+        <div class="tier-row"><div class="tier-pip" style="background:var(--green)"></div><b>LOW &lt;10%</b> · Normal operations</div>
+        <div class="tier-row"><div class="tier-pip" style="background:var(--yellow)"></div><b>WATCH 10–20%</b> · Charge RN awareness</div>
+        <div class="tier-row"><div class="tier-pip" style="background:var(--amber)"></div><b>ADVISORY 20–35%</b> · Alert bed management. Proactive discharge rounds.</div>
+        <div class="tier-row"><div class="tier-pip" style="background:var(--orange)"></div><b>WARNING 35–50%</b> · House supervisor. Pre-position float staff. Overflow ready.</div>
+        <div class="tier-row"><div class="tier-pip" style="background:var(--red)"></div><b>IMMINENT ≥50%</b> · Initiate surge protocol. Same as mPEDOCS=100 response — early.</div>
+      </div>
+    </div>
+
+    <div style="font-size:10px;color:var(--dim);text-align:center;margin-top:8px;line-height:2;padding-bottom:8px;">
+      Pediatric ED · 2025 · n=8,748 hours<br>
+      Time-varying BCCF (1.3 day / 1.9 overnight)<br>
+      Base rate 12.2% · Tipping point mPEDOCS 100
+    </div>
+  </div>
+
+</div><!-- end scroll-area -->
+
+<!-- TAB BAR -->
+<div class="tabbar">
+  <button class="tab-btn active" id="tab-home" onclick="switchTab('home')">
+    <div class="tab-icon">⚡</div>
+    <div class="tab-label">Now</div>
+  </button>
+  <button class="tab-btn" id="tab-results" onclick="switchTab('results')">
+    <div class="tab-icon">📊</div>
+    <div class="tab-label">Detail</div>
+  </button>
+  <button class="tab-btn" id="tab-inputs" onclick="switchTab('inputs')">
+    <div class="tab-icon">🎛</div>
+    <div class="tab-label">Inputs</div>
+  </button>
+  <button class="tab-btn" id="tab-about" onclick="switchTab('about')">
+    <div class="tab-icon">ℹ</div>
+    <div class="tab-label">About</div>
+  </button>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+const STATE = {
+  in_backlog:    36,
+  in_bl_trend:    0,
+  in_bl_trend24:  0,
+  in_imbal:       0,
+  in_imbal24:     0,
+  in_mpedocs:    60,
+  in_mp_roll6:   58,
+  in_mp_trend:    0,
+  in_arrivals:    6,
+  in_arrivals6:   6,
+  in_hour:       14,
+  in_dow:         1,
+};
+
+// ── Models ────────────────────────────────────────────────────────────────────
+const MODEL_12 = {
+  intercept: -3.3067,
+  fields: [
+    { id: 'in_backlog',   coef: +0.052437, label: 'Backlog level'         },
+    { id: 'in_bl_trend',  coef: +0.058284, label: 'Backlog trend 12h'     },
+    { id: 'in_imbal',     coef: +0.058284, label: 'Admits−Discharges 12h' },
+    { id: 'in_mpedocs',   coef: -0.021061, label: 'mPEDOCS current'       },
+    { id: 'in_mp_trend',  coef: +0.005891, label: 'mPEDOCS trend 3h'      },
+    { id: 'in_arrivals',  coef: +0.302516, label: 'ED arrivals 3h avg'    },
+    { id: 'in_hour',      coef: -0.112409, label: 'Hour of day'            },
+    { id: 'in_dow',       coef: -0.067405, label: 'Day of week'            },
+  ]
+};
+
+const MODEL_24 = {
+  intercept: -6.3566,
+  fields: [
+    { id: 'in_backlog',    coef: +0.010079, label: 'Backlog level'          },
+    { id: 'in_bl_trend24', coef: -0.015985, label: 'Backlog trend 24h'      },
+    { id: 'in_imbal24',    coef: -0.015985, label: 'Admits−Discharges 24h'  },
+    { id: 'in_mpedocs',    coef: +0.002591, label: 'mPEDOCS current'        },
+    { id: 'in_mp_roll6',   coef: +0.018403, label: 'mPEDOCS 6h average'     },
+    { id: 'in_arrivals6',  coef: +0.343687, label: 'ED arrivals 6h avg'     },
+    { id: 'in_hour',       coef: -0.005104, label: 'Hour of day'             },
+    { id: 'in_dow',        coef: +0.084240, label: 'Day of week'             },
+  ]
+};
+
+const TIERS = [
+  { max: 0.10, label: 'LOW',      color: '#22c55e', bg: 'rgba(34,197,94,0.08)',   action: 'No action required. Normal operations.' },
+  { max: 0.20, label: 'WATCH',    color: '#eab308', bg: 'rgba(234,179,8,0.08)',   action: 'Charge RN awareness. Monitor WR queue.' },
+  { max: 0.35, label: 'ADVISORY', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', action: 'Alert bed management. Begin proactive discharge rounds on inpatient floors.' },
+  { max: 0.50, label: 'WARNING',  color: '#f97316', bg: 'rgba(249,115,22,0.08)', action: 'Notify house supervisor. Pre-position float staff. Prepare overflow space.' },
+  { max: 1.01, label: 'IMMINENT', color: '#ef4444', bg: 'rgba(239,68,68,0.08)',  action: 'Initiate surge protocol NOW — same response as mPEDOCS=100 arriving 12h early.' },
+];
+
+function getTier(prob) { return TIERS.find(t => prob < t.max) || TIERS[TIERS.length-1]; }
+
+// ── Calculate ─────────────────────────────────────────────────────────────────
+function calcModel(model) {
+  let lo = model.intercept;
+  const contribs = model.fields.map(f => {
+    const c = f.coef * (STATE[f.id] || 0);
+    lo += c;
+    return { label: f.label, contrib: c };
+  });
+  return { prob: 1 / (1 + Math.exp(-lo)), contribs };
+}
+
+// ── Gauge ─────────────────────────────────────────────────────────────────────
+function drawGauge(canvasId, prob, color) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const cx = 100, cy = 96, r = 74, lw = 13;
+  ctx.clearRect(0, 0, 200, 100);
+  // Track
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0);
+  ctx.strokeStyle = '#1e2a3d'; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
+  // Fill
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI + prob * Math.PI);
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
+  // Glow
+  ctx.shadowColor = color; ctx.shadowBlur = 12;
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI + (prob * Math.PI) - 0.02, Math.PI + prob * Math.PI);
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.shadowBlur = 0;
+  // Needle
+  const angle = Math.PI + prob * Math.PI;
+  const nx = cx + (r - 6) * Math.cos(angle), ny = cy + (r - 6) * Math.sin(angle);
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny);
+  ctx.strokeStyle = '#e8edf5'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
+  ctx.fillStyle = '#e8edf5'; ctx.fill();
+  // Labels
+  ctx.font = '9px DM Mono, monospace'; ctx.fillStyle = '#2e3d52';
+  ctx.textAlign = 'left';  ctx.fillText('0%',   18, 96);
+  ctx.textAlign = 'right'; ctx.fillText('100%', 183, 96);
+}
+
+// ── Render drivers ────────────────────────────────────────────────────────────
+function renderDrivers(elId, contribs) {
+  const el = document.getElementById(elId);
+  const maxAbs = Math.max(...contribs.map(c => Math.abs(c.contrib)), 0.01);
+  const sorted = [...contribs].sort((a, b) => Math.abs(b.contrib) - Math.abs(a.contrib));
+  el.innerHTML = sorted.map(({ label, contrib }) => {
+    const pct  = Math.round(Math.abs(contrib) / maxAbs * 100);
+    const col  = contrib >= 0 ? '#f97316' : '#3b82f6';
+    const sign = contrib >= 0 ? '+' : '';
+    return `<div class="driver-row">
+      <div class="driver-name">${label}</div>
+      <div class="driver-bar-bg">
+        <div class="driver-bar" style="width:${pct}%;background:${col}"></div>
+      </div>
+      <div class="driver-val">${sign}${contrib.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Snapshot for home ─────────────────────────────────────────────────────────
+function renderSnapshot() {
+  const items = [
+    ['Backlog', STATE.in_backlog],
+    ['BL trend 12h', (STATE.in_bl_trend >= 0 ? '+' : '') + STATE.in_bl_trend],
+    ['mPEDOCS', STATE.in_mpedocs],
+    ['mP trend 3h', (STATE.in_mp_trend >= 0 ? '+' : '') + STATE.in_mp_trend],
+    ['Arrivals 3h', STATE.in_arrivals + '/hr'],
+    ['Arrivals 6h', STATE.in_arrivals6 + '/hr'],
+    ['Hour', STATE.in_hour + ':00'],
+    ['Day', ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][STATE.in_dow] || STATE.in_dow],
+  ];
+  document.getElementById('snapshot').innerHTML = items.map(([k, v]) =>
+    `<div style="color:var(--muted);font-size:11px;">${k} <span style="color:var(--text)">${v}</span></div>`
+  ).join('');
+}
+
+// ── Main render ───────────────────────────────────────────────────────────────
+function render() {
+  const r12 = calcModel(MODEL_12);
+  const r24 = calcModel(MODEL_24);
+  const t12 = getTier(r12.prob);
+  const t24 = getTier(r24.prob);
+
+  // Home screen
+  ['12','24'].forEach(h => {
+    const r = h === '12' ? r12 : r24;
+    const t = h === '12' ? t12 : t24;
+    const pct = Math.round(r.prob * 100) + '%';
+    document.getElementById(`home-prob-${h}`).textContent = pct;
+    document.getElementById(`home-prob-${h}`).style.color = t.color;
+    document.getElementById(`home-tier-${h}`).textContent = t.label;
+    document.getElementById(`home-tier-${h}`).style.color = t.color;
+    document.getElementById(`home-action-${h}`).textContent = t.action;
+  });
+
+  // Conflict banner: tiers differ by 2+ levels
+  const t12i = TIERS.indexOf(t12), t24i = TIERS.indexOf(t24);
+  const banner = document.getElementById('conflict-banner');
+  banner.classList.toggle('show', Math.abs(t12i - t24i) >= 2);
+
+  // Results screen
+  ['12','24'].forEach(h => {
+    const r = h === '12' ? r12 : r24;
+    const t = h === '12' ? t12 : t24;
+    const pct = Math.round(r.prob * 100);
+
+    const rc = document.getElementById(`rc-${h}`);
+    rc.style.background = t.bg;
+    rc.style.borderColor = t.color;
+    rc.style.setProperty('--tier-color', t.color);
+
+    document.getElementById(`rp-${h}`).innerHTML = pct + '<sup>%</sup>';
+    document.getElementById(`rp-${h}`).style.color = t.color;
+
+    const tb = document.getElementById(`rt-${h}`);
+    tb.textContent = t.label;
+    tb.style.color = t.color;
+    tb.style.borderColor = t.color;
+
+    document.getElementById(`ra-${h}`).textContent = t.action;
+
+    drawGauge(`gauge-${h}`, r.prob, t.color);
+    renderDrivers(`drv-${h}`, r.contribs);
+  });
+
+  renderSnapshot();
+}
+
+// ── Steppers ─────────────────────────────────────────────────────────────────
+function buildSteppers() {
+  document.querySelectorAll('.stepper').forEach(wrap => {
+    const id   = wrap.dataset.id;
+    const step = parseFloat(wrap.dataset.step) || 1;
+    const min  = parseFloat(wrap.dataset.min)  || 0;
+    const max  = parseFloat(wrap.dataset.max)  || 100;
+
+    wrap.innerHTML = `
+      <button class="step-btn" data-dir="-1">−</button>
+      <input class="step-val" type="number" value="${STATE[id]}" min="${min}" max="${max}">
+      <button class="step-btn" data-dir="1">+</button>
+    `;
+
+    const input = wrap.querySelector('.step-val');
+    const btns  = wrap.querySelectorAll('.step-btn');
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = parseFloat(btn.dataset.dir);
+        const cur = parseFloat(input.value) || 0;
+        const nv  = Math.min(max, Math.max(min, cur + dir * step));
+        input.value = nv;
+        STATE[id] = nv;
+        render();
+      });
+    });
+
+    input.addEventListener('change', () => {
+      const nv = Math.min(max, Math.max(min, parseFloat(input.value) || 0));
+      input.value = nv;
+      STATE[id] = nv;
+      render();
+    });
+  });
+}
+
+// ── Tab nav ───────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('scroll-area').scrollTop = 0;
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(function init() {
+  const now = new Date();
+  STATE.in_hour = now.getHours();
+  STATE.in_dow  = now.getDay() === 0 ? 6 : now.getDay() - 1;
+  buildSteppers();
+  // Sync stepper displays for hour/dow
+  ['in_hour','in_dow'].forEach(id => {
+    const input = document.querySelector(`.stepper[data-id="${id}"] .step-val`);
+    if (input) input.value = STATE[id];
+  });
+  render();
+})();
+</script>
+</body>
+</html>
