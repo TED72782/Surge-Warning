@@ -34,8 +34,6 @@ html, body {
   font-family: 'DM Mono', monospace; font-size: 13px;
   overflow: hidden; -webkit-font-smoothing: antialiased;
 }
-
-/* ── CHROME ── */
 .status-bar {
   height: env(safe-area-inset-top, 44px); background: var(--bg);
   position: fixed; top: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; z-index: 100;
@@ -55,7 +53,6 @@ html, body {
   border-radius: 50%; margin-right: 5px; animation: blink 2s infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
 .scroll-area {
   position: fixed;
   top: calc(env(safe-area-inset-top, 44px) + 56px);
@@ -66,7 +63,6 @@ html, body {
 .screen { display: none; padding: 16px 16px 24px; animation: fadeIn 0.2s ease; }
 .screen.active { display: block; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto;
   height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
@@ -82,8 +78,6 @@ html, body {
 .tab-btn.active { color: var(--text); }
 .tab-icon { font-size: 21px; line-height: 1; }
 .tab-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; }
-
-/* ── SHARED COMPONENTS ── */
 .card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px;
@@ -93,8 +87,6 @@ html, body {
   letter-spacing: 0.14em; margin: 20px 0 10px;
 }
 .section-label:first-child { margin-top: 8px; }
-
-/* ── HOME: SUMMARY CARDS ── */
 .summary-card {
   background: var(--surface); border: 1.5px solid var(--border);
   border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px;
@@ -114,15 +106,12 @@ html, body {
 .sc-tier { font-size: 14px; font-weight: 500; margin-bottom: 3px; transition: color 0.3s; }
 .sc-action { font-size: 11px; color: var(--muted); line-height: 1.6; }
 .sc-arrow { font-size: 18px; color: var(--dim); }
-
 .alert-banner {
   background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.35);
   border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;
   display: none; align-items: center; gap: 10px; font-size: 12px; color: #fca5a5;
 }
 .alert-banner.show { display: flex; }
-
-/* ── RESULTS ── */
 .result-card {
   border: 1.5px solid var(--border); border-radius: var(--radius);
   padding: 20px; margin-bottom: 12px; transition: all 0.3s;
@@ -142,8 +131,6 @@ html, body {
   padding: 5px 14px; border-radius: 20px; border: 1.5px solid; transition: all 0.3s; white-space: nowrap;
 }
 .result-action { font-size: 11px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 10px; }
-
-/* ── DRIVERS ── */
 .drivers-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
 .drivers-title { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
 .driver-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
@@ -151,8 +138,6 @@ html, body {
 .driver-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
 .driver-bar { height: 4px; border-radius: 2px; transition: width 0.35s; min-width: 2px; }
 .driver-val { font-size: 10px; color: var(--muted); width: 38px; text-align: right; flex-shrink: 0; }
-
-/* ── STEPPERS (inputs) ── */
 .input-group { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
 .input-row { display: flex; align-items: center; padding: 13px 16px; border-bottom: 1px solid var(--border); gap: 10px; }
 .input-row:last-child { border-bottom: none; }
@@ -172,8 +157,6 @@ html, body {
   outline: none; padding: 0 2px;
 }
 .step-val:focus { color: var(--blue); }
-
-/* ── mPEDOCS CALCULATOR ── */
 .mp-calc-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 20px; margin-bottom: 12px;
@@ -182,8 +165,6 @@ html, body {
 .mp-calc-sub { font-size: 10px; color: var(--muted); margin-bottom: 16px; letter-spacing: 0.08em; }
 .mp-field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .mp-field-label { flex: 1; font-size: 12px; color: var(--muted); }
-
-/* Big result display */
 .mp-result-row {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--surf2); border: 1px solid var(--border2);
@@ -205,8 +186,6 @@ html, body {
 }
 .mp-level-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
 .mp-formula-line { font-size: 10px; color: var(--dim); margin-top: 8px; }
-
-/* Tipping point indicator */
 .mp-tipping-bar {
   height: 4px; background: var(--border); border-radius: 2px;
   margin: 12px 0 4px; position: relative; overflow: visible;
@@ -215,14 +194,13 @@ html, body {
 .mp-tipping-marker {
   position: absolute; top: -8px; width: 2px; height: 20px;
   background: var(--orange); border-radius: 1px;
-  left: 38.46%; /* 100/260 */
+  left: 38.46%;
 }
 .mp-tipping-label {
   position: absolute; top: 14px; left: 36%; font-size: 9px;
   color: var(--orange); white-space: nowrap;
 }
 .mp-bar-labels { display: flex; justify-content: space-between; font-size: 9px; color: var(--dim); margin-bottom: 10px; }
-
 .mp-log-btn {
   width: 100%; margin-top: 12px; padding: 14px;
   background: var(--surf2); border: 1.5px solid var(--border2);
@@ -231,8 +209,6 @@ html, body {
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .mp-log-btn:active { background: var(--border); }
-
-/* BCCF bed count display */
 .bccf-result {
   display: flex; align-items: center; gap: 10px;
   background: var(--surf2); border: 1px solid var(--border2);
@@ -240,8 +216,6 @@ html, body {
 }
 .bccf-val { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--blue); min-width: 36px; text-align: center; }
 .bccf-label { font-size: 10px; color: var(--muted); line-height: 1.5; }
-
-/* ── LOG SECTION ── */
 .log-toolbar {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 12px;
@@ -256,7 +230,6 @@ html, body {
 .log-btn:active { background: var(--border); }
 .log-btn.danger:active { background: rgba(239,68,68,0.15); color: var(--red); }
 .log-empty { font-size: 12px; color: var(--dim); text-align: center; padding: 28px 0; line-height: 1.9; }
-
 .log-entry {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 14px; border-radius: 12px;
@@ -277,20 +250,11 @@ html, body {
 .log-detail { font-size: 10px; color: var(--dim); margin-top: 2px; }
 .log-delete { font-size: 18px; color: var(--dim); cursor: pointer; padding: 4px; line-height: 1; }
 .log-delete:active { color: var(--red); }
-
-/* Log trend mini-chart */
 .log-trend-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
 }
 .log-trend-title { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
-
-/* ── STEPPERS (inputs) ── */
-.input-group { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
-.input-row { display: flex; align-items: center; padding: 13px 16px; border-bottom: 1px solid var(--border); gap: 10px; }
-.input-row:last-child { border-bottom: none; }
-
-/* ── ABOUT ── */
 .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; }
 .about-title { font-family: 'Instrument Serif', serif; font-size: 18px; margin-bottom: 8px; }
 .about-body { font-size: 12px; color: var(--muted); line-height: 1.8; }
@@ -311,13 +275,37 @@ html, body {
 
 <div class="scroll-area" id="scroll-area">
 
-  <!-- ══ HOME ══ -->
+  <!-- HOME -->
   <div class="screen active" id="screen-home">
-    <div class="alert-banner" id="conflict-banner">
-      <span style="font-size:18px">⚡</span>
-      <div>12h and 24h signals diverge significantly — check Detail tab.</div>
+    <div id="home-mpedocs-card" style="
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:var(--radius); padding:16px 20px; margin-bottom:12px;
+      display:flex; align-items:center; gap:16px; cursor:pointer;
+      position:relative; overflow:hidden; transition:border-color 0.3s;
+    " onclick="switchTab('mpedocs')">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--muted);transition:background 0.3s;" id="home-mp-bar"></div>
+      <div id="home-mp-score" style="font-family:'Instrument Serif',serif;font-size:48px;line-height:1;min-width:78px;text-align:center;color:var(--muted);">—</div>
+      <div style="flex:1;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:2px;">mPEDOCS · Last logged</div>
+        <div id="home-mp-level" style="font-size:14px;font-weight:500;margin-bottom:3px;color:var(--muted);">No readings yet</div>
+        <div id="home-mp-atr" style="font-size:11px;color:var(--muted);">Go to mPEDOCS tab to log</div>
+      </div>
+      <div style="font-size:18px;color:var(--dim);">›</div>
     </div>
 
+    <div class="alert-banner" id="conflict-banner">
+      <span style="font-size:18px">⚡</span>
+      <div>8h and 24h signals diverge significantly — check Detail tab.</div>
+    </div>
+    <div class="summary-card" id="sc-8" onclick="switchTab('results')">
+      <div class="sc-num" id="h-prob-8">—</div>
+      <div class="sc-right">
+        <div class="sc-horizon">8-Hour Warning · AUC 0.77</div>
+        <div class="sc-tier" id="h-tier-8">—</div>
+        <div class="sc-action" id="h-action-8">—</div>
+      </div>
+      <div class="sc-arrow">›</div>
+    </div>
     <div class="summary-card" id="sc-12" onclick="switchTab('results')">
       <div class="sc-num" id="h-prob-12">—</div>
       <div class="sc-right">
@@ -327,7 +315,6 @@ html, body {
       </div>
       <div class="sc-arrow">›</div>
     </div>
-
     <div class="summary-card" id="sc-24" onclick="switchTab('results')">
       <div class="sc-num" id="h-prob-24">—</div>
       <div class="sc-right">
@@ -337,21 +324,32 @@ html, body {
       </div>
       <div class="sc-arrow">›</div>
     </div>
-
     <div class="section-label">Current inputs</div>
     <div class="card" style="padding:14px 16px;">
       <div id="snapshot" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;font-size:12px;"></div>
     </div>
-
     <div style="font-size:10px;color:var(--dim);text-align:center;margin-top:8px;line-height:1.8;">
       Base rate 12.2% · Trained on 8,748 hours · 2025<br>
-      Tipping point mPEDOCS 100
+      Tipping point mPEDOCS 100 · 8h model requires no backlog inputs
     </div>
   </div>
 
-  <!-- ══ RESULTS ══ -->
+  <!-- RESULTS -->
   <div class="screen" id="screen-results">
-
+    <div class="result-card" id="rc-8">
+      <div class="rc-label">8-Hour Surge Warning · AUC 0.77</div>
+      <div class="gauge-wrap"><canvas id="gauge-8" width="200" height="100"></canvas></div>
+      <div class="result-row">
+        <div class="result-prob" id="rp-8">—</div>
+        <div class="tier-badge" id="rt-8">—</div>
+      </div>
+      <div class="result-action" id="ra-8">—</div>
+    </div>
+    <div class="drivers-wrap">
+      <div class="drivers-title">Score drivers · 8-hour model</div>
+      <div id="drv-8"></div>
+    </div>
+    <div style="height:8px"></div>
     <div class="result-card" id="rc-12">
       <div class="rc-label">12-Hour Surge Warning · AUC 0.73</div>
       <div class="gauge-wrap"><canvas id="gauge-12" width="200" height="100"></canvas></div>
@@ -365,9 +363,7 @@ html, body {
       <div class="drivers-title">Score drivers · 12-hour model</div>
       <div id="drv-12"></div>
     </div>
-
     <div style="height:8px"></div>
-
     <div class="result-card" id="rc-24">
       <div class="rc-label">24-Hour Surge Warning · AUC 0.80</div>
       <div class="gauge-wrap"><canvas id="gauge-24" width="200" height="100"></canvas></div>
@@ -383,10 +379,88 @@ html, body {
     </div>
   </div>
 
-  <!-- ══ INPUTS ══ -->
+  <!-- INPUTS -->
   <div class="screen" id="screen-inputs">
 
-    <div class="section-label">Inpatient backlog</div>
+    <!-- Auto-fill banner -->
+    <div id="log-sync-banner" style="
+      background:var(--surf2); border:1px solid var(--border2); border-radius:14px;
+      padding:12px 14px; margin-bottom:16px; display:flex; align-items:center; gap:12px;
+    ">
+      <div style="flex:1;">
+        <div style="font-size:12px;color:var(--text);margin-bottom:2px;">Auto-fill from mPEDOCS Log</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.6;" id="log-sync-status">
+          No readings logged yet — go to mPEDOCS tab to log measurements.
+        </div>
+      </div>
+      <button id="log-sync-btn" onclick="syncFromLog()" style="
+        padding:9px 16px; border-radius:10px; border:1px solid var(--border2);
+        background:var(--surface); color:var(--muted); font-family:'DM Mono',monospace;
+        font-size:11px; cursor:pointer; white-space:nowrap; transition:all 0.15s; flex-shrink:0;
+      ">↑ Pull</button>
+    </div>
+
+    <!-- ── 8-HOUR MODEL ── -->
+    <div class="section-label" style="margin-top:4px;">
+      <span style="color:var(--text);font-size:11px;">8-Hour Model</span>
+      <span style="color:var(--dim);margin-left:6px;">AUC 0.77 · no backlog needed</span>
+    </div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS (current)
+            <span id="sync-dot-mpedocs" style="display:none;margin-left:6px;font-size:9px;background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
+          </div>
+          <div class="input-label-sub">Live score</div>
+        </div>
+        <div class="stepper" data-id="in_mpedocs" data-step="5" data-min="0" data-max="260"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS trend (3h)
+            <span id="sync-dot-mp_trend" style="display:none;margin-left:6px;font-size:9px;background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
+          </div>
+          <div class="input-label-sub">Current − 3h ago</div>
+        </div>
+        <div class="stepper" data-id="in_mp_trend" data-step="5" data-min="-100" data-max="100"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS 3h average
+            <span id="sync-dot-mp_roll3" style="display:none;margin-left:6px;font-size:9px;background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
+          </div>
+          <div class="input-label-sub">Rolling mean last 3h</div>
+        </div>
+        <div class="stepper" data-id="in_mp_roll3" data-step="5" data-min="0" data-max="260"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">ED arrivals (3h avg)</div>
+          <div class="input-label-sub">Per hour</div>
+        </div>
+        <div class="stepper" data-id="in_arrivals" data-step="1" data-min="0" data-max="25"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Hour of day</div>
+          <div class="input-label-sub">0 = midnight · 23 = 11 pm</div>
+        </div>
+        <div class="stepper" data-id="in_hour" data-step="1" data-min="0" data-max="23"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Day of week</div>
+          <div class="input-label-sub">Mon=0 ··· Sun=6</div>
+        </div>
+        <div class="stepper" data-id="in_dow" data-step="1" data-min="0" data-max="6"></div>
+      </div>
+    </div>
+
+    <!-- ── 12-HOUR MODEL ── -->
+    <div class="section-label">
+      <span style="color:var(--text);font-size:11px;">12-Hour Model</span>
+      <span style="color:var(--dim);margin-left:6px;">AUC 0.73</span>
+    </div>
     <div class="input-group">
       <div class="input-row">
         <div class="input-label">
@@ -398,141 +472,100 @@ html, body {
       <div class="input-row">
         <div class="input-label">
           <div class="input-label-main">Backlog trend (12h)</div>
-          <div class="input-label-sub">Backlog now − 12h ago · 12h model</div>
+          <div class="input-label-sub">Backlog now − 12h ago</div>
         </div>
         <div class="stepper" data-id="in_bl_trend" data-step="1" data-min="-30" data-max="30"></div>
       </div>
       <div class="input-row">
         <div class="input-label">
+          <div class="input-label-main">mPEDOCS (current)</div>
+          <div class="input-label-sub">Live score</div>
+        </div>
+        <div class="stepper" data-id="in_mpedocs" data-step="5" data-min="0" data-max="260" data-nodupe="1"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">mPEDOCS trend (3h)</div>
+          <div class="input-label-sub">Current − 3h ago</div>
+        </div>
+        <div class="stepper" data-id="in_mp_trend" data-step="5" data-min="-100" data-max="100" data-nodupe="1"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">ED arrivals (3h avg)</div>
+          <div class="input-label-sub">Per hour</div>
+        </div>
+        <div class="stepper" data-id="in_arrivals" data-step="1" data-min="0" data-max="25" data-nodupe="1"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Hour of day</div>
+          <div class="input-label-sub">0 = midnight · 23 = 11 pm</div>
+        </div>
+        <div class="stepper" data-id="in_hour" data-step="1" data-min="0" data-max="23" data-nodupe="1"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Day of week</div>
+          <div class="input-label-sub">Mon=0 ··· Sun=6</div>
+        </div>
+        <div class="stepper" data-id="in_dow" data-step="1" data-min="0" data-max="6" data-nodupe="1"></div>
+      </div>
+    </div>
+
+    <!-- ── 24-HOUR MODEL ── -->
+    <div class="section-label">
+      <span style="color:var(--text);font-size:11px;">24-Hour Model</span>
+      <span style="color:var(--dim);margin-left:6px;">AUC 0.80</span>
+    </div>
+    <div class="input-group">
+      <div class="input-row">
+        <div class="input-label">
+          <div class="input-label-main">Backlog (current)</div>
+          <div class="input-label-sub">Running IPS admits − discharges</div>
+        </div>
+        <div class="stepper" data-id="in_backlog" data-step="1" data-min="0" data-max="100" data-nodupe="1"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">
           <div class="input-label-main">Backlog trend (24h)</div>
-          <div class="input-label-sub">Backlog now − 24h ago · 24h model</div>
+          <div class="input-label-sub">Backlog now − 24h ago</div>
         </div>
         <div class="stepper" data-id="in_bl_trend24" data-step="1" data-min="-30" data-max="30"></div>
-      </div>
-    </div>
-
-    <div class="section-label">Inpatient flow</div>
-    <div class="input-group">
-      <div class="input-row">
-        <div class="input-label">
-          <div class="input-label-main">Admits − Discharges (12h)</div>
-          <div class="input-label-sub">Net inpatient flow · 12h model</div>
-        </div>
-        <div class="stepper" data-id="in_imbal" data-step="1" data-min="-30" data-max="30"></div>
-      </div>
-      <div class="input-row">
-        <div class="input-label">
-          <div class="input-label-main">Admits − Discharges (24h)</div>
-          <div class="input-label-sub">Net inpatient flow · 24h model</div>
-        </div>
-        <div class="stepper" data-id="in_imbal24" data-step="1" data-min="-40" data-max="40"></div>
-      </div>
-    </div>
-
-    <div class="section-label">ED state</div>
-
-    <!-- Pull from log banner -->
-    <div id="log-sync-banner" style="
-      background:var(--surf2); border:1px solid var(--border2); border-radius:14px;
-      padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; gap:12px;
-    ">
-      <div style="flex:1;">
-        <div style="font-size:12px;color:var(--text);margin-bottom:2px;">Auto-fill from mPEDOCS Log</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.6;" id="log-sync-status">
-          No readings logged yet — go to mPEDOCS tab to log measurements.
-        </div>
-      </div>
-      <button id="log-sync-btn" onclick="syncFromLog()" style="
-        padding:9px 16px; border-radius:10px; border:1px solid var(--border2);
-        background:var(--surface); color:var(--muted); font-family:'DM Mono',monospace;
-        font-size:11px; cursor:pointer; white-space:nowrap; transition:all 0.15s;
-        flex-shrink:0;
-      ">↑ Pull</button>
-    </div>
-
-    <div class="input-group">
-      <div class="input-row">
-        <div class="input-label">
-          <div class="input-label-main">mPEDOCS (current)
-            <span id="sync-dot-mpedocs" style="display:none;margin-left:6px;font-size:9px;
-              background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);
-              border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
-          </div>
-          <div class="input-label-sub">Live score · 12h model only</div>
-        </div>
-        <div class="stepper" data-id="in_mpedocs" data-step="5" data-min="0" data-max="260"></div>
       </div>
       <div class="input-row">
         <div class="input-label">
           <div class="input-label-main">mPEDOCS 6h average
-            <span id="sync-dot-mp_roll6" style="display:none;margin-left:6px;font-size:9px;
-              background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);
-              border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
+            <span id="sync-dot-mp_roll6" style="display:none;margin-left:6px;font-size:9px;background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
           </div>
-          <div class="input-label-sub">Rolling mean last 6h · 24h model</div>
+          <div class="input-label-sub">Rolling mean last 6h</div>
         </div>
         <div class="stepper" data-id="in_mp_roll6" data-step="5" data-min="0" data-max="260"></div>
       </div>
       <div class="input-row">
         <div class="input-label">
-          <div class="input-label-main">mPEDOCS trend (3h)
-            <span id="sync-dot-mp_trend" style="display:none;margin-left:6px;font-size:9px;
-              background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);
-              border-radius:4px;padding:1px 5px;vertical-align:middle;">from log</span>
-          </div>
-          <div class="input-label-sub">Current − 3h ago · 12h model</div>
-        </div>
-        <div class="stepper" data-id="in_mp_trend" data-step="5" data-min="-100" data-max="100"></div>
-      </div>
-    </div>
-
-    <div class="section-label">Arrivals</div>
-    <div class="input-group">
-      <div class="input-row">
-        <div class="input-label">
-          <div class="input-label-main">ED arrivals (3h avg)</div>
-          <div class="input-label-sub">Per hour · 12h model</div>
-        </div>
-        <div class="stepper" data-id="in_arrivals" data-step="1" data-min="0" data-max="25"></div>
-      </div>
-      <div class="input-row">
-        <div class="input-label">
           <div class="input-label-main">ED arrivals (6h avg)</div>
-          <div class="input-label-sub">Per hour · 24h model</div>
+          <div class="input-label-sub">Per hour</div>
         </div>
         <div class="stepper" data-id="in_arrivals6" data-step="1" data-min="0" data-max="25"></div>
-      </div>
-    </div>
-
-    <div class="section-label">Time</div>
-    <div class="input-group">
-      <div class="input-row">
-        <div class="input-label">
-          <div class="input-label-main">Hour of day</div>
-          <div class="input-label-sub">0 = midnight · 23 = 11 pm · 12h model only</div>
-        </div>
-        <div class="stepper" data-id="in_hour" data-step="1" data-min="0" data-max="23"></div>
       </div>
       <div class="input-row">
         <div class="input-label">
           <div class="input-label-main">Day of week</div>
-          <div class="input-label-sub">Mon=0 ··· Sun=6 · both models</div>
+          <div class="input-label-sub">Mon=0 ··· Sun=6</div>
         </div>
-        <div class="stepper" data-id="in_dow" data-step="1" data-min="0" data-max="6"></div>
+        <div class="stepper" data-id="in_dow" data-step="1" data-min="0" data-max="6" data-nodupe="1"></div>
       </div>
     </div>
+
   </div>
 
-  <!-- ══ mPEDOCS CALCULATOR ══ -->
+  <!-- mPEDOCS -->
   <div class="screen" id="screen-mpedocs">
-
     <div class="section-label" style="margin-top:8px;">mPEDOCS Calculator</div>
-
     <div class="mp-calc-card">
       <div class="mp-calc-title">mPEDOCS Score</div>
       <div class="mp-calc-sub">MODIFIED PEDIATRIC ED OVERCROWDING SCALE</div>
-
-      <!-- Inputs -->
       <div class="mp-field-row">
         <div class="mp-field-label">Patients in waiting room (WR)</div>
         <div class="stepper" data-id="mp_wr" data-step="1" data-min="0" data-max="60" data-mpfield="1"></div>
@@ -541,7 +574,6 @@ html, body {
         <div class="mp-field-label">Total registered patients (TP)</div>
         <div class="stepper" data-id="mp_tp" data-step="1" data-min="0" data-max="120" data-mpfield="1"></div>
       </div>
-
       <div class="mp-field-row" style="align-items:center;margin-top:4px;">
         <div class="mp-field-label">Available ED beds</div>
         <div class="stepper" data-id="mp_beds" data-step="1" data-min="10" data-max="80" data-mpfield="1"></div>
@@ -553,8 +585,6 @@ html, body {
           <div class="bccf-label">BCCF</div>
         </div>
       </div>
-
-      <!-- Big result -->
       <div class="mp-result-row" id="mp-result-row">
         <div class="mp-score-block">
           <div class="mp-result-label">mPEDOCS Score</div>
@@ -566,8 +596,6 @@ html, body {
           <div class="mp-level-desc" id="mp-level-desc">—</div>
         </div>
       </div>
-
-      <!-- Progress bar toward tipping point -->
       <div style="margin-top:16px;">
         <div class="mp-tipping-bar">
           <div class="mp-tipping-fill" id="mp-tipping-fill"></div>
@@ -576,29 +604,22 @@ html, body {
         </div>
         <div class="mp-bar-labels"><span>0</span><span>100</span><span>200</span><span>260</span></div>
       </div>
-
-      <!-- Log button -->
       <button class="mp-log-btn" id="mp-log-btn" onclick="logMpedocs()">
         <span id="mp-log-btn-icon">＋</span>
         <span id="mp-log-btn-text">Log this measurement</span>
       </button>
     </div>
-
     <div class="card" style="font-size:11px;color:var(--muted);line-height:1.9;padding:14px 16px;">
       <b style="color:var(--text);">Formula:</b> mPEDOCS = 33.3 × (0.11 + 0.07×WR + 0.04×TP) × BCCF<br>
       <b style="color:var(--text);">BCCF:</b> 40 ÷ available beds (min 0.8) &nbsp;|&nbsp; Ideal ED = 40 beds<br>
       <b style="color:var(--text);">Reference:</b> 10 beds→4.0 · 20→2.0 · 30→1.3 · 40→1.0 · 50→0.8<br>
       <b style="color:var(--text);">Tipping point:</b> score ≥ 100 → activate surge protocol
     </div>
-
-    <!-- Trend mini-chart (shows when ≥2 readings) -->
     <div class="log-trend-card" id="trend-card" style="display:none;">
       <div class="log-trend-title">Session Trend</div>
       <canvas id="trend-canvas" height="60" style="width:100%;display:block;"></canvas>
       <div id="trend-stats" style="font-size:10px;color:var(--muted);margin-top:8px;display:flex;gap:16px;"></div>
     </div>
-
-    <!-- Log -->
     <div class="section-label">Measurement Log</div>
     <div class="card" style="padding:14px 16px;">
       <div class="log-toolbar">
@@ -614,10 +635,9 @@ html, body {
     </div>
   </div>
 
-  <!-- ══ ABOUT ══ -->
+  <!-- ABOUT -->
   <div class="screen" id="screen-about">
     <div style="height:8px"></div>
-
     <div class="about-card">
       <div class="about-title">What is this?</div>
       <div class="about-body">
@@ -626,7 +646,19 @@ html, body {
         time jumps from 22 → 83 min and the 90th percentile crosses 2 hours.
       </div>
     </div>
-
+    <div class="about-card">
+      <div class="about-title">8-Hour Model</div>
+      <div class="about-body"><b>AUC 0.77</b> · p ≥ 0.25 → sens 73%, spec 65%, ~3,700 alerts/yr · No backlog inputs</div>
+      <div class="eq-block">
+        <b>log-odds =</b> −2.715<br>
+        + 0.0573 × mPEDOCS current<br>
+        + 0.0096 × mPEDOCS trend 3h<br>
+        − 0.0304 × mPEDOCS roll 3h<br>
+        + 0.1208 × ED arrivals 3h avg<br>
+        − 0.0358 × Hour of day<br>
+        − 0.1099 × Day of week
+      </div>
+    </div>
     <div class="about-card">
       <div class="about-title">12-Hour Model</div>
       <div class="about-body"><b>AUC 0.73</b> · p ≥ 0.15 → sens 62%, spec 75%, ~2,500 alerts/yr</div>
@@ -634,7 +666,6 @@ html, body {
         <b>log-odds =</b> −3.307<br>
         + 0.0524 × Backlog<br>
         + 0.0583 × BL trend 12h<br>
-        + 0.0583 × Admits−Discharges 12h<br>
         − 0.0211 × mPEDOCS current<br>
         + 0.0059 × mPEDOCS trend 3h<br>
         + 0.3025 × ED arrivals 3h avg<br>
@@ -642,7 +673,6 @@ html, body {
         − 0.0674 × Day of week
       </div>
     </div>
-
     <div class="about-card">
       <div class="about-title">24-Hour Model</div>
       <div class="about-body"><b>AUC 0.80</b> · p ≥ 0.15 → sens 72%, spec 81%, ~2,250 alerts/yr</div>
@@ -650,13 +680,11 @@ html, body {
         <b>log-odds =</b> −6.457<br>
         + 0.0105 × Backlog<br>
         − 0.0159 × BL trend 24h<br>
-        − 0.0159 × Admits−Discharges 24h<br>
         + 0.0208 × mPEDOCS 6h average<br>
         + 0.3488 × ED arrivals 6h avg<br>
         + 0.0854 × Day of week
       </div>
     </div>
-
     <div class="about-card">
       <div class="about-title">Alert Tiers</div>
       <div class="about-body">
@@ -667,7 +695,6 @@ html, body {
         <div class="tier-row"><div class="tier-pip" style="background:var(--red)"></div><div><b>IMMINENT ≥50%</b> · Surge protocol now. Same as mPEDOCS=100 — early.</div></div>
       </div>
     </div>
-
     <div class="about-card">
       <div class="about-title">mPEDOCS Levels</div>
       <div class="about-body">
@@ -678,7 +705,6 @@ html, body {
         <div class="tier-row"><div class="tier-pip" style="background:var(--red)"></div><div><b>L6–7 (&gt;180)</b> · Dangerously crowded. Median ATR 145+ min.</div></div>
       </div>
     </div>
-
     <div style="font-size:10px;color:var(--dim);text-align:center;margin-top:4px;line-height:2;padding-bottom:8px;">
       Cincinnati Children's / Stanford · Journal of Emergency Nursing 2026<br>
       Time-varying BCCF · Ideal ED = 40 beds · BCCF = 40 ÷ available beds
@@ -708,33 +734,42 @@ html, body {
 
 <script>
 // ── MODELS ────────────────────────────────────────────────────────────────────
-// 12h: FULL 8-input model — mPEDOCS trend 3h RETAINED (user decision)
-// Coefficients: full refitted model (not trimmed)
-const MODEL_12 = {
-  intercept: -3.307,
+// 8h: No backlog inputs — AUC 0.77. mPEDOCS current dominates at this horizon.
+const MODEL_8 = {
+  intercept: -2.715,
   fields: [
-    { id:'in_backlog',   coef:+0.052400, label:'Backlog level'         },
-    { id:'in_bl_trend',  coef:+0.058300, label:'Backlog trend 12h'     },
-    { id:'in_imbal',     coef:+0.058300, label:'Admits−Discharges 12h' },
-    { id:'in_mpedocs',   coef:-0.021100, label:'mPEDOCS current'       },
-    { id:'in_mp_trend',  coef:+0.005900, label:'mPEDOCS trend 3h'      },  // retained
-    { id:'in_arrivals',  coef:+0.302500, label:'ED arrivals 3h avg'    },
-    { id:'in_hour',      coef:-0.112400, label:'Hour of day'            },
-    { id:'in_dow',       coef:-0.067400, label:'Day of week'            },
+    { id:'in_mpedocs',   coef:+0.057254, label:'mPEDOCS current'    },
+    { id:'in_mp_trend',  coef:+0.009617, label:'mPEDOCS trend 3h'   },
+    { id:'in_mp_roll3',  coef:-0.030363, label:'mPEDOCS roll 3h'    },
+    { id:'in_arrivals',  coef:+0.120812, label:'ED arrivals 3h avg' },
+    { id:'in_hour',      coef:-0.035842, label:'Hour of day'         },
+    { id:'in_dow',       coef:-0.109946, label:'Day of week'         },
   ]
 };
 
-// 24h: TRIMMED 6-input model — mPEDOCS current (β=0.003) + Hour of day (β=0.005) REMOVED
-// ΔAUC = −0.0002, negligible
+// 12h: Admits−Discharges 12h REMOVED (ΔAUC = 0, duplicate of BL trend 12h)
+const MODEL_12 = {
+  intercept: -3.307,
+  fields: [
+    { id:'in_backlog',   coef:+0.052400, label:'Backlog level'      },
+    { id:'in_bl_trend',  coef:+0.058300, label:'Backlog trend 12h'  },
+    { id:'in_mpedocs',   coef:-0.021100, label:'mPEDOCS current'    },
+    { id:'in_mp_trend',  coef:+0.005900, label:'mPEDOCS trend 3h'   },
+    { id:'in_arrivals',  coef:+0.302500, label:'ED arrivals 3h avg' },
+    { id:'in_hour',      coef:-0.112400, label:'Hour of day'         },
+    { id:'in_dow',       coef:-0.067400, label:'Day of week'         },
+  ]
+};
+
+// 24h: Admits−Discharges 24h REMOVED (ΔAUC = 0, duplicate of BL trend 24h)
 const MODEL_24 = {
   intercept: -6.457,
   fields: [
-    { id:'in_backlog',    coef:+0.010500, label:'Backlog level'          },
-    { id:'in_bl_trend24', coef:-0.015900, label:'Backlog trend 24h'      },
-    { id:'in_imbal24',    coef:-0.015900, label:'Admits−Discharges 24h'  },
-    { id:'in_mp_roll6',   coef:+0.020800, label:'mPEDOCS 6h average'     },
-    { id:'in_arrivals6',  coef:+0.348800, label:'ED arrivals 6h avg'     },
-    { id:'in_dow',        coef:+0.085400, label:'Day of week'             },
+    { id:'in_backlog',    coef:+0.010500, label:'Backlog level'      },
+    { id:'in_bl_trend24', coef:-0.015900, label:'Backlog trend 24h'  },
+    { id:'in_mp_roll6',   coef:+0.020800, label:'mPEDOCS 6h average' },
+    { id:'in_arrivals6',  coef:+0.348800, label:'ED arrivals 6h avg' },
+    { id:'in_dow',        coef:+0.085400, label:'Day of week'         },
   ]
 };
 
@@ -750,8 +785,7 @@ const getTier = p => TIERS.find(t => p < t.max) || TIERS[TIERS.length-1];
 // ── STATE ─────────────────────────────────────────────────────────────────────
 const S = {
   in_backlog:0, in_bl_trend:0, in_bl_trend24:0,
-  in_imbal:0, in_imbal24:0,
-  in_mpedocs:60, in_mp_roll6:58, in_mp_trend:0,
+  in_mpedocs:60, in_mp_roll6:58, in_mp_roll3:58, in_mp_trend:0,
   in_arrivals:6, in_arrivals6:6,
   in_hour:14, in_dow:1,
 };
@@ -810,12 +844,13 @@ function calcModel(model) {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render() {
+  const r8 =calcModel(MODEL_8);
   const r12=calcModel(MODEL_12), r24=calcModel(MODEL_24);
+  const t8 =getTier(r8.prob);
   const t12=getTier(r12.prob),   t24=getTier(r24.prob);
 
-  // Home
-  ['12','24'].forEach(h=>{
-    const r=h==='12'?r12:r24, t=h==='12'?t12:t24;
+  ['8','12','24'].forEach(h=>{
+    const r=h==='8'?r8:h==='12'?r12:r24, t=h==='8'?t8:h==='12'?t12:t24;
     const pct=Math.round(r.prob*100)+'%';
     const sc=document.getElementById('sc-'+h);
     sc.style.setProperty('--sc-color',t.color);
@@ -827,13 +862,11 @@ function render() {
     document.getElementById('h-action-'+h).textContent=t.action;
   });
 
-  // Conflict banner
   const ti = t=>TIERS.indexOf(t);
-  document.getElementById('conflict-banner').classList.toggle('show', Math.abs(ti(t12)-ti(t24))>=2);
+  document.getElementById('conflict-banner').classList.toggle('show', Math.abs(ti(t8)-ti(t24))>=2);
 
-  // Results
-  ['12','24'].forEach(h=>{
-    const r=h==='12'?r12:r24, t=h==='12'?t12:t24;
+  ['8','12','24'].forEach(h=>{
+    const r=h==='8'?r8:h==='12'?r12:r24, t=h==='8'?t8:h==='12'?t12:t24;
     const pct=Math.round(r.prob*100);
     const rc=document.getElementById('rc-'+h);
     rc.style.background=t.bg; rc.style.borderColor=t.color;
@@ -847,12 +880,13 @@ function render() {
     renderDrivers('drv-'+h,r.contribs);
   });
 
-  // Snapshot
   const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const snap=[
     ['Backlog', S.in_backlog],
     ['BL trend 12h', (S.in_bl_trend>=0?'+':'')+S.in_bl_trend],
+    ['BL trend 24h', (S.in_bl_trend24>=0?'+':'')+S.in_bl_trend24],
     ['mPEDOCS', S.in_mpedocs],
+    ['mP roll 3h', S.in_mp_roll3],
     ['mP trend 3h', (S.in_mp_trend>=0?'+':'')+S.in_mp_trend],
     ['Arrivals 3h', S.in_arrivals+'/hr'],
     ['Arrivals 6h', S.in_arrivals6+'/hr'],
@@ -877,62 +911,55 @@ function buildSteppers() {
       <button class="step-btn" data-dir="1">+</button>`;
     const input=wrap.querySelector('.step-val');
 
+    function syncAllInstances(val) {
+      // Keep all steppers sharing the same data-id in sync
+      document.querySelectorAll(`.stepper[data-id="${id}"] .step-val`).forEach(el=>{
+        if(el !== input) el.value = val;
+      });
+    }
+
     wrap.querySelectorAll('.step-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const nv=Math.min(max,Math.max(min,(parseFloat(input.value)||0)+parseFloat(btn.dataset.dir)*step));
-        input.value=nv;
+        input.value=nv; syncAllInstances(nv);
         if(S[id]!==undefined) S[id]=nv;
-        if(isMpField) {
-          if(id==='mp_beds') updateBCCFFromBeds(nv);
-          calcMpedocs();
-        } else render();
+        if(isMpField) { if(id==='mp_beds') updateBCCFFromBeds(nv); calcMpedocs(); } else render();
       });
     });
     input.addEventListener('change',()=>{
       const nv=Math.min(max,Math.max(min,parseFloat(input.value)||0));
-      input.value=nv;
+      input.value=nv; syncAllInstances(nv);
       if(S[id]!==undefined) S[id]=nv;
-      if(isMpField) {
-        if(id==='mp_beds') updateBCCFFromBeds(nv);
-        calcMpedocs();
-      } else render();
+      if(isMpField) { if(id==='mp_beds') updateBCCFFromBeds(nv); calcMpedocs(); } else render();
     });
     input.addEventListener('input',()=>{
       const nv=parseFloat(input.value);
       if(!isNaN(nv)){
         const clamped=Math.min(max,Math.max(min,nv));
         if(S[id]!==undefined) S[id]=clamped;
-        if(isMpField) {
-          if(id==='mp_beds') updateBCCFFromBeds(clamped);
-          calcMpedocs();
-        } else render();
+        syncAllInstances(clamped);
+        if(isMpField) { if(id==='mp_beds') updateBCCFFromBeds(clamped); calcMpedocs(); } else render();
       }
     });
   });
 }
 
 // ── mPEDOCS CALCULATOR ────────────────────────────────────────────────────────
-let mpBeds = 40;   // default 40 = ideal ED size (BCCF = 1.0)
+let mpBeds = 40;
 let mpBCCF = 1.0;
 let lastMpScore = null;
 let lastMpWR = 0, lastMpTP = 0;
 
-// BCCF lookup from paper: 40 ÷ beds, clamped to published table range
-// Table: 10→4.0, 15→2.7, 20→2.0, 25→1.6, 30→1.3, 35→1.1, 40→1.0, 45→0.9, 50→0.8, 60+→0.8
 function bedsToRawBCCF(beds) {
-  // Use the published lookup table values for the exact breakpoints
   const table = [
     [10,4.0],[15,2.7],[20,2.0],[25,1.6],[30,1.3],[35,1.1],
     [40,1.0],[45,0.9],[50,0.8]
   ];
   if (beds <= 10) return 4.0;
   if (beds >= 50) return 0.8;
-  // Linear interpolation between table breakpoints
   for (let i=0; i<table.length-1; i++) {
     const [b0,c0]= table[i], [b1,c1]=table[i+1];
-    if (beds >= b0 && beds <= b1) {
-      return c0 + (c1-c0)*(beds-b0)/(b1-b0);
-    }
+    if (beds >= b0 && beds <= b1) return c0 + (c1-c0)*(beds-b0)/(b1-b0);
   }
   return 1.0;
 }
@@ -943,7 +970,6 @@ function updateBCCFFromBeds(beds) {
   const disp = document.getElementById('bccf-display');
   if (disp) {
     disp.textContent = mpBCCF.toFixed(2);
-    // Color: blue at ideal (1.0), yellow above (small ED), muted below (large ED)
     disp.style.color = mpBCCF > 1.05 ? 'var(--yellow)' : mpBCCF < 0.95 ? 'var(--muted)' : 'var(--blue)';
   }
 }
@@ -963,38 +989,33 @@ function calcMpedocs() {
   const wr = parseFloat(document.querySelector('.stepper[data-id="mp_wr"] .step-val')?.value)||0;
   const tp = parseFloat(document.querySelector('.stepper[data-id="mp_tp"] .step-val')?.value)||0;
   const score = 33.3*(0.11 + 0.07*wr + 0.04*tp)*mpBCCF;
-  lastMpScore = score;
-  lastMpWR = wr; lastMpTP = tp;
-
+  lastMpScore = score; lastMpWR = wr; lastMpTP = tp;
   const lv = getMPLevel(score);
-  const scoreEl = document.getElementById('mp-score-val');
-  const badgeEl = document.getElementById('mp-level-badge');
-  const descEl  = document.getElementById('mp-level-desc');
-  const rowEl   = document.getElementById('mp-result-row');
-  const fmtEl   = document.getElementById('mp-formula-line');
-
-  scoreEl.textContent = score.toFixed(1); scoreEl.style.color = lv.color;
-  badgeEl.textContent = lv.label; badgeEl.style.color = lv.color; badgeEl.style.borderColor = lv.color;
-  descEl.textContent = lv.desc; descEl.style.color = lv.color;
-  rowEl.style.setProperty('--mp-color', lv.color);
-  fmtEl.textContent = `WR=${wr} · TP=${tp} · BCCF=${mpBCCF}`;
-
-  // Tipping bar (0–260 range)
-  const MAX_SCORE = 260;
-  const fillPct = Math.min(100, score/MAX_SCORE*100);
+  document.getElementById('mp-score-val').textContent = score.toFixed(1);
+  document.getElementById('mp-score-val').style.color = lv.color;
+  document.getElementById('mp-level-badge').textContent = lv.label;
+  document.getElementById('mp-level-badge').style.color = lv.color;
+  document.getElementById('mp-level-badge').style.borderColor = lv.color;
+  document.getElementById('mp-level-desc').textContent = lv.desc;
+  document.getElementById('mp-level-desc').style.color = lv.color;
+  document.getElementById('mp-result-row').style.setProperty('--mp-color', lv.color);
+  document.getElementById('mp-formula-line').textContent = `WR=${wr} · TP=${tp} · BCCF=${mpBCCF}`;
   const fill = document.getElementById('mp-tipping-fill');
-  fill.style.width = fillPct+'%';
+  fill.style.width = Math.min(100, score/260*100)+'%';
   fill.style.background = lv.color;
-
-  // Sync to surge warning inputs
   S.in_mpedocs = Math.round(score);
   const mpInput = document.querySelector('.stepper[data-id="in_mpedocs"] .step-val');
   if (mpInput) mpInput.value = S.in_mpedocs;
+  // Also update roll3 if not yet synced from log (use current score as best estimate)
+  if (!LOG.length) {
+    S.in_mp_roll3 = Math.round(score);
+    const r3Input = document.querySelector('.stepper[data-id="in_mp_roll3"] .step-val');
+    if (r3Input) r3Input.value = S.in_mp_roll3;
+  }
   render();
 }
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
-// In-memory log (session only)
 let LOG = [];
 
 function logMpedocs() {
@@ -1002,42 +1023,61 @@ function logMpedocs() {
   const now = new Date();
   const lv = getMPLevel(lastMpScore);
   LOG.unshift({
-    score: lastMpScore,
-    wr: lastMpWR,
-    tp: lastMpTP,
-    beds: mpBeds,
-    bccf: mpBCCF,
-    level: lv.label,
-    desc: lv.desc,
-    color: lv.color,
-    ts: now,
-    // Human-readable timestamp
+    score: lastMpScore, wr: lastMpWR, tp: lastMpTP,
+    beds: mpBeds, bccf: mpBCCF, level: lv.label, desc: lv.desc, color: lv.color, ts: now,
     tsDisplay: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}) +
                ' · ' + now.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric',year:'numeric'}),
-    // ISO for CSV export
     tsISO: now.toISOString(),
   });
-  renderLog();
-  renderTrend();
-  updateLogSyncStatus();
-
-  // Button feedback
-  const btn = document.getElementById('mp-log-btn');
-  const icon = document.getElementById('mp-log-btn-icon');
-  const txt  = document.getElementById('mp-log-btn-text');
+  renderLog(); renderTrend(); updateLogSyncStatus(); updateHomeMpedocs();
+  const btn=document.getElementById('mp-log-btn');
+  const icon=document.getElementById('mp-log-btn-icon');
+  const txt=document.getElementById('mp-log-btn-text');
   icon.textContent='✓'; txt.textContent='Logged';
   btn.style.borderColor='var(--green)'; btn.style.color='var(--green)';
   setTimeout(()=>{ icon.textContent='＋'; txt.textContent='Log this measurement'; btn.style.borderColor=''; btn.style.color=''; }, 1600);
 }
 
-function deleteLog(i) { LOG.splice(i,1); renderLog(); renderTrend(); updateLogSyncStatus(); }
+function updateHomeMpedocs() {
+  const card = document.getElementById('home-mpedocs-card');
+  const scoreEl = document.getElementById('home-mp-score');
+  const levelEl = document.getElementById('home-mp-level');
+  const atrEl   = document.getElementById('home-mp-atr');
+  const bar     = document.getElementById('home-mp-bar');
+  const ATR_MAP = [
+    { max:60,   atr:'Median ATR ~8 min'   },
+    { max:100,  atr:'Median ATR ~14 min'  },
+    { max:140,  atr:'Median ATR ~83 min'  },
+    { max:180,  atr:'Median ATR ~116 min' },
+    { max:9999, atr:'Median ATR ~145+ min'},
+  ];
+  if (!LOG.length) {
+    scoreEl.textContent = '—'; scoreEl.style.color = 'var(--muted)';
+    levelEl.textContent = 'No readings yet'; levelEl.style.color = 'var(--muted)';
+    atrEl.textContent   = 'Go to mPEDOCS tab to log';
+    card.style.borderColor = 'var(--border)';
+    bar.style.background   = 'var(--muted)';
+    return;
+  }
+  const latest = LOG[0];
+  const lv  = getMPLevel(latest.score);
+  const atr = ATR_MAP.find(a => latest.score < a.max) || ATR_MAP[ATR_MAP.length-1];
+  const ageMin = Math.round((Date.now() - latest.ts.getTime()) / 60000);
+  const ageStr = ageMin < 1 ? 'just now' : ageMin === 1 ? '1 min ago' : ageMin < 60 ? `${ageMin} min ago` : `${Math.round(ageMin/60)}h ago`;
+  scoreEl.textContent = latest.score.toFixed(0); scoreEl.style.color = lv.color;
+  levelEl.textContent = `${lv.label} · ${lv.desc}`; levelEl.style.color = lv.color;
+  atrEl.textContent   = `${atr.atr} · logged ${ageStr}`;
+  card.style.borderColor = lv.color;
+  bar.style.background   = lv.color;
+}
+
+function deleteLog(i) { LOG.splice(i,1); renderLog(); renderTrend(); updateLogSyncStatus(); updateHomeMpedocs(); }
 
 function clearLog() {
   if (!LOG.length) return;
   if (!confirm('Clear all logged readings?')) return;
-  LOG=[]; renderLog(); renderTrend(); updateLogSyncStatus();
-  // Clear sync dots
-  ['mpedocs','mp_roll6','mp_trend'].forEach(k => {
+  LOG=[]; renderLog(); renderTrend(); updateLogSyncStatus(); updateHomeMpedocs();
+  ['mpedocs','mp_roll6','mp_roll3','mp_trend'].forEach(k => {
     const d = document.getElementById('sync-dot-'+k);
     if (d) d.style.display='none';
   });
@@ -1058,105 +1098,70 @@ function copyLogCSV() {
   }).catch(()=>{ alert(csv); });
 }
 
-// ── SYNC FROM LOG → SURGE INPUTS ─────────────────────────────────────────────
+// ── SYNC FROM LOG ─────────────────────────────────────────────────────────────
 function setStepperVal(id, val) {
   const clamped = Math.round(val);
   S[id] = clamped;
-  const input = document.querySelector(`.stepper[data-id="${id}"] .step-val`);
-  if (input) input.value = clamped;
+  document.querySelectorAll(`.stepper[data-id="${id}"] .step-val`).forEach(el => el.value = clamped);
 }
 
 function syncFromLog() {
   if (!LOG.length) return;
-
   const now = Date.now();
-  const MS_3H  = 3  * 60 * 60 * 1000;
-  const MS_6H  = 6  * 60 * 60 * 1000;
-
-  // Entries are newest-first (LOG[0] = most recent)
+  const MS_3H = 3*60*60*1000, MS_6H = 6*60*60*1000;
   const newest = LOG[0];
-
-  // 1. mPEDOCS current = newest score
   setStepperVal('in_mpedocs', newest.score);
   document.getElementById('sync-dot-mpedocs').style.display = 'inline';
-
-  // 2. mPEDOCS 6h average = mean of all entries within last 6h
   const within6h = LOG.filter(e => (now - e.ts.getTime()) <= MS_6H);
   if (within6h.length) {
     const avg6h = within6h.reduce((s,e) => s + e.score, 0) / within6h.length;
     setStepperVal('in_mp_roll6', avg6h);
     document.getElementById('sync-dot-mp_roll6').style.display = 'inline';
   }
-
-  // 3. mPEDOCS trend 3h = newest − entry closest to 3h ago
-  //    Find the entry whose timestamp is closest to (now − 3h)
-  //    If no entry older than 3h exists, use the oldest entry available
+  const MS_3H_WIN = 3*60*60*1000;
+  const within3h = LOG.filter(e => (now - e.ts.getTime()) <= MS_3H_WIN);
+  if (within3h.length) {
+    const avg3h = within3h.reduce((s,e) => s + e.score, 0) / within3h.length;
+    setStepperVal('in_mp_roll3', avg3h);
+    document.getElementById('sync-dot-mp_roll3').style.display = 'inline';
+  }
   const target3h = now - MS_3H;
-  let ref3h = LOG[LOG.length - 1]; // oldest as fallback
-  let bestDiff = Infinity;
+  let ref3h = LOG[LOG.length-1]; let bestDiff = Infinity;
   for (const e of LOG) {
     const diff = Math.abs(e.ts.getTime() - target3h);
     if (diff < bestDiff) { bestDiff = diff; ref3h = e; }
   }
-  const trend3h = newest.score - ref3h.score;
-  setStepperVal('in_mp_trend', trend3h);
+  setStepperVal('in_mp_trend', newest.score - ref3h.score);
   document.getElementById('sync-dot-mp_trend').style.display = 'inline';
-
-  render();
-  updateLogSyncStatus();
-
-  // Button flash
+  render(); updateLogSyncStatus();
   const btn = document.getElementById('log-sync-btn');
-  btn.textContent = '✓ Synced';
-  btn.style.borderColor = 'var(--blue)';
-  btn.style.color = 'var(--blue)';
-  setTimeout(() => {
-    btn.textContent = '↑ Pull';
-    btn.style.borderColor = '';
-    btn.style.color = '';
-  }, 1800);
+  btn.textContent = '✓ Synced'; btn.style.borderColor='var(--blue)'; btn.style.color='var(--blue)';
+  setTimeout(()=>{ btn.textContent='↑ Pull'; btn.style.borderColor=''; btn.style.color=''; }, 1800);
 }
 
 function updateLogSyncStatus() {
   const el = document.getElementById('log-sync-status');
   const btn = document.getElementById('log-sync-btn');
   if (!el) return;
-
   if (!LOG.length) {
     el.textContent = 'No readings logged yet — go to mPEDOCS tab to log measurements.';
-    btn.style.opacity = '0.4';
-    btn.style.cursor = 'default';
-    btn.onclick = null;
-    return;
+    btn.style.opacity='0.4'; btn.style.cursor='default'; btn.onclick=null; return;
   }
-
-  btn.style.opacity = '1';
-  btn.style.cursor = 'pointer';
-  btn.onclick = syncFromLog;
-
-  const now = Date.now();
-  const MS_6H = 6 * 60 * 60 * 1000;
+  btn.style.opacity='1'; btn.style.cursor='pointer'; btn.onclick=syncFromLog;
+  const now = Date.now(), MS_6H = 6*60*60*1000;
   const newest = LOG[0];
   const within6h = LOG.filter(e => (now - e.ts.getTime()) <= MS_6H);
   const ageMin = Math.round((now - newest.ts.getTime()) / 60000);
   const ageStr = ageMin < 1 ? 'just now' : ageMin === 1 ? '1 min ago' : ageMin < 60 ? `${ageMin} min ago` : `${Math.round(ageMin/60)}h ago`;
-
-  el.innerHTML =
-    `Latest: <b style="color:var(--text)">${newest.score.toFixed(0)}</b> (${ageStr}) · ` +
+  el.innerHTML = `Latest: <b style="color:var(--text)">${newest.score.toFixed(0)}</b> (${ageStr}) · ` +
     `<b style="color:var(--text)">${within6h.length}</b> reading${within6h.length!==1?'s':''} in last 6h · ` +
     `<b style="color:var(--text)">${LOG.length}</b> total`;
 }
 
 function renderLog() {
   const el = document.getElementById('log-list');
-  const ct = document.getElementById('log-count');
-  ct.textContent = LOG.length + (LOG.length===1?' reading':' readings');
-
-  if (!LOG.length) {
-    el.innerHTML='<div class="log-empty">No readings logged yet.<br>Enter values above and tap Log.</div>';
-    return;
-  }
-
+  document.getElementById('log-count').textContent = LOG.length + (LOG.length===1?' reading':' readings');
+  if (!LOG.length) { el.innerHTML='<div class="log-empty">No readings logged yet.<br>Enter values above and tap Log.</div>'; return; }
   el.innerHTML = LOG.map((e,i)=>`
     <div class="log-entry" style="--lc:${e.color}">
       <div class="log-score" style="color:${e.color}">${e.score.toFixed(0)}</div>
@@ -1169,62 +1174,36 @@ function renderLog() {
     </div>`).join('');
 }
 
-// ── TREND MINI-CHART ──────────────────────────────────────────────────────────
 function renderTrend() {
   const card = document.getElementById('trend-card');
   if (LOG.length < 2) { card.style.display='none'; return; }
   card.style.display='block';
-
   const canvas = document.getElementById('trend-canvas');
-  // Set canvas width to parent width
   canvas.width = canvas.parentElement.offsetWidth - 32;
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = 60;
   ctx.clearRect(0,0,W,H);
-
-  // Scores in chronological order
   const scores = [...LOG].reverse().map(e=>e.score);
-  const minS = Math.min(...scores, 0);
-  const maxS = Math.max(...scores, 120);
+  const minS = Math.min(...scores, 0), maxS = Math.max(...scores, 120);
   const pad = 8;
   const xs = scores.map((_,i)=> pad + i*(W-2*pad)/(scores.length-1||1));
   const ys = scores.map(s=> H-pad - (s-minS)/(maxS-minS||1)*(H-2*pad));
-
-  // Tipping line at 100
   if (maxS >= 100 && minS <= 100) {
     const ty = H-pad - (100-minS)/(maxS-minS)*(H-2*pad);
-    ctx.setLineDash([3,3]);
-    ctx.strokeStyle='rgba(249,115,22,0.5)';
-    ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.setLineDash([3,3]); ctx.strokeStyle='rgba(249,115,22,0.5)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle='rgba(249,115,22,0.7)'; ctx.font='8px DM Mono'; ctx.textAlign='right';
     ctx.fillText('100',W-2,ty-2);
   }
-
-  // Line
   ctx.beginPath();
   xs.forEach((x,i)=>i===0?ctx.moveTo(x,ys[i]):ctx.lineTo(x,ys[i]));
   ctx.strokeStyle='rgba(91,131,163,0.6)'; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
-
-  // Dots colored by level
-  scores.forEach((s,i)=>{
-    const lv=getMPLevel(s);
-    ctx.beginPath(); ctx.arc(xs[i],ys[i],3.5,0,2*Math.PI);
-    ctx.fillStyle=lv.color; ctx.fill();
-  });
-
-  // Stats
+  scores.forEach((s,i)=>{ const lv=getMPLevel(s); ctx.beginPath(); ctx.arc(xs[i],ys[i],3.5,0,2*Math.PI); ctx.fillStyle=lv.color; ctx.fill(); });
   const statsEl = document.getElementById('trend-stats');
   const mean = scores.reduce((a,b)=>a+b,0)/scores.length;
   const trend = scores.length>=2 ? scores[scores.length-1]-scores[0] : 0;
   const aboveTip = scores.filter(s=>s>=100).length;
-  statsEl.innerHTML = `
-    <span>n=${scores.length}</span>
-    <span>mean=${mean.toFixed(0)}</span>
-    <span>trend ${trend>=0?'+':''}${trend.toFixed(0)}</span>
-    <span style="color:${aboveTip>0?'var(--orange)':'var(--muted)'}">${aboveTip} ≥100</span>
-  `;
+  statsEl.innerHTML = `<span>n=${scores.length}</span><span>mean=${mean.toFixed(0)}</span><span>trend ${trend>=0?'+':''}${trend.toFixed(0)}</span><span style="color:${aboveTip>0?'var(--orange)':'var(--muted)'}">${aboveTip} ≥100</span>`;
 }
 
 // ── TAB NAV ───────────────────────────────────────────────────────────────────
@@ -1234,9 +1213,7 @@ function switchTab(name) {
   document.getElementById('screen-'+name).classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
   document.getElementById('scroll-area').scrollTop=0;
-  // Re-render trend chart if switching to mPEDOCS tab (canvas size may have changed)
   if (name==='mpedocs') setTimeout(renderTrend, 50);
-  // Refresh sync status when switching to inputs tab
   if (name==='inputs') updateLogSyncStatus();
 }
 
@@ -1250,7 +1227,6 @@ function switchTab(name) {
     const el=document.querySelector(`.stepper[data-id="${id}"] .step-val`);
     if(el) el.value=S[id];
   });
-  // Init beds stepper to 40 (ideal)
   const bedsEl = document.querySelector('.stepper[data-id="mp_beds"] .step-val');
   if (bedsEl) bedsEl.value = 40;
   updateBCCFFromBeds(40);
@@ -1258,6 +1234,7 @@ function switchTab(name) {
   render();
   renderLog();
   updateLogSyncStatus();
+  updateHomeMpedocs();
 })();
 </script>
 </body>
