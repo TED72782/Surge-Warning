@@ -769,7 +769,7 @@ to { opacity:1; transform:translateY(0); }
           </div>
         </div>
         <div>
-          <div class="ilbl">Arrivals 3h <span class="ival" id="sf-d-arrivals">16</span></div>
+          <div class="ilbl">Arrivals 3h <span class="ival" id="sf-d-arrivals">0</span></div>
           <div class="tstepper" data-sfid="in_arrivals" data-min="0" data-max="60" data-step="1">
             <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="0" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
           </div>
@@ -782,6 +782,7 @@ to { opacity:1; transform:translateY(0); }
         </div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:#8892b0;" id="sf-calc-score">—</div>
       </div>
+      <button onclick="resetSurgeInputs()" style="margin-top:10px;width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;padding:9px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Reset All Inputs</button>
     </div>
   </div>
 </div>
@@ -843,19 +844,19 @@ to { opacity:1; transform:translateY(0); }
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid #1a1e30;">
         <div>
           <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">mPEDOCS Score</div>
-          <div id="mp-calc-score" style="font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:#8892b0;">&#8212;</div>
+          <div id="mp-calc-score" style="font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:#22c55e;">4.8</div>
           <div id="mp-calc-formula" style="font-size:9px;color:#8892b0;margin-top:2px;">WR=0 &middot; TP=0 &middot; BCCF=1.3</div>
         </div>
         <div style="text-align:right;">
-          <div id="mp-calc-level" style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;border:1px solid #8892b0;color:#8892b0;margin-bottom:4px;">&#8212;</div>
-          <div id="mp-calc-desc" style="font-size:10px;color:#8892b0;margin-bottom:8px;">enter values above</div>
-          <button onclick="applyMpCalc()" style="background:rgba(0,229,195,.1);border:1px solid rgba(0,229,195,.3);border-radius:4px;color:#00e5c3;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;cursor:pointer;">&#8593; USE THIS SCORE</button>
+          <div id="mp-calc-level" style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;border:1px solid #22c55e;color:#22c55e;margin-bottom:4px;">L1</div>
+          <div id="mp-calc-desc" style="font-size:10px;color:#22c55e;margin-bottom:8px;">Not busy</div>
+          
         </div>
       </div>
       <div style="margin-top:10px;height:4px;background:#1a1e30;border-radius:2px;position:relative;overflow:visible;">
         <div id="mp-calc-bar" style="height:4px;border-radius:2px;width:0%;background:#8892b0;transition:width .3s,background .3s;"></div>
-        <div style="position:absolute;left:38.5%;top:-3px;width:2px;height:10px;background:#ffd166;border-radius:1px;"></div>
-        <div style="position:absolute;left:38.5%;top:-16px;font-size:8px;color:#ffd166;font-family:'Space Mono',monospace;transform:translateX(-50%);">100</div>
+        <div id="mp-calc-tick" style="position:absolute;left:38.5%;top:-3px;width:2px;height:10px;background:#ffd166;border-radius:1px;"></div>
+        <div id="mp-calc-tick-lbl" style="position:absolute;left:38.5%;top:-16px;font-size:8px;color:#ffd166;font-family:'Space Mono',monospace;transform:translateX(-50%);">100</div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;"><span>0</span><span>260</span></div>
     </div>
@@ -871,7 +872,7 @@ to { opacity:1; transform:translateY(0); }
         </div>
       </div>
       <div>
-        <div class="ilbl">Arrivals last 3h <span class="ival" id="d-arrivals">16</span></div>
+        <div class="ilbl">Arrivals last 3h <span class="ival" id="d-arrivals">0</span></div>
         <div class="tstepper" data-id="in_arrivals" data-min="0" data-max="60" data-step="1">
           <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="0" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
         </div>
@@ -978,6 +979,11 @@ to { opacity:1; transform:translateY(0); }
   <div class="panel">
     <div class="ph"><div class="pt">MH Calendar · Risk Modifiers</div><div class="badge" style="background:rgba(167,139,250,0.1);color:#a78bfa;border-color:rgba(167,139,250,0.3);">EMPIRICAL</div></div>
     <div class="pb">
+      <div style="font-size:9px;color:var(--muted);margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap;">
+        <span><span style="color:#c084fc;">■</span> Elevating</span>
+        <span><span style="color:#22d3ee;">■</span> Protective</span>
+        <span><span style="color:#64748b;">■</span> Neutral</span>
+      </div>
       <div class="upcoming-list" id="mh-upcoming-events"></div>
     </div>
   </div>
@@ -1129,12 +1135,6 @@ function $$(id){var el=document.getElementById(id);return el||_DUMMY_EL;}
 // Surge rate by hour (from 3-year dataset)
 const THRESH_OPTIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 let SURGE_THRESH = 10;  // default — adjustable via slider
-// Empirical floor: P(any surge in next 8h | confirmed surge this hour)
-// Derived from 2023-2025 Throughput data, keyed by arrivals/hr threshold
-const SURGE_FLAG_FLOORS = {
-  6:0.923, 7:0.896, 8:0.859, 9:0.815, 10:0.756,
-  11:0.676, 12:0.585, 13:0.478, 14:0.382, 15:0.303,
-};
 const PERSISTENCE_MODELS = {
   "70": {
     1:{intercept:-8.819322,mpedocs:0.1013,arr_3h:0.081323,hour:0.007278,dow:-0.017023,auc:0.94},
@@ -1604,12 +1604,6 @@ function getUpcomingEvents(fromDateStr, n=8) {
 // ═══════════════════════════════════════════════════════════════════════════
 // SURGE PROBABILITY ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
-function updateFloorDisplay() {
-  var floorEl  = document.getElementById('surge-flag-floor-display');
-  var threshEl = document.getElementById('surge-flag-thresh-display');
-  if(floorEl)  floorEl.textContent  = Math.round((SURGE_FLAG_FLOORS[SURGE_THRESH]||0.756)*100)+'%';
-  if(threshEl) threshEl.textContent = SURGE_THRESH;
-}
 
 function onThreshChange(val) {
   if (!_initialRenderDone) return;
@@ -1617,7 +1611,7 @@ function onThreshChange(val) {
   setThreshold(val);
   document.getElementById('thresh-val').textContent = '>' + val + '/hr';
   document.getElementById('thresh-display').textContent = val;
-  updateFloorDisplay();
+  
   const _ch=new Date().getHours(),_hr=SURGE_BY_HOUR[_ch]||0;
   const brd=document.getElementById('baserate-display'),hbr=document.getElementById('hstat-baserate');
   if(brd)brd.textContent=Math.round(_hr*100);
@@ -1734,7 +1728,7 @@ async function renderSurgeDashboard() {
   _cachedIliData = iliData; _cachedWxMod = wxMod; _cachedWxLabel = wxLabel; _cachedWxTemp = wxTemp;
   _initialRenderDone = true;
   renderDashboard(iliData, wxMod, wxLabel, wxTemp);
-  updateFloorDisplay();
+  
 }
 
 function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = null) {
@@ -2455,6 +2449,7 @@ document.querySelectorAll('.tbtn[data-m]').forEach(function(btn){
     var mp8Auc=(MP8_THRESH[String(MP8_SEL)]||MP8_THRESH['100']).auc;
     var lbl=document.getElementById('thresh-auc-lbl');
     if(lbl) lbl.textContent='mPEDOCS \u2265'+MP8_SEL+' · 8h AUC '+mp8Auc.toFixed(3)+' · Persistence h+1 AUC '+persAuc.toFixed(3);
+    updateMpTick();
     renderMpedocs();
   });
 });
@@ -2470,6 +2465,31 @@ document.querySelectorAll('.tstepper[data-id]').forEach(function(el){
 });
 
 // ── Surge panel ─────────────────────────────────────────────────────────────
+function resetSurgeInputs(){
+  // Reset all surge tab steppers to 0
+  document.querySelectorAll('.tstepper[data-sfid]').forEach(function(el){
+    var inp=el.querySelector('.tsval');
+    if(inp)inp.value=0;
+  });
+  // Reset state
+  S.in_arrivals=0;
+  // Reset displays
+  var ids=['sf-d-wr','sf-d-tp','sf-d-arrivals'];
+  ids.forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=0;});
+  // Reset surge flag
+  setSurgeFlag(false);
+  // Recalculate
+  sfCalcMpedocs();
+  // Sync arrivals to Now tab
+  var arrInp=document.querySelector('.tstepper[data-id="in_arrivals"] .tsval');
+  var arrD=document.getElementById('d-arrivals');
+  if(arrInp)arrInp.value=0;
+  if(arrD)arrD.textContent=0;
+  ED_STATE_ACTIVE=false;
+  updateForecastBars();
+  renderMpedocs();
+}
+
 function sfCalcMpedocs(){
   var wrEl=document.querySelector('.tstepper[data-sfid="mp_wr"] .tsval');
   var tpEl=document.querySelector('.tstepper[data-sfid="mp_tp"] .tsval');
@@ -2664,6 +2684,14 @@ function updateBCCFDisplays(){
   var si=document.getElementById('bccf-shift-active');
   if(si)si.textContent=cur.shift+' shift active · BCCF '+MP_BCCF.toFixed(2);
 }
+function updateMpTick(){
+  var pct=(MP8_SEL/260*100).toFixed(1)+'%';
+  var tick=document.getElementById('mp-calc-tick');
+  var tlbl=document.getElementById('mp-calc-tick-lbl');
+  if(tick){tick.style.left=pct;}
+  if(tlbl){tlbl.style.left=pct; tlbl.textContent=MP8_SEL;}
+}
+
 function autoMpBCCF(){
   var dayInp=document.querySelector('.tstepper[data-id="mp_day_beds"] .tsval');
   var eveInp=document.querySelector('.tstepper[data-id="mp_eve_beds"] .tsval');
@@ -2706,21 +2734,6 @@ function calcMpCalc(){
   var sfSc=document.getElementById('sf-calc-score'),sfFm=document.getElementById('sf-calc-formula');
   var sfCol=rounded>=100?'#ff4d6d':rounded>=80?'#ff9a3c':rounded>=60?'#ffd166':'#8892b0';
   if(sfSc){sfSc.textContent=rounded;sfSc.style.color=sfCol;} if(sfFm)sfFm.textContent='WR='+wr+' · TP='+tp+' · BCCF='+MP_BCCF;
-}
-
-function applyMpCalc(){
-  var wrEl=document.querySelector('.tstepper[data-id="mp_wr"] .tsval');
-  var tpEl=document.querySelector('.tstepper[data-id="mp_tp"] .tsval');
-  var wr=wrEl?parseFloat(wrEl.value)||0:0;
-  var tp=tpEl?parseFloat(tpEl.value)||0:0;
-  var score=Math.round(33.3*(0.11+0.07*wr+0.04*tp)*MP_BCCF);
-  // Push into the mPEDOCS model input
-  S.in_mpedocs=score;
-  var mpInp=document.querySelector('.tstepper[data-id="in_mpedocs"] .tsval');
-  var mpDisp=$$('d-mpedocs');
-  if(mpInp) mpInp.value=score;
-  if(mpDisp&&mpDisp!==_DUMMY_EL) mpDisp.textContent=score;
-  renderMpedocs();
 }
 
 // Wire up bed capacity steppers
@@ -2768,6 +2781,8 @@ autoMpBCCF();
   var inp=document.querySelector('.tstepper[data-id="in_hour"] .tsval');if(inp)inp.value=h;
   var d=$$('d-hour');if(d!==_DUMMY_EL)d.textContent=h;
 })();
+calcMpCalc(); // initialise mPEDOCS calculator at WR=0 TP=0
+updateMpTick(); // set tick position to match default MP8_SEL
 renderMpedocs();
 renderSurgeDashboard();
 setTimeout(function(){var _s=document.getElementById('sc-surge');if(_s)_s.scrollTop=0;},200);
@@ -2951,16 +2966,16 @@ function renderMHTab(){
         var mev=upcomingMH[i];
         var daysUntil=Math.round((new Date(mev.start+'T12:00:00')-now)/86400000);
         var duLabel=daysUntil===0?'Today':daysUntil===1?'Tomorrow':'in '+daysUntil+'d';
-        var isElevated=mev.mod>1.0;
-        var evColor=isElevated?'#ff9a3c':'#39d98a';
-        var evBorder=isElevated?'var(--orange)':'var(--green)';
+        var evEffect=mev.mod>1.0?'elevating':mev.mod<1.0?'protective':'neutral';
+        var evColor=evEffect==='elevating'?'#c084fc':evEffect==='protective'?'#22d3ee':'#64748b';
+        var evBorder=evColor;
         var modLabel=(mev.mod>1?'+':'')+Math.round((mev.mod-1)*100)+'% · \u00d7'+mev.mod.toFixed(2);
         var dateRange=mev.start===mev.end?mev.start.slice(5):(mev.start.slice(5)+' \u2013 '+mev.end.slice(5));
-        mhEvHTML+='<div class="cal-event" style="border-left-color:'+evBorder+';">';
+        mhEvHTML+='<div class="cal-event '+evEffect+'" style="border-left-color:'+evBorder+';">';
         mhEvHTML+='<div class="cal-event-date">'+dateRange+'<br>('+duLabel+')</div>';
         mhEvHTML+='<div style="flex:1;">';
         mhEvHTML+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
-        mhEvHTML+='<div class="cal-event-name">'+(isElevated?'\u26a0\ufe0f':'\u2705')+' '+mev.label+'</div>';
+        mhEvHTML+='<div class="cal-event-name">'+(evEffect==='elevating'?'\u26a0\ufe0f':evEffect==='protective'?'\u2705':'\u2014')+' '+mev.label+'</div>';
         mhEvHTML+='<div style="font-size:8px;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,0.04);color:'+evColor+';font-family:\'Space Mono\',monospace;white-space:nowrap;">MH '+modLabel+'</div>';
         mhEvHTML+='</div>';
         mhEvHTML+='<div class="cal-surge-note" style="color:'+evColor+';">'+mev.note+'</div>';
