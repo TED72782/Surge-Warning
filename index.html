@@ -1102,6 +1102,11 @@ to { opacity:1; transform:translateY(0); }
     <button class="sbtns" id="reset-settings-btn">Reset Defaults</button>
     <div class="svdbadge" id="savedBadge">✓ Saved</div>
   </div>
+  <div class="sbtnrow" style="margin-top:8px;">
+    <button class="sbtns" id="save-my-default-btn" style="flex:1;">⭐ Save as My Default</button>
+    <button class="sbtns" id="restore-my-default-btn" style="flex:1;">↩ Restore My Default</button>
+    <div class="svdbadge" id="myDefaultBadge">⭐ Saved</div>
+  </div>
 </div><!-- /t-body -->
 </div><!-- /sc-settings -->
 
@@ -1857,11 +1862,14 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const fm = fd.getMonth() + 1;
     const fSchool = getSchoolStatus(fds);
     // Weather not used in surge model (ΔR²<0.001 empirically)
-    const { modifier: fLocalMod7, activeEvents: fEvents7 } = getLocalEventModifier(fds);
+    const { modifier: fLocalMod7, activeEvents: fEvents7 } = getLocalEventModifier(fds, 19);
     const fGradInfo7 = getGraduationModifier(fds);
     const fGradMod7 = fGradInfo7.modifier;
     const peakP = computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod);
-    const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => s + computeSurgeProb(h,fdow,fm,fSchool,fLocalMod7,fGradMod7,iliMod), 0) / 11;
+    const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => {
+      const { modifier: hMod } = getLocalEventModifier(fds, h);
+      return s + computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod);
+    }, 0) / 11;
     const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
     days7.push({
       dowLabel: DOW_NAMES[fdow],
@@ -1954,6 +1962,17 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const duLabel = daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `in ${daysUntil}d`;
     const evEffect = (!ev.surgeModifier || ev.surgeModifier === 1.0) ? 'neutral' : ev.surgeModifier > 1.0 ? 'elevating' : 'protective';
     const evType = evEffect;
+    // Build hourly modifier chips if present
+    let hourlyHTML = '';
+    if (ev.hourlyModifiers && Object.keys(ev.hourlyModifiers).length > 0) {
+      const chips = Object.entries(ev.hourlyModifiers)
+        .sort((a,b) => +a[0] - +b[0])
+        .map(([h, m]) => {
+          const col = m > 1.05 ? '#c084fc' : m < 0.95 ? '#22d3ee' : '#64748b';
+          return `<span style="font-family:'Space Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.04);border:1px solid ${col};color:${col};white-space:nowrap;">${String(h).padStart(2,'0')}:00 ×${m.toFixed(2)}</span>`;
+        }).join('');
+      hourlyHTML = `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">${chips}</div>`;
+    }
     return `<div class="cal-event ${evType}">
       <div class="cal-event-date">${ev.start.slice(5)}<br>(${duLabel})</div>
       <div style="flex:1;">
@@ -1962,6 +1981,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
           <div style="font-size:8px;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,0.04);color:${catColor};font-family:'Space Mono',monospace;white-space:nowrap;">${catLabel}${mechLabel}${modLabel}</div>
         </div>
         <div class="cal-surge-note">${ev.surgeNote || ev.desc || ''}</div>
+        ${hourlyHTML}
       </div>
     </div>`;
   }).join('');
@@ -2529,6 +2549,14 @@ function onShiftChange(){
   if(ds)SHIFT_DAY_START=Math.max(0,Math.min(23,parseInt(ds.value)||0));
   if(es)SHIFT_EVE_START=Math.max(0,Math.min(23,parseInt(es.value)||0));
   if(ns)SHIFT_NIGHT_START=Math.max(0,Math.min(23,parseInt(ns.value)||0));
+  // Hard stops: Eve >= Day+1, Night >= Eve+1
+  if(SHIFT_EVE_START<=SHIFT_DAY_START){ SHIFT_EVE_START=SHIFT_DAY_START+1; if(es){es.value=SHIFT_EVE_START;} }
+  if(SHIFT_NIGHT_START<=SHIFT_EVE_START){ SHIFT_NIGHT_START=SHIFT_EVE_START+1; if(ns){ns.value=SHIFT_NIGHT_START;} }
+  // Cap at 23
+  SHIFT_EVE_START=Math.min(23,SHIFT_EVE_START);
+  SHIFT_NIGHT_START=Math.min(23,SHIFT_NIGHT_START);
+  if(es)es.value=SHIFT_EVE_START;
+  if(ns)ns.value=SHIFT_NIGHT_START;
   var dl=document.getElementById('shift-day-lbl'),el=document.getElementById('shift-eve-lbl'),nl=document.getElementById('shift-night-lbl');
   if(dl)dl.textContent=String(SHIFT_DAY_START).padStart(2,'0')+':00';
   if(el)el.textContent=String(SHIFT_EVE_START).padStart(2,'0')+':00';
@@ -2634,6 +2662,83 @@ if(_rsb)_rsb.addEventListener('click',function(){
 
 // Sync season inputs when settings tab opens
 var _tbSettings=document.getElementById('tb-settings');
+
+// ── Save as My Default ───────────────────────────────────────────────────
+function captureMyDefault(){
+  return {
+    gradSettings: {events:GRADUATION_EVENTS, seasonStart:GRAD_SEASON_START, seasonEnd:GRAD_SEASON_END},
+    shifts: {dayStart:SHIFT_DAY_START, eveStart:SHIFT_EVE_START, nightStart:SHIFT_NIGHT_START,
+             dayBeds:MP_DAY_BEDS, eveBeds:MP_EVE_BEDS, nightBeds:MP_NIGHT_BEDS},
+    mp8Sel: MP8_SEL,
+  };
+}
+function applyMyDefault(snap){
+  if(!snap) return;
+  // Grad settings
+  if(snap.gradSettings){
+    GRADUATION_EVENTS=snap.gradSettings.events||DEFAULT_GRAD_EVENTS;
+    GRAD_SEASON_START=snap.gradSettings.seasonStart||DEFAULT_SEASON_START;
+    GRAD_SEASON_END=snap.gradSettings.seasonEnd||DEFAULT_SEASON_END;
+    GRAD_SETTINGS={events:GRADUATION_EVENTS,seasonStart:GRAD_SEASON_START,seasonEnd:GRAD_SEASON_END};
+    saveGradSettings(GRAD_SETTINGS);
+    ALL_EVENTS=buildAllEvents();
+    renderGradEntries();
+    $$('seasonStart').value=GRAD_SEASON_START;
+    $$('seasonEnd').value=GRAD_SEASON_END;
+  }
+  // Shifts + beds
+  if(snap.shifts){
+    SHIFT_DAY_START=snap.shifts.dayStart; SHIFT_EVE_START=snap.shifts.eveStart; SHIFT_NIGHT_START=snap.shifts.nightStart;
+    MP_DAY_BEDS=snap.shifts.dayBeds; MP_EVE_BEDS=snap.shifts.eveBeds; MP_NIGHT_BEDS=snap.shifts.nightBeds;
+    var dbs=document.querySelector('.tstepper[data-id="mp_day_beds_s"] .tsval');
+    var ebs=document.querySelector('.tstepper[data-id="mp_eve_beds_s"] .tsval');
+    var nbs=document.querySelector('.tstepper[data-id="mp_night_beds_s"] .tsval');
+    var dss=document.getElementById('shift-day-start');
+    var ess=document.getElementById('shift-eve-start');
+    var nss=document.getElementById('shift-night-start');
+    if(dbs)dbs.value=MP_DAY_BEDS; if(ebs)ebs.value=MP_EVE_BEDS; if(nbs)nbs.value=MP_NIGHT_BEDS;
+    if(dss)dss.value=SHIFT_DAY_START; if(ess)ess.value=SHIFT_EVE_START; if(nss)nss.value=SHIFT_NIGHT_START;
+    updateBCCFDisplays(); onShiftChange();
+  }
+  // mPEDOCS threshold
+  if(snap.mp8Sel){
+    MP8_SEL=snap.mp8Sel;
+    document.querySelectorAll('.tbtn[data-m]').forEach(function(b){b.classList.remove('on');});
+    document.querySelectorAll('.tbtn[data-m="'+MP8_SEL+'"]').forEach(function(b){b.classList.add('on');});
+    updateMpTick(); renderMpedocs();
+  }
+  renderSurgeDashboard();
+}
+
+var _smdb=document.getElementById('save-my-default-btn');
+if(_smdb)_smdb.addEventListener('click',function(){
+  try{ localStorage.setItem('pedED_myDefault', JSON.stringify(captureMyDefault())); }catch(e){}
+  var badge=document.getElementById('myDefaultBadge');
+  if(badge){badge.textContent='\u2b50 Saved as default';badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2500);}
+});
+
+var _rmdb=document.getElementById('restore-my-default-btn');
+if(_rmdb)_rmdb.addEventListener('click',function(){
+  try{
+    var raw=localStorage.getItem('pedED_myDefault');
+    if(!raw){
+      var badge=document.getElementById('myDefaultBadge');
+      if(badge){badge.textContent='No default saved';badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2000);}
+      return;
+    }
+    applyMyDefault(JSON.parse(raw));
+    var badge=document.getElementById('myDefaultBadge');
+    if(badge){badge.textContent='\u2b50 Restored';badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2000);}
+  }catch(e){}
+});
+
+// Auto-restore my default on load if saved
+(function(){
+  try{
+    var raw=localStorage.getItem('pedED_myDefault');
+    if(raw) applyMyDefault(JSON.parse(raw));
+  }catch(e){}
+})();
 if(_tbSettings)_tbSettings.addEventListener('click',function(){
   var ss=document.getElementById('seasonStart'),se=document.getElementById('seasonEnd');
   if(ss)ss.value=GRAD_SEASON_START;
