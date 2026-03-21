@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PED-ED SURGE · LIVE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MBED Surge Watch</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -18,7 +18,25 @@
   --blue: #60a5fa;
   --purple: #a78bfa;
   --text: #c8cfe8;
-  --muted: #3d4566;
+  --muted: #8892b0;
+  --green: #39d98a;
+  --orange: #ff9a3c;
+  --red: #ff4d6d;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;}
+:root {
+  --bg: #060810;
+  --panel: #0c0e1a;
+  --panel2: #101320;
+  --border: #1a1e30;
+  --accent: #00e5c3;
+  --accent2: #ff4d6d;
+  --accent3: #ffd166;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --text: #c8cfe8;
+  --muted: #8892b0;
   --green: #39d98a;
   --orange: #ff9a3c;
   --red: #ff4d6d;
@@ -32,7 +50,6 @@ body {
   line-height: 1.5;
   min-height: 100vh;
 }
-
 /* ── HEADER ── */
 .header {
   border-bottom: 1px solid var(--border);
@@ -64,10 +81,8 @@ body {
 }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 1.5s infinite; }
 @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.15} }
-
 /* ── MAIN ── */
 .main { padding: 20px 28px; display: flex; flex-direction: column; gap: 18px; }
-
 /* ── SURGE ALERT BAR ── */
 .surge-bar {
   border-radius: 8px;
@@ -87,10 +102,10 @@ body {
   background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
   pointer-events: none;
 }
-.surge-bar.LOW    { background: rgba(57,217,138,0.08);  border: 1px solid rgba(57,217,138,0.25); }
-.surge-bar.WATCH  { background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.3); }
-.surge-bar.HIGH   { background: rgba(255,154,60,0.1);   border: 1px solid rgba(255,154,60,0.35); }
-.surge-bar.SURGE  { background: rgba(255,77,109,0.12);  border: 1px solid rgba(255,77,109,0.4); animation: pulse-red 2s infinite; }
+.surge-bar.LOW { background: rgba(57,217,138,0.08);  border: 1px solid rgba(57,217,138,0.25); }
+.surge-bar.WATCH { background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.3); }
+.surge-bar.HIGH { background: rgba(255,154,60,0.1);   border: 1px solid rgba(255,154,60,0.35); }
+.surge-bar.SURGE { background: rgba(255,77,109,0.12);  border: 1px solid rgba(255,77,109,0.4); animation: pulse-red 2s infinite; }
 @keyframes pulse-red {
   0%,100% { border-color: rgba(255,77,109,0.4); box-shadow: none; }
   50% { border-color: rgba(255,77,109,0.8); box-shadow: 0 0 20px rgba(255,77,109,0.15); }
@@ -132,12 +147,10 @@ body {
 .WATCH .action-dot { background: var(--accent3); }
 .HIGH  .action-dot { background: var(--orange); }
 .SURGE .action-dot { background: var(--red); }
-
 /* ── 3-COL CARDS ── */
 .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
 .row2 { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
 .row2b { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-
 /* ── PANEL ── */
 .panel {
   background: var(--panel);
@@ -171,9 +184,6 @@ body {
 .badge-r { background: rgba(255,77,109,0.12); color: var(--red); border: 1px solid rgba(255,77,109,0.25); }
 .badge-b { background: rgba(96,165,250,0.12); color: var(--blue); border: 1px solid rgba(96,165,250,0.25); }
 .badge-p { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
-
-
-
 /* ── SCHOOL CALENDAR ── */
 .cal-today {
   padding: 12px;
@@ -181,15 +191,14 @@ body {
   margin-bottom: 12px;
   font-size: 12px;
 }
-.cal-today.school-day   { background: rgba(57,217,138,0.07); border: 1px solid rgba(57,217,138,0.2); }
-.cal-today.no-school    { background: rgba(255,77,109,0.07); border: 1px solid rgba(255,77,109,0.2); }
+.cal-today.school-day { background: rgba(57,217,138,0.07); border: 1px solid rgba(57,217,138,0.2); }
+.cal-today.no-school { background: rgba(255,77,109,0.07); border: 1px solid rgba(255,77,109,0.2); }
 .cal-today.school-break { background: rgba(255,209,102,0.07); border: 1px solid rgba(255,209,102,0.2); }
 .cal-status { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
 .school-day   .cal-status { color: var(--green); }
 .no-school    .cal-status { color: var(--red); }
 .school-break .cal-status { color: var(--accent3); }
 .cal-desc { color: var(--muted); font-size: 11px; line-height: 1.4; }
-
 .upcoming-list { display: flex; flex-direction: column; gap: 6px; }
 .cal-event {
   display: flex;
@@ -202,16 +211,15 @@ body {
   font-size: 11px;
 }
 .cal-event.holiday { border-color: var(--red); }
-.cal-event.break   { border-color: var(--accent3); }
-.cal-event.return  { border-color: var(--green); }
-.cal-event.pd      { border-color: var(--muted); }
+.cal-event.break { border-color: var(--accent3); }
+.cal-event.return { border-color: var(--green); }
+.cal-event.pd { border-color: var(--muted); }
 .cal-event-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); min-width: 60px; margin-top: 1px; }
 .cal-event-name { color: var(--text); line-height: 1.3; }
 .cal-surge-note { font-size: 10px; font-style: italic; margin-top: 2px; }
 .holiday .cal-surge-note { color: var(--red); }
 .break   .cal-surge-note { color: var(--accent3); }
 .return  .cal-surge-note { color: var(--orange); }
-
 /* ── FACTOR SCORE ── */
 .factor-scores { display: flex; flex-direction: column; gap: 8px; }
 .factor-row {
@@ -232,13 +240,12 @@ body {
   min-width: 40px;
   text-align: right;
 }
-.score-high  { color: var(--red); }
-.score-med   { color: var(--orange); }
-.score-low   { color: var(--green); }
-.score-none  { color: var(--muted); }
+.score-high { color: var(--red); }
+.score-med { color: var(--orange); }
+.score-low { color: var(--green); }
+.score-none { color: var(--muted); }
 .factor-bar-bg { height: 3px; background: var(--border); border-radius: 2px; margin-top: 5px; }
 .factor-bar-fill { height: 3px; border-radius: 2px; transition: width 0.8s ease; }
-
 /* ── 7-DAY FORECAST ── */
 .forecast-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .fc-day {
@@ -257,7 +264,6 @@ body {
 .fc-date { color: var(--muted); font-size: 9px; margin-bottom: 6px; }
 .fc-surge-bar { height: 4px; border-radius: 2px; margin: 4px auto 0; width: 80%; }
 .fc-surge-pct { font-family: 'Space Mono', monospace; font-size: 9px; margin-top: 3px; }
-
 /* ── LOADING SPINNER ── */
 .loading {
   display: flex; align-items: center; justify-content: center;
@@ -275,7 +281,6 @@ body {
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 /* ── SECTION DIVIDER ── */
 .sdiv {
   display: flex; align-items: center; gap: 12px;
@@ -284,10 +289,8 @@ body {
   text-transform: uppercase; color: var(--muted);
 }
 .sdiv::after { content:''; flex:1; height:1px; background: var(--border); }
-
 /* ── LAST UPDATED ── */
 #lastUpdated { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
-
 /* ── FOOTER ── */
 .footer {
   padding: 14px 28px;
@@ -297,18 +300,15 @@ body {
   letter-spacing: 0.5px;
   margin-top: 6px;
 }
-
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(8px); }
-  to   { opacity:1; transform:translateY(0); }
+to { opacity:1; transform:translateY(0); }
 }
 .panel, .surge-bar { animation: fadeUp 0.35s ease both; }
-
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
 /* ═══════════════════════════════════════════════════════
    MOBILE RESPONSIVE — max-width 768px
    ═══════════════════════════════════════════════════════ */
@@ -322,112 +322,96 @@ body {
     gap: 8px;
     position: sticky;
   }
-  .logo-main { font-size: 18px; letter-spacing: 2px; }
-  .logo-sub  { font-size: 9px; }
-  .header-stats {
+.logo-main { font-size: 18px; letter-spacing: 2px; }
+.logo-sub { font-size: 9px; }
+.header-stats {
     width: 100%;
     flex-wrap: wrap;
     gap: 10px;
     justify-content: space-between;
   }
-  .hstat-val { font-size: 13px; }
-  .hstat-lbl { font-size: 8px; }
-  .live-badge { font-size: 9px; padding: 3px 8px; }
-  .settings-btn { font-size: 10px; padding: 4px 10px; }
-
-  /* Main padding */
+.hstat-val { font-size: 13px; }
+.hstat-lbl { font-size: 8px; }
+.live-badge { font-size: 9px; padding: 3px 8px; }
+.settings-btn { font-size: 10px; padding: 4px 10px; }
+/* Main padding */
   .main { padding: 12px 14px; gap: 12px; }
-
-  /* Surge bar — stack vertically */
+/* Surge bar — stack vertically */
   .surge-bar {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
     padding: 14px 16px;
   }
-  .surge-level-text { font-size: 34px; }
-  .surge-prob { font-size: 12px; }
-  .surge-detail { padding: 0; }
-  .surge-headline { font-size: 13px; }
-  .surge-rationale { font-size: 11px; }
-  .surge-actions { min-width: unset; width: 100%; }
-  .action-item { font-size: 10px; }
-
-  /* All multi-column grids → single column */
+.surge-level-text { font-size: 34px; }
+.surge-prob { font-size: 12px; }
+.surge-detail { padding: 0; }
+.surge-headline { font-size: 13px; }
+.surge-rationale { font-size: 11px; }
+.surge-actions { min-width: unset; width: 100%; }
+.action-item { font-size: 10px; }
+/* All multi-column grids → single column */
   .row3, .row2, .row2b {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-
-  /* Panel padding */
+/* Panel padding */
   .pb { padding: 12px; }
-  .ph { padding: 9px 12px; }
-  .pt { font-size: 8.5px; letter-spacing: 1.5px; }
-  .badge { font-size: 8px; padding: 2px 5px; }
-
-
-
-
-  /* Factor scores — tighten */
+.ph { padding: 9px 12px; }
+.pt { font-size: 8.5px; letter-spacing: 1.5px; }
+.badge { font-size: 8px; padding: 2px 5px; }
+/* Factor scores — tighten */
   .factor-icon { font-size: 14px; }
-  .factor-name { font-size: 11px; }
-  .factor-desc { font-size: 9px; }
-  .factor-score { font-size: 12px; }
-
-  /* Calendar events */
+.factor-name { font-size: 11px; }
+.factor-desc { font-size: 9px; }
+.factor-score { font-size: 12px; }
+/* Calendar events */
   .cal-event { padding: 6px 8px; font-size: 10px; }
-  .cal-event-date { font-size: 9px; min-width: 50px; }
-  .cal-status { font-size: 11px; }
-  .cal-desc { font-size: 10px; }
-
-  /* 24h forecast bars — allow horizontal scroll */
+.cal-event-date { font-size: 9px; min-width: 50px; }
+.cal-status { font-size: 11px; }
+.cal-desc { font-size: 10px; }
+/* 24h forecast bars — allow horizontal scroll */
   .forecast-bars-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .forecast-bars-inner {
+.forecast-bars-inner {
     min-width: 600px;
   }
-
-  /* 7-day grid — 2 rows of compressed cells or scroll */
+/* 7-day grid — 2 rows of compressed cells or scroll */
   .forecast-grid {
     grid-template-columns: repeat(7, 1fr);
     gap: 3px;
     overflow-x: auto;
   }
-  .fc-day { padding: 7px 3px; }
-  .fc-dow { font-size: 9px; }
-  .fc-date { font-size: 8px; }
-  .fc-surge-pct { font-size: 8px; }
-
-  /* Section dividers */
+.fc-day { padding: 7px 3px; }
+.fc-dow { font-size: 9px; }
+.fc-date { font-size: 8px; }
+.fc-surge-pct { font-size: 8px; }
+/* Section dividers */
   .sdiv { font-size: 8px; letter-spacing: 1.5px; }
-
-  /* Settings drawer — full width on mobile */
+/* Settings drawer — full width on mobile */
   .settings-drawer { width: 100%; right: -100%; border-left: none; border-top: 1px solid var(--border); }
-  .settings-drawer.open { right: 0; }
-  .grad-entry { grid-template-columns: 1fr 1fr; gap: 6px; }
-  .drawer-season-row { grid-template-columns: 1fr; }
-  .drawer-body { padding: 14px; }
-
-  /* Footer — single line */
+.settings-drawer.open { right: 0; }
+.grad-entry { grid-template-columns: 1fr 1fr; gap: 6px; }
+.drawer-season-row { grid-template-columns: 1fr; }
+.drawer-body { padding: 14px; }
+/* Footer — single line */
   .footer { flex-direction: column; gap: 4px; font-size: 9px; padding: 10px 14px; }
-
-  /* Alert strip */
+/* Alert strip */
   .alert-strip { padding: 10px 12px; }
-  .alert-text { font-size: 11px; }
-
-  /* Composite score box */
+.alert-text { font-size: 11px; }
+/* Composite score box */
   .composite-score-num { font-size: 28px !important; }
 }
 
 /* Extra small phones (iPhone SE etc) */
 @media (max-width: 390px) {
   .surge-level-text { font-size: 28px; }
-  .header-stats { gap: 6px; }
-  .hstat-val { font-size: 12px; }
-  .forecast-grid { gap: 2px; }
-  .fc-day { padding: 5px 2px; }
+.header-stats { gap: 6px; }
+.hstat-val { font-size: 12px; }
+.forecast-grid { gap: 2px; }
+.fc-day { padding: 5px 2px; }
 }
 
 .error-msg {
@@ -438,7 +422,6 @@ body {
   border: 1px solid rgba(255,154,60,0.2);
   border-radius: 4px;
 }
-
 /* ── SETTINGS DRAWER ── */
 .settings-btn {
   display: flex; align-items: center; gap: 6px;
@@ -454,7 +437,6 @@ body {
   transition: all 0.15s;
 }
 .settings-btn:hover { border-color: var(--accent); color: var(--accent); }
-
 .settings-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -463,7 +445,6 @@ body {
   backdrop-filter: blur(4px);
 }
 .settings-overlay.open { display: block; }
-
 .settings-drawer {
   position: fixed;
   top: 0; right: -480px;
@@ -476,7 +457,6 @@ body {
   overflow: hidden;
 }
 .settings-drawer.open { right: 0; }
-
 .drawer-header {
   padding: 18px 20px;
   border-bottom: 1px solid var(--border);
@@ -495,9 +475,7 @@ body {
   line-height: 1;
 }
 .drawer-close:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-
 .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
-
 .drawer-section-title {
   font-family: 'Space Mono', monospace;
   font-size: 9px; letter-spacing: 2px;
@@ -506,7 +484,6 @@ body {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
 }
-
 .grad-entry {
   display: grid;
   grid-template-columns: 1fr 1fr auto auto;
@@ -518,9 +495,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 5px;
 }
-.grad-entry input[type="date"],
-.grad-entry input[type="time"],
-.grad-entry input[type="text"] {
+.grad-entry input[type="date"], .grad-entry input[type="time"], .grad-entry input[type="text"] {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -534,19 +509,15 @@ body {
 }
 .grad-entry input:focus { border-color: var(--accent); }
 .grad-entry input::placeholder { color: var(--muted); }
-
 /* colorscheme for dark date pickers */
-.grad-entry input[type="date"]::-webkit-calendar-picker-indicator,
-.grad-entry input[type="time"]::-webkit-calendar-picker-indicator {
+.grad-entry input[type="date"]::-webkit-calendar-picker-indicator, .grad-entry input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(0.5);
   cursor: pointer;
 }
-
 .grad-full-row {
   grid-column: 1 / -1;
 }
 .grad-full-row input[type="text"] { width: 100%; }
-
 .btn-icon {
   background: none; border: 1px solid var(--border);
   border-radius: 4px; color: var(--muted);
@@ -557,7 +528,6 @@ body {
 .btn-icon:hover { border-color: var(--red); color: var(--red); }
 .btn-icon.add { border-color: rgba(57,217,138,0.3); color: var(--green); }
 .btn-icon.add:hover { border-color: var(--green); background: rgba(57,217,138,0.08); }
-
 .drawer-add-row {
   display: flex; gap: 8px; margin-top: 10px;
 }
@@ -577,7 +547,6 @@ body {
   transition: all 0.15s;
 }
 .drawer-add-row button:hover { background: rgba(57,217,138,0.2); }
-
 .drawer-info {
   margin-top: 12px;
   padding: 10px 12px;
@@ -589,7 +558,6 @@ body {
   line-height: 1.5;
 }
 .drawer-info strong { color: var(--blue); }
-
 .drawer-footer {
   padding: 14px 20px;
   border-top: 1px solid var(--border);
@@ -621,7 +589,6 @@ body {
   transition: all 0.15s;
 }
 .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
-
 .saved-badge {
   display: none;
   font-family: 'Space Mono', monospace;
@@ -629,7 +596,6 @@ body {
   align-items: center; gap: 5px;
 }
 .saved-badge.show { display: flex; }
-
 .drawer-season-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -641,116 +607,502 @@ body {
   display: block; margin-bottom: 4px;
   font-family: 'Space Mono', monospace; letter-spacing: 0.5px;
 }
+
+
+
+.app-scroll{position:fixed;top:0;left:0;right:0;bottom:56px;overflow:hidden;height:calc(100% - 56px);}
+.app-screen{display:none;}
+.app-screen.on{display:block;position:absolute;top:0;left:0;right:0;bottom:0;height:100%;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060810;}
+.app-tabs{position:fixed;bottom:0;left:0;right:0;height:56px;background:#0c0e1a;border-top:1px solid #1a1e30;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;z-index:9999;}
+.app-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:#8892b0;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.8px;text-transform:uppercase;position:relative;transition:color .15s;}
+.app-tab.on{color:#00e5c3;}
+.app-tab.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:#00e5c3;border-radius:0 0 2px 2px;}
+.app-tab-ico{font-size:16px;line-height:1;}
+.t-body{padding:14px 14px 16px;}
+.tp{background:#0c0e1a;border:1px solid #1a1e30;border-radius:8px;overflow:hidden;margin-bottom:12px;}
+.tph{padding:10px 14px;border-bottom:1px solid #1a1e30;display:flex;align-items:center;justify-content:space-between;}
+.tpt{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#00e5c3;}
+.tpb{padding:14px;}
+.tsec{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#8892b0;margin:14px 0 8px;display:flex;align-items:center;gap:10px;}
+.tsec::after{content:'';flex:1;height:1px;background:#1a1e30;}
+.tbadge-g{font-size:8px;font-family:'Space Mono',monospace;padding:2px 6px;border-radius:3px;background:rgba(57,217,138,.1);color:#39d98a;border:1px solid rgba(57,217,138,.25);}
+.thr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 12px;background:#0c0e1a;border:1px solid #1a1e30;border-radius:7px;}
+.thr-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:#8892b0;white-space:nowrap;}
+.thr-btns{display:flex;gap:5px;flex:1;}
+.tbtn{flex:1;padding:5px 0;border-radius:5px;border:1px solid #1a1e30;background:transparent;color:#8892b0;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;}
+.tbtn.on{border-color:#00e5c3;color:#00e5c3;font-weight:700;}
+.mhero{border-radius:8px;padding:16px;margin-bottom:12px;transition:all .4s;}
+.mhero.CLEAR   {background:rgba(57,217,138,.06); border:1px solid rgba(57,217,138,.2);}
+.mhero.WATCH   {background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.25);}
+.mhero.ADVISORY{background:rgba(255,154,60,.08); border:1px solid rgba(255,154,60,.3);}
+.mhero.WARNING {background:rgba(255,77,109,.10); border:1px solid rgba(255,77,109,.4);}
+.mhero.IMMINENT{background:rgba(255,77,109,.14); border:1px solid rgba(255,77,109,.5);animation:mpulse 2s infinite;}
+@keyframes mpulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 16px rgba(255,77,109,.15)}}
+.mbig{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:2px;line-height:1;}
+.mtlbl{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;margin-top:3px;}
+.mact{font-size:11px;color:#8892b0;margin-top:8px;line-height:1.5;}
+.CLEAR .mbig,.CLEAR .mtlbl{color:#39d98a;}
+.WATCH .mbig,.WATCH .mtlbl{color:#ffd166;}
+.ADVISORY .mbig,.ADVISORY .mtlbl{color:#ff9a3c;}
+.WARNING .mbig,.WARNING .mtlbl,.IMMINENT .mbig,.IMMINENT .mtlbl{color:#ff4d6d;}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ilbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:#8892b0;margin-bottom:4px;display:flex;justify-content:space-between;}
+.ival{color:#c8cfe8;font-weight:600;}
+.tstepper{display:flex;align-items:center;background:rgba(255,255,255,.02);border:1px solid #1a1e30;border-radius:6px;overflow:hidden;transition:border-color .15s;}
+.tstepper:focus-within{border-color:#00e5c3;}
+.tsbtn{width:36px;height:38px;border:none;background:none;color:#c8cfe8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tsbtn:active{background:rgba(255,255,255,.05);}
+.tsval{flex:1;height:38px;border:none;background:none;color:#c8cfe8;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;text-align:center;outline:none;width:0;min-width:0;}
+.tsval::-webkit-inner-spin-button{display:none;}
+.tdrv{margin-bottom:7px;}
+.tdrv-top{display:flex;justify-content:space-between;margin-bottom:3px;font-size:9px;color:#8892b0;}
+.tdrv-bg{height:3px;background:#1a1e30;border-radius:2px;}
+.tdrv-fill{height:3px;border-radius:2px;transition:width .4s;}
+.cbig{font-family:'Bebas Neue',sans-serif;font-size:88px;letter-spacing:-1px;line-height:.9;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.scell{background:#0c0e1a;border:1px solid #1a1e30;border-radius:7px;padding:10px 6px;text-align:center;}
+.sval2{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;margin-bottom:2px;}
+.slbl{font-size:8px;color:#8892b0;letter-spacing:.5px;text-transform:uppercase;line-height:1.4;}
+.bkrow{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #1a1e30;font-size:10px;}
+.bkrow:last-child{border:none;}
+.bkname{color:#8892b0;}
+.bkright{display:flex;align-items:center;gap:8px;}
+.bkbarbg{width:60px;height:3px;background:#1a1e30;border-radius:2px;}
+.bkbar{height:3px;border-radius:2px;transition:width .4s;}
+.bkval{font-family:'Space Mono',monospace;font-weight:700;font-size:10px;min-width:32px;text-align:right;}
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;padding:12px;}
+.pnum{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:#00e5c3;}
+.plbl{font-size:8px;color:#8892b0;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.sinfo{margin-top:12px;padding:10px 12px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:5px;font-size:11px;color:#8892b0;line-height:1.5;}
+.sinfo strong{color:#60a5fa;}
+.sbtnrow{display:flex;gap:10px;margin-top:16px;}
+.sbtnp{flex:1;background:rgba(0,229,195,.1);border:1px solid rgba(0,229,195,.3);border-radius:5px;color:#00e5c3;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;padding:10px;cursor:pointer;text-transform:uppercase;}
+.sbtns{background:rgba(255,255,255,.03);border:1px solid #1a1e30;border-radius:5px;color:#8892b0;font-family:'Space Mono',monospace;font-size:10px;padding:10px 14px;cursor:pointer;}
+.svdbadge{display:none;font-family:'Space Mono',monospace;font-size:10px;color:#39d98a;align-items:center;gap:5px;}
+.svdbadge.show{display:flex;}
+.gerow{display:grid;grid-template-columns:120px 1fr 80px auto;gap:6px;align-items:center;margin-bottom:6px;padding:8px;background:rgba(255,255,255,.02);border:1px solid #1a1e30;border-radius:5px;}
+.gerow input{background:rgba(255,255,255,.04);border:1px solid #1a1e30;border-radius:4px;color:#c8cfe8;font-size:11px;padding:4px 6px;outline:none;width:100%;}
+.gerow input:focus{border-color:#00e5c3;}
+.delbtn{background:none;border:1px solid rgba(255,77,109,.3);border-radius:4px;color:#ff4d6d;font-size:13px;padding:3px 8px;cursor:pointer;line-height:1;}
+
+
+.bccf-toggle-btn{padding:4px 10px;border-radius:4px;border:1px solid #1a1e30;background:transparent;color:#8892b0;font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;transition:all .15s;}
+.bccf-toggle-btn.on{border-color:#00e5c3;color:#00e5c3;background:rgba(0,229,195,.08);}
 </style>
 </head>
 <body>
 
+<div class="app-scroll" id="app-scroll">
+
+<!-- TAB 1: SURGE -->
+<div class="app-screen on" id="sc-surge">
 <div class="header">
   <div class="logo">
-    <div class="logo-main">PED-ED SURGE</div>
+    <div class="logo-main">MBED SURGE WATCH</div>
     <div class="logo-sub">Live Prediction · Tacoma WA · Lat 47.25 / Lon -122.44</div>
     <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.3px;font-family:'IBM Plex Sans',sans-serif;font-style:italic;">
-      Surge = &gt;<span id="thresh-display">10</span> patient arrivals in a single hour &nbsp;·&nbsp; Base rate <span id="baserate-display">12</span>% of hours &nbsp;·&nbsp; Model AUC 0.838
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-      <span style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">Surge Threshold</span>
-      <input type="range" id="thresh-slider" min="6" max="15" step="1" value="10"
-        style="flex:1;max-width:180px;accent-color:var(--accent);cursor:pointer;"
-        oninput="onThreshChange(this.value)">
-      <span id="thresh-val" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">&gt;10 /hr</span>
+      Surge = &gt;<span id="thresh-display">10</span> patient arrivals in a single hour &nbsp;·&nbsp; Base rate this hour <span id="baserate-display">12</span>% &nbsp;·&nbsp; Model AUC 0.838
     </div>
   </div>
   <div class="header-stats">
-    <div class="hstat">
-      <div class="hstat-val" style="color:var(--accent)">0.838</div>
-      <div class="hstat-lbl">Model AUC</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;width:100%;">
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <div class="hstat">
+          <div class="hstat-val" style="color:var(--accent)">0.838</div>
+          <div class="hstat-lbl">Model AUC</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-val" style="color:var(--accent3)" id="hstat-baserate">12.0%</div>
+          <div class="hstat-lbl">This Hour</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-val" id="lastUpdated">—</div>
+          <div class="hstat-lbl">Last Refresh</div>
+        </div>
+        <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+        <button class="settings-btn" id="open-settings-btn">⚙ MANAGE EVENTS</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:flex-end;">
+        <span style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">Surge Threshold</span>
+        <input type="range" id="thresh-slider" min="6" max="15" step="1" value="10"
+          style="flex:1;max-width:180px;accent-color:var(--accent);cursor:pointer;"
+          oninput="onThreshChange(this.value)">
+        <span id="thresh-val" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">&gt;10 /hr</span>
+      </div>
     </div>
-    <div class="hstat">
-      <div class="hstat-val" style="color:var(--accent3)">12.0%</div>
-      <div class="hstat-lbl">Base Rate</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-val" id="lastUpdated">—</div>
-      <div class="hstat-lbl">Last Refresh</div>
-    </div>
-    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
-    <button class="settings-btn" onclick="openSettings()">⚙ MANAGE EVENTS</button>
   </div>
 </div>
-
-<!-- SETTINGS OVERLAY -->
-<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
-
-<!-- SETTINGS DRAWER -->
-<div class="settings-drawer" id="settingsDrawer">
-  <div class="drawer-header">
-    <div class="drawer-title">🎓 Graduation Event Manager</div>
-    <button class="drawer-close" onclick="closeSettings()">✕</button>
-  </div>
-  <div class="drawer-body">
-
-    <!-- Season window -->
-    <div class="drawer-section-title">Graduation Season Window</div>
-    <div class="drawer-season-row">
-      <div>
-        <label>Season Start (month/day)</label>
-        <input type="date" id="seasonStart" value="2026-06-01">
-      </div>
-      <div>
-        <label>Season End (month/day)</label>
-        <input type="date" id="seasonEnd" value="2026-06-20">
-      </div>
-    </div>
-
-    <!-- Individual ceremonies -->
-    <div class="drawer-section-title" style="margin-top:4px;">Confirmed Ceremony Dates</div>
-    <div id="gradEntriesList"></div>
-
-    <!-- Add new row -->
-    <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:6px;">
-      <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:8px;">ADD CEREMONY</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div>
-          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Date</label>
-          <input type="date" id="newDate" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;padding:5px 8px;outline:none;">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Time (optional)</label>
-          <input type="time" id="newTime" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;padding:5px 8px;outline:none;">
-        </div>
-      </div>
-      <div style="margin-bottom:8px;">
-        <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Ceremony Name</label>
-        <input type="text" id="newName" placeholder="e.g. Lincoln High School Graduation"
-          style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;padding:5px 8px;outline:none;">
-      </div>
-      <button onclick="addGradEntry()" style="width:100%;background:rgba(57,217,138,0.1);border:1px solid rgba(57,217,138,0.3);border-radius:4px;color:var(--green);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;">+ ADD CEREMONY</button>
-    </div>
-
-    <div class="drawer-info" style="margin-top:14px;">
-      <strong>How it works:</strong> Confirmed ceremony dates get a ×1.18 surge modifier (vs ×1.13 for generic season days). All weekdays within the season window get the base graduation modifier. Changes are saved to your browser and persist across refreshes.
-      <br><br>
-      <strong>Where to find dates:</strong> tacomadome.org/events · tacomaschools.org · individual school graduation pages · batestech.edu/commencement · pierce.ctc.edu/commencement · cptc.edu/graduation
-    </div>
-  </div>
-
-  <div class="drawer-footer">
-    <button class="btn-primary" onclick="saveSettings()">SAVE & APPLY</button>
-    <button class="btn-secondary" onclick="resetToDefaults()">RESET DEFAULTS</button>
-    <div class="saved-badge" id="savedBadge">✓ Saved</div>
-  </div>
-</div>
-
 <div class="main" id="mainContent">
   <div class="loading"><div class="spinner"></div>Loading surge prediction…</div>
+</div>
+
+<!-- STATIC confirmed surge toggle — lives outside renderDashboard to survive re-renders -->
+<div class="main" style="padding-top:0;">
+  <div class="sdiv">Current Status</div>
+  <div class="panel">
+    <div class="ph"><div class="pt">Surge Confirmed This Hour?</div><div class="badge badge-r">ARRIVALS THRESHOLD</div></div>
+    <div class="pb">
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button id="surge-flag-no"  onclick="setSurgeFlag(false)" class="tbtn on"  style="flex:1;padding:10px 0;">NO</button>
+        <button id="surge-flag-yes" onclick="setSurgeFlag(true)"  class="tbtn"     style="flex:1;padding:10px 0;border-color:#ff4d6d;color:#ff4d6d;">YES — surge active</button>
+      </div>
+      <div style="font-size:10px;color:#8892b0;line-height:1.5;margin-bottom:12px;">
+        Tap <strong style="color:#ff4d6d;">YES</strong> if arrivals this hour have met or exceeded the threshold above. Enter WR &amp; TP to update the 8h forecast bars with current ED state.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">
+        <div>
+          <div class="ilbl">Waiting Room <span class="ival" id="sf-d-wr">0</span></div>
+          <div class="tstepper" data-sfid="mp_wr" data-min="0" data-max="60" data-step="1">
+            <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="0" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+          </div>
+        </div>
+        <div>
+          <div class="ilbl">Total Present <span class="ival" id="sf-d-tp">0</span></div>
+          <div class="tstepper" data-sfid="mp_tp" data-min="0" data-max="120" data-step="1">
+            <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="0" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+          </div>
+        </div>
+        <div>
+          <div class="ilbl">Arrivals 3h <span class="ival" id="sf-d-arrivals">16</span></div>
+          <div class="tstepper" data-sfid="in_arrivals" data-min="0" data-max="60" data-step="1">
+            <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="16" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">Computed mPEDOCS</div>
+          <div style="font-size:9px;color:#8892b0;" id="sf-calc-formula">WR=0 · TP=0</div>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:#8892b0;" id="sf-calc-score">—</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="footer">
   <div>RF MODEL · AUC 0.838 · N=146,276 VISITS · TACOMA PUBLIC SCHOOLS CALENDAR 2025-26 · TACOMA DOME GRADUATION EVENTS</div>
   <div>NOT FOR CLINICAL USE WITHOUT LOCAL VALIDATION · REFRESH EVERY 30 MIN</div>
 </div>
+</div>
+
+<!-- TAB 2: mPEDOCS -->
+<div class="app-screen" id="sc-now">
+<div class="t-body">
+  <div class="mhero CLEAR" id="mp-hero">
+    <div class="mbig" id="mp-prob">--%</div>
+    <div class="mtlbl" id="mp-tier">--</div>
+    <div style="font-size:9px;color:#8892b0;margin-top:4px;font-family:'Space Mono',monospace;" id="mp-auc-lbl">8h · mPEDOCS ≥100 · AUC 0.852</div>
+    <div class="mact" id="mp-action">--</div>
+  </div>
+  <div class="thr">
+    <div class="thr-lbl">Threshold</div>
+    <div class="thr-btns">
+      <button class="tbtn" id="mt70" data-m="70">70</button>
+      <button class="tbtn" id="mt80" data-m="80">80</button>
+      <button class="tbtn on" id="mt100" data-m="100">100</button>
+      <button class="tbtn" id="mt120" data-m="120">120</button>
+    </div>
+  </div>
+  <div class="tsec">mPEDOCS Calculator</div>
+  <div class="tp" style="margin-bottom:12px;">
+    <div class="tph">
+      <div class="tpt">Compute Score</div>
+      <div style="font-size:9px;color:#00e5c3;font-family:'Space Mono',monospace;" id="bccf-shift-active">Day shift active · BCCF 1.3</div>
+      <button class="settings-btn" onclick="switchTab('settings')" style="margin-top:6px;">⚙ SHIFT SETTINGS</button>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px;width:100%;">
+        <div style="text-align:center;padding:6px 4px;background:rgba(0,229,195,0.05);border:1px solid rgba(0,229,195,0.15);border-radius:6px;">
+          <div style="font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:2px;">☀ DAY</div>
+          <div style="font-size:14px;font-family:'Space Mono',monospace;font-weight:700;color:#00e5c3;" id="bccf-day-val">1.3</div>
+          <div style="font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;">BCCF</div>
+        </div>
+        <div style="text-align:center;padding:6px 4px;background:rgba(255,209,102,0.05);border:1px solid rgba(255,209,102,0.15);border-radius:6px;">
+          <div style="font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:2px;">🌇 EVE</div>
+          <div style="font-size:14px;font-family:'Space Mono',monospace;font-weight:700;color:#ffd166;" id="bccf-eve-val">1.6</div>
+          <div style="font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;">BCCF</div>
+        </div>
+        <div style="text-align:center;padding:6px 4px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:6px;">
+          <div style="font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:2px;">🌙 NIGHT</div>
+          <div style="font-size:14px;font-family:'Space Mono',monospace;font-weight:700;color:#a78bfa;" id="bccf-night-val">1.9</div>
+          <div style="font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;">BCCF</div>
+        </div>
+      </div>
+    </div>
+    <div class="tpb">
+      <div class="igrid" style="margin-bottom:10px;">
+        <div>
+          <div class="ilbl">Waiting Room (WR) <span class="ival" id="d-mp-wr">0</span></div>
+          <div class="tstepper" data-id="mp_wr" data-min="0" data-max="60" data-step="1">
+            <button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" type="number" value="0" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+          </div>
+        </div>
+        <div>
+          <div class="ilbl">Total Patients (TP) <span class="ival" id="d-mp-tp">0</span></div>
+          <div class="tstepper" data-id="mp_tp" data-min="0" data-max="120" data-step="1">
+            <button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" type="number" value="0" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid #1a1e30;">
+        <div>
+          <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">mPEDOCS Score</div>
+          <div id="mp-calc-score" style="font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:#8892b0;">&#8212;</div>
+          <div id="mp-calc-formula" style="font-size:9px;color:#8892b0;margin-top:2px;">WR=0 &middot; TP=0 &middot; BCCF=1.3</div>
+        </div>
+        <div style="text-align:right;">
+          <div id="mp-calc-level" style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;border:1px solid #8892b0;color:#8892b0;margin-bottom:4px;">&#8212;</div>
+          <div id="mp-calc-desc" style="font-size:10px;color:#8892b0;margin-bottom:8px;">enter values above</div>
+          <button onclick="applyMpCalc()" style="background:rgba(0,229,195,.1);border:1px solid rgba(0,229,195,.3);border-radius:4px;color:#00e5c3;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;cursor:pointer;">&#8593; USE THIS SCORE</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;height:4px;background:#1a1e30;border-radius:2px;position:relative;overflow:visible;">
+        <div id="mp-calc-bar" style="height:4px;border-radius:2px;width:0%;background:#8892b0;transition:width .3s,background .3s;"></div>
+        <div style="position:absolute;left:38.5%;top:-3px;width:2px;height:10px;background:#ffd166;border-radius:1px;"></div>
+        <div style="position:absolute;left:38.5%;top:-16px;font-size:8px;color:#ffd166;font-family:'Space Mono',monospace;transform:translateX(-50%);">100</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:8px;color:#8892b0;font-family:'Space Mono',monospace;"><span>0</span><span>260</span></div>
+    </div>
+  </div>
+  <div class="tsec">Inputs</div>
+  <div class="tp">
+    <div class="tph"><div class="tpt">Current ED State</div><div class="tbadge-g">Hour auto-syncs</div></div>
+    <div class="tpb igrid">
+      <div>
+        <div class="ilbl">mPEDOCS <span class="ival" id="d-mpedocs">60</span></div>
+        <div class="tstepper" data-id="in_mpedocs" data-min="0" data-max="350" data-step="5">
+          <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="60" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="ilbl">Arrivals last 3h <span class="ival" id="d-arrivals">16</span></div>
+        <div class="tstepper" data-id="in_arrivals" data-min="0" data-max="60" data-step="1">
+          <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="16" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+        </div>
+      </div>
+      <div style="grid-column:1/-1;">
+        <div class="ilbl">Hour <span class="ival" id="d-hour">--</span></div>
+        <div class="tstepper" data-id="in_hour" data-min="0" data-max="23" data-step="1">
+          <button class="tsbtn" data-d="-1">−</button><input class="tsval" type="number" value="14" inputmode="numeric"><button class="tsbtn" data-d="1">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tsec">Score Drivers</div>
+  <div class="tp"><div class="tpb" id="mp-drivers"></div></div>
+</div>
+
+
+<!-- TAB 3: COMPOSITE --
+<div class="t-body">
+  <div class="sdiv" style="margin-top:4px;">Composite Probability</div>
+  <div class="mhero CLEAR" id="comp-hero">
+    <div class="cbig" id="comp-num" style="color:#39d98a;">--%</div>
+    <div style="font-size:9px;color:#8892b0;margin-top:4px;font-family:'Space Mono',monospace;">Composite · 8h Surge Peak + mPEDOCS 8h + ILI</div>
+    <div class="mtlbl" id="comp-tier" style="margin-top:6px;">--</div>
+    <div class="mact" id="comp-action">--</div>
+  </div>
+  <div class="sgrid">
+    <div class="scell"><div class="sval2" id="sig-surge" style="color:#8892b0;">--%</div><div class="slbl">Surge<br>Predictor</div></div>
+    <div class="scell"><div class="sval2" id="sig-mp8"   style="color:#8892b0;">--%</div><div class="slbl">mPEDOCS<br>8h</div></div>
+    <div class="scell"><div class="sval2" id="sig-ili"   style="color:#8892b0;">×1.00</div><div class="slbl">ILI<br>Modifier</div></div>
+  </div>
+  <div class="tsec">Breakdown</div>
+  <div class="tp" id="comp-breakdown"></div>
+  <div class="tsec">Why This Score</div>
+  <div class="tp"><div class="tpb" id="comp-why" style="font-size:11px;color:#8892b0;line-height:1.8;"></div></div>
+  <div class="tsec">Performance</div>
+  <div class="tp">
+    <div class="pgrid">
+      <div><div class="pnum">0.838</div><div class="plbl">Surge AUC</div></div>
+      <div><div class="pnum" id="comp-mp-auc">0.852</div><div class="plbl">mPEDOCS AUC</div></div>
+      <div><div class="pnum">r=0.65</div><div class="plbl">ILI r</div></div>
+    </div>
+    <div style="padding:0 12px 12px;font-size:9px;color:#8892b0;line-height:1.7;">3yr · 146,164 visits · Train 2023–24 / Test 2025 · ATR-corrected · BCCF 1.3/1.9</div>
+  </div>
+</div>
+
+
+<!-- TAB: MH -->
+
+
+<!-- TAB 4: SETTINGS -->
+</div><!-- /sc-now -->
+
+<div class="app-screen" id="sc-mh">
+<div class="t-body">
+
+  <div class="mhero CLEAR" id="mh-risk-hero">
+    <div class="mbig" id="mh-visits-now" style="font-size:56px;">--</div>
+    <div class="mtlbl" id="mh-risk-tier">--</div>
+    <div style="font-size:9px;color:#8892b0;margin-top:4px;font-family:'Space Mono',monospace;">expected MH visits this hour · 3yr empirical</div>
+    <div class="mact" id="mh-risk-action">--</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px;">
+    <div style="background:#0c0e1a;border:1px solid #1a1e30;border-radius:8px;padding:10px;text-align:center;">
+      <div style="font-size:18px;font-family:'Bebas Neue',sans-serif;color:#a78bfa;" id="mh-daily-est">--</div>
+      <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;margin-top:2px;">Est Today</div>
+    </div>
+    <div style="background:#0c0e1a;border:1px solid #1a1e30;border-radius:8px;padding:10px;text-align:center;">
+      <div style="font-size:18px;font-family:'Bebas Neue',sans-serif;color:#ffd166;" id="mh-los-est">--</div>
+      <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;margin-top:2px;">Median LOS</div>
+    </div>
+    <div style="background:#0c0e1a;border:1px solid #1a1e30;border-radius:8px;padding:10px;text-align:center;">
+      <div style="font-size:18px;font-family:'Bebas Neue',sans-serif;color:#00e5c3;" id="mh-surge-pct">--%</div>
+      <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;margin-top:2px;">Above Threshold</div>
+    </div>
+  </div>
+
+  <div style="background:#0c0e1a;border:1px solid #1a1e30;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">MH Surge ≥</span>
+      <input type="range" id="mh-thresh-slider" min="3" max="15" step="1" value="8"
+        style="flex:1;accent-color:#a78bfa;cursor:pointer;"
+        oninput="renderMHTab()">
+      <span id="mh-thresh-val" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:600;color:#a78bfa;">8/day</span>
+    </div>
+    <div style="font-size:9px;color:#8892b0;margin-top:6px;" id="mh-thresh-context"></div>
+  </div>
+
+  <div class="sdiv">24-Hour MH Visit Forecast</div>
+  <div class="panel">
+    <div class="ph"><div class="pt">Expected MH Visits · Next 24h</div><div class="badge" style="background:rgba(167,139,250,0.1);color:#a78bfa;border-color:rgba(167,139,250,0.3);">EMPIRICAL</div></div>
+    <div class="pb">
+      <div class="forecast-bars-wrap">
+        <div id="mh-bars-inner" style="display:flex;gap:3px;height:90px;align-items:flex-end;"></div>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted);">
+        Bar height = expected MH visits · <span style="color:#a78bfa;">■ above threshold</span> · <span style="color:#39d98a;">■ below threshold</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sdiv">Context</div>
+  <div class="panel">
+    <div class="tpb" id="mh-context-panel" style="font-size:11px;color:#8892b0;line-height:2.0;padding:12px 14px;"></div>
+  </div>
+
+  <div class="sdiv">MH LOS Reference</div>
+  <div class="panel">
+    <div class="tpb" style="padding:12px 14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:#8892b0;line-height:1.8;">
+        <div><span style="color:#c8cfe8;">Discharge:</span> median 5.0h</div>
+        <div><span style="color:#c8cfe8;">Transfer:</span> median 17.7h</div>
+        <div><span style="color:#c8cfe8;">Admit:</span> median 5.8h</div>
+        <div><span style="color:#c8cfe8;">90th pct:</span> 24.9h</div>
+        <div><span style="color:#ffd166;">Thu/Sat arrival:</span> longest LOS</div>
+        <div><span style="color:#ffd166;">Late night:</span> 21:00 = 20.8h avg</div>
+      </div>
+      <div style="margin-top:10px;font-size:9px;color:#8892b0;line-height:1.5;">
+        LOS increases with arrival hour — morning arrivals (08:00) average 8.9h vs late evening (21:00) 20.8h. Thursday and Saturday show longest median LOS, likely reflecting reduced inpatient psychiatric bed availability on weekends.
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /sc-mh -->
+
+
+
+<div class="app-screen" id="sc-settings">
+<div class="t-body">
+  <div class="tsec">Shift Configuration</div>
+  <div class="tp" style="margin-bottom:16px;">
+    <div class="tph"><div class="tpt">Shift Start Times &amp; Beds</div><div class="tbadge-g">Controls BCCF</div></div>
+    <div class="tpb">
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px;">
+        <div>
+          <div style="font-size:9px;color:#00e5c3;font-family:'Space Mono',monospace;margin-bottom:3px;">&#9728; DAY START</div>
+          <div class="tstepper" data-id="shift-day-start" data-min="0" data-max="23" data-step="1"><button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" id="shift-day-start" type="number" value="7" inputmode="numeric"><button class="tsbtn" data-d="1">+</button></div>
+          <div style="font-size:9px;color:#00e5c3;font-family:'Space Mono',monospace;margin-top:3px;" id="shift-day-lbl">07:00</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#ffd166;font-family:'Space Mono',monospace;margin-bottom:3px;">&#127747; EVE START</div>
+          <div class="tstepper" data-id="shift-eve-start" data-min="0" data-max="23" data-step="1"><button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" id="shift-eve-start" type="number" value="15" inputmode="numeric"><button class="tsbtn" data-d="1">+</button></div>
+          <div style="font-size:9px;color:#ffd166;font-family:'Space Mono',monospace;margin-top:3px;" id="shift-eve-lbl">15:00</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#a78bfa;font-family:'Space Mono',monospace;margin-bottom:3px;">&#127769; NIGHT START</div>
+          <div class="tstepper" data-id="shift-night-start" data-min="0" data-max="23" data-step="1"><button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" id="shift-night-start" type="number" value="23" inputmode="numeric"><button class="tsbtn" data-d="1">+</button></div>
+          <div style="font-size:9px;color:#a78bfa;font-family:'Space Mono',monospace;margin-top:3px;" id="shift-night-lbl">23:00</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">
+        <div>
+          <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:3px;">DAY BEDS</div>
+          <div class="tstepper" data-id="mp_day_beds_s" data-min="10" data-max="80" data-step="1"><button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" type="number" value="30" inputmode="numeric"><button class="tsbtn" data-d="1">+</button></div>
+          <div style="font-size:9px;color:#00e5c3;font-family:'Space Mono',monospace;margin-top:3px;">BCCF <span id="bccf-day-val-s">1.3</span></div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:3px;">EVE BEDS</div>
+          <div class="tstepper" data-id="mp_eve_beds_s" data-min="10" data-max="80" data-step="1"><button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" type="number" value="25" inputmode="numeric"><button class="tsbtn" data-d="1">+</button></div>
+          <div style="font-size:9px;color:#ffd166;font-family:'Space Mono',monospace;margin-top:3px;">BCCF <span id="bccf-eve-val-s">1.6</span></div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:3px;">NIGHT BEDS</div>
+          <div class="tstepper" data-id="mp_night_beds_s" data-min="10" data-max="80" data-step="1"><button class="tsbtn" data-d="-1">&#8722;</button><input class="tsval" type="number" value="21" inputmode="numeric"><button class="tsbtn" data-d="1">+</button></div>
+          <div style="font-size:9px;color:#a78bfa;font-family:'Space Mono',monospace;margin-top:3px;">BCCF <span id="bccf-night-val-s">1.9</span></div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:9px;color:#8892b0;">Current: <span style="color:var(--accent);" id="shift-summary">Day 07:00 · Evening 15:00 · Night 23:00</span></div>
+    </div>
+  </div>
+  <div class="tsec">Graduation Season Window</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+    <div><div style="font-size:10px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:4px;">Season Start</div>
+      <input type="date" id="seasonStart" value="2026-06-01" style="width:100%;background:rgba(255,255,255,.04);border:1px solid #1a1e30;border-radius:4px;color:#c8cfe8;font-size:12px;padding:6px 8px;outline:none;"></div>
+    <div><div style="font-size:10px;color:#8892b0;font-family:'Space Mono',monospace;margin-bottom:4px;">Season End</div>
+      <input type="date" id="seasonEnd" value="2026-06-20" style="width:100%;background:rgba(255,255,255,.04);border:1px solid #1a1e30;border-radius:4px;color:#c8cfe8;font-size:12px;padding:6px 8px;outline:none;"></div>
+  </div>
+  <div class="tsec">Confirmed Ceremony Dates</div>
+  <div id="gradEntriesList"></div>
+  <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,.015);border:1px solid #1a1e30;border-radius:6px;">
+    <div style="font-size:10px;color:#8892b0;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:8px;">ADD CEREMONY</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div><div style="font-size:10px;color:#8892b0;margin-bottom:3px;">Date</div>
+        <input type="date" id="newDate" style="width:100%;background:rgba(255,255,255,.04);border:1px solid #1a1e30;border-radius:4px;color:#c8cfe8;font-size:12px;padding:5px 8px;outline:none;"></div>
+      <div><div style="font-size:10px;color:#8892b0;margin-bottom:3px;">Time (optional)</div>
+        <input type="time" id="newTime" style="width:100%;background:rgba(255,255,255,.04);border:1px solid #1a1e30;border-radius:4px;color:#c8cfe8;font-size:12px;padding:5px 8px;outline:none;"></div>
+    </div>
+    <div style="margin-bottom:8px;"><div style="font-size:10px;color:#8892b0;margin-bottom:3px;">Ceremony Name</div>
+      <input type="text" id="newName" placeholder="e.g. Lincoln High School Graduation" style="width:100%;background:rgba(255,255,255,.04);border:1px solid #1a1e30;border-radius:4px;color:#c8cfe8;font-size:12px;padding:5px 8px;outline:none;"></div>
+    <button id="add-grad-btn" style="width:100%;background:rgba(57,217,138,.1);border:1px solid rgba(57,217,138,.3);border-radius:4px;color:#39d98a;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;">+ ADD CEREMONY</button>
+  </div>
+  <div class="sinfo" style="margin-top:14px;">
+    <strong>How it works:</strong> Confirmed ceremony dates get ×1.18 modifier. Season window days get base graduation modifier. Changes persist across sessions.<br><br>
+    <strong>Sources:</strong> tacomadome.org · tacomaschools.org · batestech.edu · pierce.ctc.edu · cptc.edu/graduation
+  </div>
+  <div class="sbtnrow">
+    <button class="sbtnp" id="save-settings-btn">Save &amp; Apply</button>
+    <button class="sbtns" id="reset-settings-btn">Reset Defaults</button>
+    <div class="svdbadge" id="savedBadge">✓ Saved</div>
+  </div>
+</div><!-- /t-body -->
+</div><!-- /sc-settings -->
+
+</div><!-- /app-scroll -->
+
+<div class="app-tabs">
+  <button class="app-tab on"  id="tb-surge">   <div class="app-tab-ico">📈</div><div>Surge</div></button>
+  <button class="app-tab"     id="tb-now">     <div class="app-tab-ico">🔢</div><div>Now</div></button>
+  <button class="app-tab"     id="tb-mh">      <div class="app-tab-ico">🧠</div><div>MH</div></button>
+  <button class="app-tab"     id="tb-settings"><div class="app-tab-ico">⚙</div><div>Settings</div></button>
+</div>
 
 <script>
+
+// NULL-SAFE DOM HELPER — returns dummy object if element not found
+var _DUMMY_EL = {
+  textContent:'', value:'', innerHTML:'', scrollTop:0,
+  classList:{add:function(){},remove:function(){},contains:function(){return false;},toggle:function(){}},
+  style:{}, children:[], firstElementChild:null, offsetHeight:0, offsetWidth:0,
+  querySelectorAll:function(){return[];}, querySelector:function(){return null;},
+  addEventListener:function(){}, appendChild:function(){},
+  sort:function(){return this;}, slice:function(){return [];}
+};
+function $$(id){var el=document.getElementById(id);return el||_DUMMY_EL;}
+
+// ═══ SURGE DASHBOARD JS ═══
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -758,6 +1110,50 @@ body {
 // Surge rate by hour (from 3-year dataset)
 const THRESH_OPTIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 let SURGE_THRESH = 10;  // default — adjustable via slider
+// Empirical floor: P(any surge in next 8h | confirmed surge this hour)
+// Derived from 2023-2025 Throughput data, keyed by arrivals/hr threshold
+const SURGE_FLAG_FLOORS = {
+  6:0.923, 7:0.896, 8:0.859, 9:0.815, 10:0.756,
+  11:0.676, 12:0.585, 13:0.478, 14:0.382, 15:0.303,
+};
+const PERSISTENCE_MODELS = {
+  1:{intercept:-13.187375,mpedocs:0.170363,arr_3h:0.203189,hour:0.059956, dow:-0.028615,auc:0.973},
+  2:{intercept:-10.101802,mpedocs:0.096647,arr_3h:0.341706,hour:0.056184, dow:-0.047945,auc:0.950},
+  3:{intercept:-8.096910, mpedocs:0.056315,arr_3h:0.417913,hour:0.029840, dow:-0.061319,auc:0.922},
+  4:{intercept:-6.435047, mpedocs:0.032647,arr_3h:0.426731,hour:0.001713, dow:-0.075921,auc:0.887},
+  5:{intercept:-5.038307, mpedocs:0.016457,arr_3h:0.404873,hour:-0.021223,dow:-0.092454,auc:0.843},
+  6:{intercept:-3.982494, mpedocs:0.004162,arr_3h:0.386209,hour:-0.040327,dow:-0.106921,auc:0.800},
+  7:{intercept:-3.165984, mpedocs:-0.005832,arr_3h:0.376576,hour:-0.059213,dow:-0.118684,auc:0.758},
+  8:{intercept:-2.517410, mpedocs:-0.013540,arr_3h:0.372677,hour:-0.079741,dow:-0.128838,auc:0.722},
+};
+// Empirical multipliers by threshold: P(surge at H | no surge 15:00→H) / P(surge at H)
+// Applied to surge window bars (15:00-21:00) when no surge confirmed
+const SURGE_WINDOW_MULTIPLIERS_BY_THRESH = {
+  "6": {15:1.0,16:0.89, 17:0.878,18:0.827,19:0.508,20:0.7,  21:0.629},
+  "7": {15:1.0,16:0.888,17:0.873,18:0.82, 19:0.682,20:0.697,21:0.727},
+  "8": {15:1.0,16:0.885,17:0.83, 18:0.791,19:0.684,20:0.763,21:0.917},
+  "9": {15:1.0,16:0.888,17:0.855,18:0.769,19:0.775,20:0.626,21:0.748},
+  "10":{15:1.0,16:0.904,17:0.85, 18:0.762,19:0.713,20:0.709,21:0.63},
+  "11":{15:1.0,16:0.933,17:0.846,18:0.869,19:0.676,20:0.738,21:0.782},
+  "12":{15:1.0,16:0.927,17:0.873,18:0.836,19:0.725,20:0.773,21:0.701},
+  "13":{15:1.0,16:0.957,17:0.851,18:0.862,19:0.819,20:0.775,21:0.73},
+  "14":{15:1.0,16:0.958,17:0.853,18:0.861,19:0.795,20:0.919,21:0.732},
+  "15":{15:1.0,16:1.016,17:0.909,18:0.921,19:0.876,20:0.925,21:0.696},
+};
+function getSurgeWindowMultiplier(currentHour){
+  var table=SURGE_WINDOW_MULTIPLIERS_BY_THRESH[String(SURGE_THRESH)]||SURGE_WINDOW_MULTIPLIERS_BY_THRESH["10"];
+  var m=1.0;
+  for(var h=15;h<=Math.min(currentHour,21);h++){
+    if(table[h]!==undefined) m=table[h];
+  }
+  return m;
+}
+
+function calcPersistenceProb(horizon,mpedocs,arr_3h,hour,dow){
+  var m=PERSISTENCE_MODELS[horizon]; if(!m)return null;
+  var logit=m.intercept+m.mpedocs*mpedocs+m.arr_3h*arr_3h+m.hour*hour+m.dow*dow;
+  return Math.min(0.99,Math.max(0.01,1/(1+Math.exp(-logit))));
+}
 // Cache last-fetched API data so slider can re-render without refetching
 let _cachedIliData = null, _cachedWxMod = 1.0, _cachedWxLabel = '', _cachedWxTemp = null;
 let _initialRenderDone = false;
@@ -882,10 +1278,79 @@ function getGraduationModifier(dateStr) {
 // ✅ = statistically significant (p<0.05) | ❌ = not significant | ⚠️ = borderline
 const LOCAL_EVENTS = [
   // ════════════════════════════════════════════════════════════════════════════
-  // PUYALLUP FAIRGROUNDS EVENTS
-  // Full scan completed Mar 2026. N=10 event categories tested across 2023-2025.
-  // Method: Mann-Whitney U, matched controls by month, peak hours 11-21.
+  // MAJOR FEDERAL HOLIDAYS
+  // Method: daily arrivals vs same-DOW controls ±4 weeks, 2023-2025.
+  // p-values limited by n=2 years; effect sizes clinically consistent.
   // ════════════════════════════════════════════════════════════════════════════
+
+  // Thanksgiving — near shutdown of pediatric ED visits (surge_ratio=0.10)
+  { start:'2023-11-23', end:'2023-11-23', icon:'🦃', category:'holiday', surgeModifier:0.10, surgeNote:'Thanksgiving Day. Empirical surge rate 90% below controls. Families defer non-urgent visits.' },
+  { start:'2024-11-28', end:'2024-11-28', icon:'🦃', category:'holiday', surgeModifier:0.10, surgeNote:'Thanksgiving Day. Empirical surge rate 90% below controls.' },
+  { start:'2025-11-27', end:'2025-11-27', icon:'🦃', category:'holiday', surgeModifier:0.10, surgeNote:'Thanksgiving Day.' },
+  { start:'2026-11-26', end:'2026-11-26', icon:'🦃', category:'holiday', surgeModifier:0.10, surgeNote:'Thanksgiving Day.' },
+
+  // Christmas Eve — 72% reduction
+  { start:'2023-12-24', end:'2023-12-24', icon:'🎄', category:'holiday', surgeModifier:0.28, hourlyModifiers:{8:1.35,17:0.42,19:1.00,20:1.09,22:1.03,23:1.13}, surgeNote:'Christmas Eve. 08:00 spike ×1.35 (morning before family travel). 17:00 very low ×0.42. Evening normalizes.' },
+  { start:'2024-12-24', end:'2024-12-24', icon:'🎄', category:'holiday', surgeModifier:0.28, hourlyModifiers:{8:1.35,17:0.42,19:1.00,20:1.09,22:1.03,23:1.13}, surgeNote:'Christmas Eve.' },
+  { start:'2025-12-24', end:'2025-12-24', icon:'🎄', category:'holiday', surgeModifier:0.28, hourlyModifiers:{8:1.35,17:0.42,19:1.00,20:1.09,22:1.03,23:1.13}, surgeNote:'Christmas Eve.' },
+  { start:'2026-12-24', end:'2026-12-24', icon:'🎄', category:'holiday', surgeModifier:0.28, hourlyModifiers:{8:1.35,17:0.42,19:1.00,20:1.09,22:1.03,23:1.13}, surgeNote:'Christmas Eve.' },
+
+  // Christmas Day — 64% reduction
+  { start:'2023-12-25', end:'2023-12-25', icon:'🎄', category:'holiday', surgeModifier:0.36, hourlyModifiers:{10:0.55,11:0.77,12:1.18,23:1.66}, surgeNote:'Christmas Day. 23:00 spike ×1.66 (post-dinner injuries). Morning suppressed.' },
+  { start:'2024-12-25', end:'2024-12-25', icon:'🎄', category:'holiday', surgeModifier:0.36, hourlyModifiers:{10:0.55,11:0.77,12:1.18,23:1.66}, surgeNote:'Christmas Day.' },
+  { start:'2025-12-25', end:'2025-12-25', icon:'🎄', category:'holiday', surgeModifier:0.36, hourlyModifiers:{10:0.55,11:0.77,12:1.18,23:1.66}, surgeNote:'Christmas Day.' },
+  { start:'2026-12-25', end:'2026-12-25', icon:'🎄', category:'holiday', surgeModifier:0.36, hourlyModifiers:{10:0.55,11:0.77,12:1.18,23:1.66}, surgeNote:'Christmas Day.' },
+
+  // Christmas Week (Dec 26-29) — 16% elevated (p<0.05)
+  { start:'2023-12-26', end:'2023-12-29', icon:'🎄', category:'holiday', surgeModifier:1.16, surgeNote:'Christmas Week. Surge rate 16% above controls. p<0.05. Post-holiday deferred care + travel injuries.' },
+  { start:'2024-12-26', end:'2024-12-29', icon:'🎄', category:'holiday', surgeModifier:1.16, surgeNote:'Christmas Week.' },
+  { start:'2025-12-26', end:'2025-12-29', icon:'🎄', category:'holiday', surgeModifier:1.16, surgeNote:'Christmas Week.' },
+  { start:'2026-12-26', end:'2026-12-29', icon:'🎄', category:'holiday', surgeModifier:1.16, surgeNote:'Christmas Week.' },
+
+  // July 4th — 52% reduction
+  { start:'2023-07-04', end:'2023-07-04', icon:'🎆', category:'holiday', surgeModifier:0.48, hourlyModifiers:{19:0.20,20:1.0,21:0.85}, surgeNote:'July 4th. Suppressed overall (×0.48) but returns to normal at 20:00 fireworks window. 19:00 nearly zero.' },
+  { start:'2024-07-04', end:'2024-07-04', icon:'🎆', category:'holiday', surgeModifier:0.48, surgeNote:'July 4th.' },
+  { start:'2025-07-04', end:'2025-07-04', icon:'🎆', category:'holiday', surgeModifier:0.48, surgeNote:'July 4th.' },
+  { start:'2026-07-04', end:'2026-07-04', icon:'🎆', category:'holiday', surgeModifier:0.48, surgeNote:'July 4th.' },
+
+  // Halloween — 60% reduction
+  { start:'2023-10-31', end:'2023-10-31', icon:'🎃', category:'holiday', surgeModifier:0.40, hourlyModifiers:{17:0.40,18:0.40,19:0.40,20:0.40,21:1.38,22:1.10}, surgeNote:'Halloween. Suppressed during trick-or-treating (17-20:00) but 21:00 spike ×1.38 above controls. Post trick-or-treat injuries/candy issues.' },
+  { start:'2024-10-31', end:'2024-10-31', icon:'🎃', category:'holiday', surgeModifier:0.40, surgeNote:'Halloween.' },
+  { start:'2025-10-31', end:'2025-10-31', icon:'🎃', category:'holiday', surgeModifier:0.40, surgeNote:'Halloween.' },
+  { start:'2026-10-31', end:'2026-10-31', icon:'🎃', category:'holiday', surgeModifier:0.40, surgeNote:'Halloween.' },
+
+  // Easter — 42% reduction
+  { start:'2023-04-09', end:'2023-04-09', icon:'🐣', category:'holiday', surgeModifier:0.58, surgeNote:'Easter Sunday. Surge rate 42% below controls.' },
+  { start:'2024-03-31', end:'2024-03-31', icon:'🐣', category:'holiday', surgeModifier:0.58, surgeNote:'Easter Sunday.' },
+  { start:'2025-04-20', end:'2025-04-20', icon:'🐣', category:'holiday', surgeModifier:0.58, surgeNote:'Easter Sunday.' },
+  { start:'2026-04-05', end:'2026-04-05', icon:'🐣', category:'holiday', surgeModifier:0.58, surgeNote:'Easter Sunday.' },
+
+  // New Year Eve — 23:00 massive spike ×2.18, 16:00 spike ×1.34
+  { start:'2023-12-31', end:'2023-12-31', icon:'🎆', category:'holiday', surgeModifier:1.0, hourlyModifiers:{16:1.34,17:0.67,18:0.63,19:0.90,20:0.80,21:0.62,22:0.96,23:2.18}, surgeNote:'New Year Eve. 23:00 surge ×2.18 above controls (pre-midnight injuries). 16:00 also elevated ×1.34.' },
+  { start:'2024-12-31', end:'2024-12-31', icon:'🎆', category:'holiday', surgeModifier:1.0, hourlyModifiers:{16:1.34,17:0.67,18:0.63,19:0.90,20:0.80,21:0.62,22:0.96,23:2.18}, surgeNote:'New Year Eve.' },
+  { start:'2025-12-31', end:'2025-12-31', icon:'🎆', category:'holiday', surgeModifier:1.0, hourlyModifiers:{16:1.34,17:0.67,18:0.63,19:0.90,20:0.80,21:0.62,22:0.96,23:2.18}, surgeNote:'New Year Eve.' },
+  { start:'2026-12-31', end:'2026-12-31', icon:'🎆', category:'holiday', surgeModifier:1.0, hourlyModifiers:{16:1.34,17:0.67,18:0.63,19:0.90,20:0.80,21:0.62,22:0.96,23:2.18}, surgeNote:'New Year Eve.' },
+
+  // New Year Day — midday surge 13-14:00 ×1.44-1.64
+  { start:'2024-01-01', end:'2024-01-01', icon:'🎉', category:'holiday', surgeModifier:1.0, hourlyModifiers:{8:0.44,9:0.80,13:1.44,14:1.64,15:1.05}, surgeNote:'New Year Day. Midday surge 13-14:00 ×1.44-1.64 (post-midnight injuries/illness presenting midday). Morning suppressed.' },
+  { start:'2025-01-01', end:'2025-01-01', icon:'🎉', category:'holiday', surgeModifier:1.0, hourlyModifiers:{8:0.44,9:0.80,13:1.44,14:1.64,15:1.05}, surgeNote:'New Year Day.' },
+  { start:'2026-01-01', end:'2026-01-01', icon:'🎉', category:'holiday', surgeModifier:1.0, hourlyModifiers:{8:0.44,9:0.80,13:1.44,14:1.64,15:1.05}, surgeNote:'New Year Day.' },
+  { start:'2027-01-01', end:'2027-01-01', icon:'🎉', category:'holiday', surgeModifier:1.0, hourlyModifiers:{8:0.44,9:0.80,13:1.44,14:1.64,15:1.05}, surgeNote:'New Year Day.' },
+
+  // Labor Day — 48% elevated (pre-school-year surge)
+  { start:'2023-09-04', end:'2023-09-04', icon:'👷', category:'holiday', surgeModifier:1.48, hourlyModifiers:{12:0.44,15:1.58,16:0.75,17:1.52,18:1.02,20:0.53}, surgeNote:'Labor Day. 15:00 (×1.58) and 17:00 (×1.52) afternoon spikes. End-of-summer injuries + deferred care.' },
+  { start:'2024-09-02', end:'2024-09-02', icon:'👷', category:'holiday', surgeModifier:1.48, hourlyModifiers:{12:0.44,15:1.58,16:0.75,17:1.52,18:1.02,20:0.53}, surgeNote:'Labor Day.' },
+  { start:'2025-09-01', end:'2025-09-01', icon:'👷', category:'holiday', surgeModifier:1.48, hourlyModifiers:{12:0.44,15:1.58,16:0.75,17:1.52,18:1.02,20:0.53}, surgeNote:'Labor Day.' },
+  { start:'2026-09-07', end:'2026-09-07', icon:'👷', category:'holiday', surgeModifier:1.48, hourlyModifiers:{12:0.44,15:1.58,16:0.75,17:1.52,18:1.02,20:0.53}, surgeNote:'Labor Day.' },
+
+  // Memorial Day — 40% reduction
+  { start:'2023-05-29', end:'2023-05-29', icon:'🇺🇸', category:'holiday', surgeModifier:0.60, hourlyModifiers:{19:1.20,20:1.27,22:1.32}, surgeNote:'Memorial Day. 19-20:00 moderate rise, 22:00 spike ×1.32. Late evening end-of-weekend surge.' },
+  { start:'2024-05-27', end:'2024-05-27', icon:'🇺🇸', category:'holiday', surgeModifier:0.60, hourlyModifiers:{19:1.20,20:1.27,22:1.32}, surgeNote:'Memorial Day.' },
+  { start:'2025-05-26', end:'2025-05-26', icon:'🇺🇸', category:'holiday', surgeModifier:0.60, hourlyModifiers:{19:1.20,20:1.27,22:1.32}, surgeNote:'Memorial Day.' },
+  { start:'2026-05-25', end:'2026-05-25', icon:'🇺🇸', category:'holiday', surgeModifier:0.60, hourlyModifiers:{19:1.20,20:1.27,22:1.32}, surgeNote:'Memorial Day.' },
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // PUYALLUP FAIRGROUNDS EVENTS
 
   // ════════════════════════════════════════════════════════════════════════════
   // PUYALLUP FAIRGROUNDS — HARDCODED ANNUAL DATES
@@ -1047,7 +1512,7 @@ function getSchoolStatus(dateStr) {
 }
 
 // Returns the combined surge modifier from all active local events on a date
-function getLocalEventModifier(dateStr) {
+function getLocalEventModifier(dateStr, hour) {
   const d = new Date(dateStr + 'T12:00:00');
   let combinedMod = 1.0;
   const activeEvents = [];
@@ -1055,8 +1520,12 @@ function getLocalEventModifier(dateStr) {
     const s = new Date(ev.start + 'T00:00:00');
     const e = new Date(ev.end + 'T23:59:59');
     if (d >= s && d <= e) {
-      // Stack modifiers multiplicatively but cap total at 1.4×
-      combinedMod = Math.min(1.40, combinedMod * ev.surgeModifier);
+      // Use hour-specific modifier if available and hour is provided
+      let mod = ev.surgeModifier;
+      if (hour !== undefined && ev.hourlyModifiers && ev.hourlyModifiers[hour] !== undefined) {
+        mod = ev.hourlyModifiers[hour];
+      }
+      combinedMod = Math.min(1.40, combinedMod * mod);
       activeEvents.push(ev);
     }
   }
@@ -1083,16 +1552,24 @@ function getUpcomingEvents(fromDateStr, n=8) {
 // ═══════════════════════════════════════════════════════════════════════════
 // SURGE PROBABILITY ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
+function updateFloorDisplay() {
+  var floorEl  = document.getElementById('surge-flag-floor-display');
+  var threshEl = document.getElementById('surge-flag-thresh-display');
+  if(floorEl)  floorEl.textContent  = Math.round((SURGE_FLAG_FLOORS[SURGE_THRESH]||0.756)*100)+'%';
+  if(threshEl) threshEl.textContent = SURGE_THRESH;
+}
+
 function onThreshChange(val) {
   if (!_initialRenderDone) return;
   val = parseInt(val);
   setThreshold(val);
   document.getElementById('thresh-val').textContent = '>' + val + '/hr';
   document.getElementById('thresh-display').textContent = val;
-  // Update base rate display
-  const baseRate = SURGE_BY_HOUR.reduce((a,b)=>a+b,0)/24;
-  const brd = document.getElementById('baserate-display');
-  if(brd) brd.textContent = Math.round(baseRate*100);
+  updateFloorDisplay();
+  const _ch=new Date().getHours(),_hr=SURGE_BY_HOUR[_ch]||0;
+  const brd=document.getElementById('baserate-display'),hbr=document.getElementById('hstat-baserate');
+  if(brd)brd.textContent=Math.round(_hr*100);
+  if(hbr)hbr.textContent=Math.round(_hr*100)+'%';
   // Re-render using cached API data — no network fetch needed
   renderDashboard(_cachedIliData, _cachedWxMod, _cachedWxLabel, _cachedWxTemp);
 }
@@ -1205,6 +1682,7 @@ async function renderSurgeDashboard() {
   _cachedIliData = iliData; _cachedWxMod = wxMod; _cachedWxLabel = wxLabel; _cachedWxTemp = wxTemp;
   _initialRenderDone = true;
   renderDashboard(iliData, wxMod, wxLabel, wxTemp);
+  updateFloorDisplay();
 }
 
 function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = null) {
@@ -1240,11 +1718,15 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
   }
 
   const surgeProb = computeSurgeProb(hour, dow, month, schoolStatus, localEventMod, gradInfo.modifier, iliMod, wxMod);
+  window._lastSurgeProb = surgeProb; window._lastIliMod = iliMod;
   const { level, color, label } = surgeLevel(surgeProb);
 
   // Update header timestamp
   document.getElementById('lastUpdated').textContent =
     now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+  const _hr2=SURGE_BY_HOUR[hour]||0,_brd2=document.getElementById('baserate-display'),_hbr2=document.getElementById('hstat-baserate');
+  if(_brd2)_brd2.textContent=Math.round(_hr2*100);
+  if(_hbr2)_hbr2.textContent=Math.round(_hr2*100)+'%';
 
   // ── 24h hourly surge forecast ──────────────────────────────────────────
   const nextHours = [];
@@ -1255,13 +1737,70 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const fdow = (futureDate.getDay() + 6) % 7;
     const fm = futureDate.getMonth() + 1;
     const fSchool = getSchoolStatus(fd);
-    const { modifier: fLocalMod } = getLocalEventModifier(fd);
+    const { modifier: fLocalMod } = getLocalEventModifier(fd, h);
     const fGradMod = getGraduationModifier(fd).modifier;
-    const fp = computeSurgeProb(h, fdow, fm, fSchool, fLocalMod, fGradMod, iliMod, wxMod);
-    nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}:00` });
+    let fp = computeSurgeProb(h, fdow, fm, fSchool, fLocalMod, fGradMod, iliMod, wxMod);
+    let isSurvival = false, isPersistence = false;
+    if(!SURGE_FLAG_ACTIVE && !ED_STATE_ACTIVE) {
+      // Apply surge window multiplier if in/past surge window with no confirmed surge
+      if(h>=15 && h<=21){
+        const mult = getSurgeWindowMultiplier(hour);
+        if(mult < 1.0){fp = fp * mult; isSurvival = true;}
+      }
+    } else if((SURGE_FLAG_ACTIVE||ED_STATE_ACTIVE)&&i>=1&&i<=8){
+      // ED state entered or surge confirmed — use persistence model
+      const pp=calcPersistenceProb(i,S.in_mpedocs,S.in_arrivals,h,fdow);
+      if(pp!==null){fp=pp; isPersistence=true;}
+    }
+    nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}:00`, isPersistence, isSurvival });
   }
 
   // ── 7-day daily surge forecast ─────────────────────────────────────────
+  // ── CENSUS LOOKUP: empirical (month, dow) mean arrivals + std ──────────
+  // Derived from 3-year Throughput dataset (2023-2025, n=1091 days)
+  // MAE=16.9, RMSE=22.7 patients/day. 95% CI = mean ± 1.96×std.
+  const CENSUS_LOOKUP = {
+    '1_0':{mean:147.6,std:23.7},'1_1':{mean:149.6,std:18.0},'1_2':{mean:146.3,std:27.1},
+    '1_3':{mean:153.8,std:27.7},'1_4':{mean:139.8,std:32.1},'1_5':{mean:130.6,std:18.1},
+    '1_6':{mean:131.8,std:17.4},'2_0':{mean:167.2,std:18.5},'2_1':{mean:157.8,std:22.9},
+    '2_2':{mean:152.8,std:24.6},'2_3':{mean:148.2,std:18.0},'2_4':{mean:147.3,std:17.3},
+    '2_5':{mean:130.8,std:21.7},'2_6':{mean:144.5,std:20.8},'3_0':{mean:174.5,std:13.2},
+    '3_1':{mean:162.5,std:12.1},'3_2':{mean:155.8,std:14.1},'3_3':{mean:153.4,std:12.7},
+    '3_4':{mean:148.5,std:14.0},'3_5':{mean:135.1,std:9.6},'3_6':{mean:142.9,std:14.5},
+    '4_0':{mean:155.0,std:16.4},'4_1':{mean:151.6,std:13.4},'4_2':{mean:139.5,std:15.5},
+    '4_3':{mean:146.0,std:12.3},'4_4':{mean:137.2,std:10.2},'4_5':{mean:120.5,std:11.9},
+    '4_6':{mean:134.0,std:15.6},'5_0':{mean:166.9,std:17.1},'5_1':{mean:156.3,std:17.5},
+    '5_2':{mean:147.5,std:15.9},'5_3':{mean:146.6,std:13.6},'5_4':{mean:145.6,std:18.6},
+    '5_5':{mean:132.5,std:9.8},'5_6':{mean:137.2,std:15.1},'6_0':{mean:133.3,std:18.6},
+    '6_1':{mean:128.8,std:16.6},'6_2':{mean:127.5,std:18.2},'6_3':{mean:130.7,std:16.9},
+    '6_4':{mean:124.2,std:18.2},'6_5':{mean:116.8,std:10.8},'6_6':{mean:121.0,std:15.9},
+    '7_0':{mean:113.6,std:8.0},'7_1':{mean:103.0,std:12.8},'7_2':{mean:112.8,std:11.3},
+    '7_3':{mean:102.2,std:11.5},'7_4':{mean:102.6,std:11.8},'7_5':{mean:106.2,std:10.2},
+    '7_6':{mean:110.5,std:10.4},'8_0':{mean:112.9,std:9.0},'8_1':{mean:103.5,std:8.3},
+    '8_2':{mean:102.2,std:12.6},'8_3':{mean:101.9,std:12.9},'8_4':{mean:93.6,std:11.1},
+    '8_5':{mean:93.9,std:12.2},'8_6':{mean:103.8,std:8.8},'9_0':{mean:130.9,std:21.2},
+    '9_1':{mean:130.5,std:17.0},'9_2':{mean:124.8,std:16.3},'9_3':{mean:120.4,std:13.1},
+    '9_4':{mean:116.5,std:13.2},'9_5':{mean:116.8,std:9.7},'9_6':{mean:115.3,std:14.3},
+    '10_0':{mean:137.9,std:11.8},'10_1':{mean:125.7,std:12.3},'10_2':{mean:124.1,std:12.8},
+    '10_3':{mean:122.7,std:13.6},'10_4':{mean:117.3,std:16.1},'10_5':{mean:110.8,std:12.9},
+    '10_6':{mean:118.6,std:10.9},'11_0':{mean:151.4,std:14.6},'11_1':{mean:143.1,std:20.2},
+    '11_2':{mean:143.6,std:17.4},'11_3':{mean:135.3,std:21.7},'11_4':{mean:135.2,std:16.0},
+    '11_5':{mean:125.9,std:13.9},'11_6':{mean:128.2,std:12.4},'12_0':{mean:171.9,std:26.0},
+    '12_1':{mean:164.8,std:20.8},'12_2':{mean:158.3,std:20.3},'12_3':{mean:162.8,std:24.8},
+    '12_4':{mean:155.5,std:22.3},'12_5':{mean:144.8,std:17.7},'12_6':{mean:152.3,std:23.5},
+  };
+  function getCensusEstimate(month, dow, schoolType, localMod, iliMod) {
+    const base = CENSUS_LOOKUP[`${month}_${dow}`] || {mean:134,std:22.7};
+    let adj = 0;
+    if (schoolType === 'break' || schoolType === 'holiday') adj += -7.1;
+    else if (schoolType === 'no-school') adj += -2.7;
+    if (localMod < 0.95) adj += -6.1;       // protective event (Spring Fair etc)
+    else if (localMod > 1.02) adj += -2.3;  // State Fair (positive modifier but mild suppression)
+    const iliAdj = (iliMod - 1.0) * 47.1;   // empirical: +47 pts per unit ILI modifier
+    const mean = Math.round(base.mean + adj + iliAdj);
+    const ci95 = Math.round(1.96 * base.std);
+    return { mean, lo: mean - ci95, hi: mean + ci95, ci95 };
+  }
   const days7 = [];
   const DOW_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const MON_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1277,6 +1816,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const fGradMod7 = fGradInfo7.modifier;
     const peakP = computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod);
     const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => s + computeSurgeProb(h,fdow,fm,fSchool,fLocalMod7,fGradMod7,iliMod), 0) / 11;
+    const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
     days7.push({
       dowLabel: DOW_NAMES[fdow],
       dateLabel: `${MON_NAMES[fm-1]} ${fd.getDate()}`,
@@ -1286,6 +1826,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
       schoolType: fSchool.type,
       localEvents: fEvents7,
       gradInfo: fGradInfo7,
+      census,
     });
   }
 
@@ -1326,12 +1867,14 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
   const forecastBarsHTML = nextHours.map((h, i) => {
     const c = surgeBarColor(h.prob);
     const pct = (h.prob * 100).toFixed(0);
+    const dot=h.isPersistence?`<div style="width:4px;height:4px;border-radius:50%;background:#ff4d6d;margin:0 auto;"></div>`:h.isSurvival?`<div style="width:4px;height:4px;border-radius:50%;background:#00e5c3;margin:0 auto;"></div>`:`<div style="width:4px;height:4px;"></div>`;
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;">
       <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;">${h.label}</div>
       <div style="flex:1;width:100%;display:flex;align-items:flex-end;min-height:60px;">
-        <div style="width:100%;height:${Math.max(4, h.prob*100)}%;min-height:4px;background:${c};border-radius:2px 2px 0 0;opacity:0.85;"></div>
+        <div style="width:100%;height:${Math.max(4,Math.round(h.prob*90))}px;background:${c};border-radius:2px 2px 0 0;opacity:0.85;${h.isPersistence?'border-top:2px solid rgba(255,77,109,0.6);':h.isSurvival?'border-top:2px solid rgba(0,229,195,0.4);':''}"></div>
       </div>
       <div style="font-size:8.5px;color:${c};font-family:'Space Mono',monospace;">${pct}%</div>
+      ${dot}
     </div>`;
   }).join('');
 
@@ -1349,6 +1892,10 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
       ${gradIcon ? `<div style="font-size:10px;margin-bottom:2px;" title="${d.gradInfo && d.gradInfo.label || 'Graduation season'}">${gradIcon}</div>` : ''}
       <div class="fc-surge-bar" style="background:linear-gradient(90deg,${c} ${bw}%,var(--border) ${bw}%);"></div>
       <div class="fc-surge-pct" style="color:${c}">pk ${(d.peakProb*100).toFixed(0)}%</div>
+      <div style="margin-top:5px;padding-top:5px;border-top:1px solid var(--border);">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--text);">${d.census.mean}</div>
+        <div style="font-size:8px;color:#8892b0;line-height:1.3;">${d.census.lo}–${d.census.hi}<br>est. arrivals</div>
+      </div>
     </div>`;
   }).join('');
 
@@ -1597,7 +2144,9 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
           <span style="color:var(--green);">■ LOW</span> &nbsp;
           <span style="color:var(--accent3);">■ WATCH</span> &nbsp;
           <span style="color:var(--orange);">■ ELEVATED</span> &nbsp;
-          <span style="color:var(--red);">■ SURGE RISK</span>
+          <span style="color:var(--red);">■ SURGE RISK</span> &nbsp;·&nbsp;
+          <span style="color:#ff4d6d;">● crowding risk (mPEDOCS-based, ED state entered)</span> &nbsp;·&nbsp;
+          <span style="color:#00e5c3;">● surge window reduction (no surge confirmed)</span>
         </div>
       </div>
     </div>
@@ -1605,11 +2154,11 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     <!-- 7-DAY FORECAST -->
     <div class="sdiv">7-Day Outlook</div>
     <div class="panel">
-      <div class="ph"><div class="pt">7-Day Peak Surge Probability Forecast</div><div class="badge badge-b">SCHOOL &amp; LOCAL EVENTS OVERLAY</div></div>
+      <div class="ph"><div class="pt">7-Day Peak Surge Probability · Est. Daily Arrivals</div><div class="badge badge-b">SCHOOL &amp; LOCAL EVENTS · ILI ADJUSTED</div></div>
       <div class="pb">
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><div class="forecast-grid" style="min-width:320px;">${days7HTML}</div></div>
         <div style="margin-top:10px;font-size:10px;color:var(--muted);">
-          "pk %" = peak hour (19:00) surge probability for that day, incorporating school calendar + local events.
+          "pk %" = peak hour (19:00) surge probability for that day, incorporating school calendar + local events. Estimated arrivals = empirical (month × DOW) baseline adjusted for school status, local events, and ILI; 95% CI shown as range. MAE ±17 patients/day.
           🏫 school day · 🏖️ break · 🎉 holiday · ⚠️ post-break return
         </div>
       </div>
@@ -1736,11 +2285,670 @@ function resetToDefaults() {
   document.getElementById('seasonEnd').value   = GRAD_SEASON_END;
 }
 
-// ── BOOT ──────────────────────────────────────────────────────────────────
-// Render immediately with no API data so cards aren't stuck on loading
-renderDashboard(null, 1.0, '', null);
-// Then fetch API data and re-render with full signals
+// ═══ APP TABS ═══
+function switchTab(name){
+  document.querySelectorAll('.app-screen').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.app-tab').forEach(function(t){t.classList.remove('on');});
+  var _sc=document.getElementById('sc-'+name);
+  _sc.classList.add('on');
+  _sc.scrollTop=0;
+  if(name==='mh'&&typeof renderMHTab==='function') renderMHTab();
+  document.getElementById('tb-'+name).classList.add('on');
+}
+['surge','now','mh','settings'].forEach(function(name){
+  var btn=document.getElementById('tb-'+name);
+  if(btn)btn.addEventListener('click',function(){switchTab(name);});
+});
+var _obsBtn=document.getElementById('open-settings-btn');
+if(_obsBtn)_obsBtn.addEventListener('click',function(){switchTab('settings');});
+
+// ═══ mPEDOCS ═══
+var MP8_THRESH={"70": {"intercept": -2.623783, "mpedocs": 0.036972, "arrivals": 0.176066, "hour": 0.065275, "auc": 0.8418}, "80": {"intercept": -2.992394, "mpedocs": 0.031171, "arrivals": 0.205383, "hour": 0.04129, "auc": 0.8378}, "100": {"intercept": -4.109889, "mpedocs": 0.025049, "arrivals": 0.093652, "hour": 0.018659, "auc": 0.8517}, "120": {"intercept": -5.489003, "mpedocs": 0.022403, "arrivals": 0.113538, "hour": 0.011209, "auc": 0.868}};
+var MP8_SEL=100;
+var S={in_mpedocs:60,in_arrivals:16,in_hour:new Date().getHours()};
+var SURGE_FLAG_ACTIVE = false;
+var ED_STATE_ACTIVE = false;
+ // true once staff enter any WR/TP/arrivals value
+function setSurgeFlag(val){
+  SURGE_FLAG_ACTIVE = val;
+
+  var yesBtn = document.getElementById('surge-flag-yes');
+  var noBtn  = document.getElementById('surge-flag-no');
+  if(yesBtn && noBtn){
+    if(val){
+      yesBtn.classList.add('on');    yesBtn.style.borderColor='#ff4d6d'; yesBtn.style.color='#ff4d6d';
+      noBtn.classList.remove('on');  noBtn.style.borderColor='';         noBtn.style.color='';
+    } else {
+      noBtn.classList.add('on');     noBtn.style.borderColor='';         noBtn.style.color='';
+      yesBtn.classList.remove('on'); yesBtn.style.borderColor='#ff4d6d'; yesBtn.style.color='#ff4d6d';
+    }
+  }
+  renderMpedocs(); renderComposite();
+  updateForecastBars();
+}
+
+function updateForecastBars(){
+  var bi=document.querySelector('.forecast-bars-inner');
+  if(!bi)return;
+  var now=new Date(),iliMod=getIliMod(),wxMod=typeof _cachedWxMod!=='undefined'?_cachedWxMod:1.0;
+  var cols=bi.children;
+  for(var i=0;i<Math.min(cols.length,24);i++){
+    var fh=new Date(now.getTime()+i*3600000),h=fh.getHours(),dw=(fh.getDay()+6)%7,mo=fh.getMonth()+1;
+    var ds=fh.toISOString().slice(0,10);
+    var school=getSchoolStatus(ds),ev=getLocalEventModifier(ds,h),grad=getGraduationModifier(ds);
+    var fp=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,wxMod);
+    var isSurv=false,isPers=false;
+    if(!SURGE_FLAG_ACTIVE&&!ED_STATE_ACTIVE){
+      if(h>=15&&h<=21){
+        var mult2=getSurgeWindowMultiplier(now.getHours());
+        if(mult2<1.0){fp=fp*mult2;isSurv=true;}
+      }
+    } else if((SURGE_FLAG_ACTIVE||ED_STATE_ACTIVE)&&i>=1&&i<=8){
+      var pp=calcPersistenceProb(i,S.in_mpedocs,S.in_arrivals,h,dw);if(pp!==null){fp=pp;isPers=true;}
+    }
+    var col=surgeBarColor(fp),pct=Math.round(fp*100);
+    var divs=cols[i].children; if(divs.length<3)continue;
+    var fill=divs[1].children[0];
+    if(fill){fill.style.height=Math.max(4,Math.round(fp*90))+'px';fill.style.background=col;fill.style.borderTop=isPers?'2px solid rgba(255,77,109,0.6)':isSurv?'2px solid rgba(0,229,195,0.4)':'';
+    }
+    divs[2].textContent=pct+'%'; divs[2].style.color=col;
+    if(divs[3])divs[3].style.background=isPers?'#ff4d6d':isSurv?'#00e5c3':'transparent';
+  }
+}
+
+var MP_TIERS=[
+  {max:0.10,lbl:'CLEAR',   cls:'CLEAR',   action:'Normal operations.'},
+  {max:0.20,lbl:'WATCH',   cls:'WATCH',   action:'Monitor WR queue depth.'},
+  {max:0.35,lbl:'ADVISORY',cls:'ADVISORY',action:'Alert bed management. Begin discharge rounds.'},
+  {max:0.50,lbl:'WARNING', cls:'WARNING', action:'Notify house supervisor. Pre-position staff.'},
+  {max:1.01,lbl:'IMMINENT',cls:'IMMINENT',action:'Initiate surge protocol NOW.'},
+];
+function mpTier(p){return MP_TIERS.find(function(t){return p<=t.max;})||MP_TIERS[4];}
+function mpSig(x){return 1/(1+Math.exp(-x));}
+function mpPct(p){return Math.round(p*100)+'%';}
+function pCol(p){return p<0.10?'#39d98a':p<0.20?'#ffd166':p<0.35?'#ff9a3c':'#ff4d6d';}
+
+function calcMp8(){
+  var t=MP8_THRESH[String(MP8_SEL)]||MP8_THRESH['100'],lo=t.intercept,contribs=[];
+  [{id:'in_mpedocs',c:t.mpedocs,l:'mPEDOCS'},{id:'in_arrivals',c:t.arrivals,l:'Arrivals 3h'},{id:'in_hour',c:t.hour,l:'Hour'}]
+    .forEach(function(f){var v=S[f.id]||0,c=f.c*v;lo+=c;contribs.push({l:f.l,c:c});});
+  contribs.sort(function(a,b){return Math.abs(b.c)-Math.abs(a.c);});
+  return {prob:mpSig(lo),contribs:contribs};
+}
+
+function renderMpedocs(){
+  var r=calcMp8(),t=mpTier(r.prob);
+  $$('mp-hero').className='mhero '+t.cls;
+  $$('mp-prob').textContent=mpPct(r.prob);
+  $$('mp-tier').textContent=t.lbl;
+  $$('mp-action').textContent=t.action;
+  $$('mp-auc-lbl').textContent='8h · mPEDOCS ≥'+MP8_SEL+' · AUC '+(MP8_THRESH[String(MP8_SEL)]||MP8_THRESH['100']).auc.toFixed(3);
+  $$('mp-drivers').innerHTML=r.contribs.map(function(c){
+    var w=Math.min(100,Math.abs(c.c)/3*100),cv=c.c>0?'#ff4d6d':'#39d98a';
+    return '<div class="tdrv"><div class="tdrv-top"><span>'+c.l+'</span><span style="color:'+cv+'">'+(c.c>0?'+':'')+c.c.toFixed(3)+'</span></div>'+
+      '<div class="tdrv-bg"><div class="tdrv-fill" style="width:'+w+'%;background:'+cv+';"></div></div></div>';
+  }).join('');
+}
+
+function getSurgeProb(){
+  // 8h peak surge probability — same inputs as surge tab but max over next 8 hours
+  try {
+    var now=new Date(), iliMod=getIliMod();
+    var wxMod=typeof _cachedWxMod!=='undefined'?_cachedWxMod:1.0;
+    var peak=0;
+    for(var i=0;i<8;i++){
+      var fh=new Date(now.getTime()+i*3600000);
+      var h=fh.getHours(), dw=(fh.getDay()+6)%7, mo=fh.getMonth()+1;
+      var ds=fh.toISOString().slice(0,10);
+      var school=getSchoolStatus(ds), ev=getLocalEventModifier(ds), grad=getGraduationModifier(ds);
+      var p=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,wxMod);
+      if(p>peak)peak=p;
+    }
+    return peak;
+  } catch(e) {
+    return typeof window._lastSurgeProb!=='undefined'?window._lastSurgeProb:0;
+  }
+}
+function getIliMod(){return typeof window._lastIliMod!=='undefined'?window._lastIliMod:1.0;}
+
+function renderComposite(){
+  var sp=getSurgeProb(),r8=calcMp8(),iliMod=getIliMod();
+  var blended=0.50*sp+0.50*r8.prob,comp=Math.min(0.99,blended*iliMod);
+  // Confirmed surge floor: empirical P(any surge in next 8h | arrivals >= SURGE_THRESH this hour)
+  if(SURGE_FLAG_ACTIVE){
+    var floor=SURGE_FLAG_FLOORS[SURGE_THRESH]||SURGE_FLAG_FLOORS[10];
+    comp=Math.max(comp,floor);
+  }
+  var t=mpTier(comp),c=pCol(comp);
+  $$('comp-hero').className='mhero '+t.cls;
+  $$('comp-num').textContent=Math.round(comp*100)+'%'; $$('comp-num').style.color=c;
+  $$('comp-tier').textContent=t.lbl; $$('comp-tier').style.color=c;
+  $$('comp-action').textContent=t.action;
+  $$('sig-surge').textContent=mpPct(sp); $$('sig-surge').style.color=pCol(sp);
+  $$('sig-mp8').textContent=mpPct(r8.prob); $$('sig-mp8').style.color=pCol(r8.prob);
+  var ili=getIliMod();
+  $$('sig-ili').textContent='×'+ili.toFixed(2);
+  $$('sig-ili').style.color=ili>1.05?'#ff4d6d':ili<0.97?'#39d98a':'#8892b0';
+  $$('comp-breakdown').innerHTML=[
+    {n:'8h Surge Peak ×0.50',v:sp*0.50,mx:0.5},{n:'mPEDOCS 8h ×0.50',v:r8.prob*0.50,mx:0.5},
+    {n:'ILI amplifier',v:Math.abs(ili-1),mx:0.5,raw:'×'+ili.toFixed(2)},
+  ].map(function(it){
+    var w=Math.min(100,(it.v/it.mx)*100),cv=pCol(it.v*2);
+    return '<div class="bkrow"><div class="bkname">'+it.n+'</div><div class="bkright">'+
+      '<div class="bkbarbg"><div class="bkbar" style="width:'+w+'%;background:'+cv+';"></div></div>'+
+      '<div class="bkval" style="color:'+cv+'">'+(it.raw||mpPct(it.v))+'</div></div></div>';
+  }).join('');
+  $$('comp-why').innerHTML=[
+    '· ('+Math.round(sp*100)+'%×0.50)+('+Math.round(r8.prob*100)+'%×0.50)×'+ili.toFixed(2)+' = <strong style="color:#c8cfe8;">'+Math.round(comp*100)+'%</strong>.'+(SURGE_FLAG_ACTIVE?' <span style="color:#ff4d6d;">⚡ Confirmed surge floor applied ('+Math.round((SURGE_FLAG_FLOORS[SURGE_THRESH]||0.756)*100)+'%).</span>':''),
+    '· <strong style="color:#c8cfe8;">'+(sp>r8.prob?'Surge':'mPEDOCS 8h')+'</strong> dominant.',
+  ].map(function(s){return '<div style="margin-bottom:5px;">'+s+'</div>';}).join('');
+  $$('comp-mp-auc').textContent=(MP8_THRESH[String(MP8_SEL)]||MP8_THRESH['100']).auc.toFixed(3);
+}
+
+// mPEDOCS threshold buttons
+document.querySelectorAll('.tbtn[data-m]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    MP8_SEL=parseInt(this.dataset.m);
+    document.querySelectorAll('.tbtn[data-m]').forEach(function(b){b.classList.remove('on');});
+    this.classList.add('on'); renderMpedocs(); renderComposite();
+  });
+});
+
+// Steppers
+document.querySelectorAll('.tstepper[data-id]').forEach(function(el){
+  var id=el.dataset.id,mn=+el.dataset.min,mx2=+el.dataset.max,st=+el.dataset.step;
+  var inp=el.querySelector('.tsval'),disp=$$('d-'+id.replace('in_',''));
+  function set(v){v=Math.max(mn,Math.min(mx2,+v||0));inp.value=v;S[id]=v;if(disp&&disp!==_DUMMY_EL)disp.textContent=v;renderMpedocs();renderComposite();}
+  el.querySelectorAll('.tsbtn').forEach(function(b){b.addEventListener('click',function(){set(+inp.value + +this.dataset.d*st);});});
+  inp.addEventListener('change',function(){set(this.value);});
+  inp.addEventListener('input',function(){var v=+this.value;if(!isNaN(v)){S[id]=v;renderMpedocs();renderComposite();}});
+});
+
+// ── Surge panel ─────────────────────────────────────────────────────────────
+function sfCalcMpedocs(){
+  var wrEl=document.querySelector('.tstepper[data-sfid="mp_wr"] .tsval');
+  var tpEl=document.querySelector('.tstepper[data-sfid="mp_tp"] .tsval');
+  var wr=wrEl?parseFloat(wrEl.value)||0:0,tp=tpEl?parseFloat(tpEl.value)||0:0;
+  var score=Math.round(33.3*(0.11+0.07*wr+0.04*tp)*MP_BCCF);
+  var col=score>=100?'#ff4d6d':score>=80?'#ff9a3c':score>=60?'#ffd166':'#8892b0';
+  var se=document.getElementById('sf-calc-score'),fe=document.getElementById('sf-calc-formula');
+  var wD=document.getElementById('sf-d-wr'),tD=document.getElementById('sf-d-tp');
+  if(se){se.textContent=score;se.style.color=col;} if(fe)fe.textContent='WR='+wr+' · TP='+tp+' · BCCF='+MP_BCCF;
+  if(wD)wD.textContent=wr; if(tD)tD.textContent=tp;
+  S.in_mpedocs=score;
+  ED_STATE_ACTIVE=(wr>0||tp>0);
+  var mw=document.querySelector('.tstepper[data-id="mp_wr"] .tsval'),mt=document.querySelector('.tstepper[data-id="mp_tp"] .tsval');
+  var mi=document.querySelector('.tstepper[data-id="in_mpedocs"] .tsval'),md=document.getElementById('d-mpedocs');
+  if(mw)mw.value=wr; if(mt)mt.value=tp; if(mi)mi.value=score; if(md)md.textContent=score;
+  if(typeof calcMpCalc==='function')calcMpCalc();
+  updateForecastBars();
+}
+document.querySelectorAll('.tstepper[data-sfid]').forEach(function(el){
+  var id=el.dataset.sfid,mn=+el.dataset.min,mx2=+el.dataset.max,st=+el.dataset.step,inp=el.querySelector('.tsval');
+  function set(v){v=Math.max(mn,Math.min(mx2,+v||0));inp.value=v;
+    if(id==='mp_wr'||id==='mp_tp'){sfCalcMpedocs();}
+    else{S[id]=v;var d=document.getElementById('sf-d-'+id.replace('in_',''));if(d)d.textContent=v;
+      var tw=document.querySelector('.tstepper[data-id="'+id+'"] .tsval');if(tw)tw.value=v;
+      ED_STATE_ACTIVE=(S.in_mpedocs>0||v>0);
+      updateForecastBars();renderMpedocs();renderComposite();}}
+  el.querySelectorAll('.tsbtn').forEach(function(b){b.addEventListener('click',function(){set(+inp.value + +this.dataset.d*st);});});
+  inp.addEventListener('change',function(){set(this.value);});
+  inp.addEventListener('input',function(){var v=+this.value;if(!isNaN(v)){if(id==='mp_wr'||id==='mp_tp')sfCalcMpedocs();else{S[id]=v;updateForecastBars();}}});
+});
+
+// ── Shift config ──────────────────────────────────────────────────────────────
+function onShiftChange(){
+  var ds=document.getElementById('shift-day-start'),es=document.getElementById('shift-eve-start'),ns=document.getElementById('shift-night-start');
+  if(ds)SHIFT_DAY_START=Math.max(0,Math.min(23,parseInt(ds.value)||0));
+  if(es)SHIFT_EVE_START=Math.max(0,Math.min(23,parseInt(es.value)||0));
+  if(ns)SHIFT_NIGHT_START=Math.max(0,Math.min(23,parseInt(ns.value)||0));
+  var dl=document.getElementById('shift-day-lbl'),el=document.getElementById('shift-eve-lbl'),nl=document.getElementById('shift-night-lbl');
+  if(dl)dl.textContent=String(SHIFT_DAY_START).padStart(2,'0')+':00';
+  if(el)el.textContent=String(SHIFT_EVE_START).padStart(2,'0')+':00';
+  if(nl)nl.textContent=String(SHIFT_NIGHT_START).padStart(2,'0')+':00';
+  var dbs=document.querySelector('.tstepper[data-id="mp_day_beds_s"] .tsval');
+  var ebs=document.querySelector('.tstepper[data-id="mp_eve_beds_s"] .tsval');
+  var nbs=document.querySelector('.tstepper[data-id="mp_night_beds_s"] .tsval');
+  if(dbs)MP_DAY_BEDS=parseInt(dbs.value)||30; if(ebs)MP_EVE_BEDS=parseInt(ebs.value)||25; if(nbs)MP_NIGHT_BEDS=parseInt(nbs.value)||21;
+  updateBCCFDisplays();
+  var dvs=document.getElementById('bccf-day-val-s'),evs=document.getElementById('bccf-eve-val-s'),nvs=document.getElementById('bccf-night-val-s');
+  if(dvs)dvs.textContent=bedsToBCCF(MP_DAY_BEDS).toFixed(2);
+  if(evs)evs.textContent=bedsToBCCF(MP_EVE_BEDS).toFixed(2);
+  if(nvs)nvs.textContent=bedsToBCCF(MP_NIGHT_BEDS).toFixed(2);
+  var dbt=document.querySelector('.tstepper[data-id="mp_day_beds"] .tsval');
+  var ebt=document.querySelector('.tstepper[data-id="mp_eve_beds"] .tsval');
+  var nbt=document.querySelector('.tstepper[data-id="mp_night_beds"] .tsval');
+  if(dbt)dbt.value=MP_DAY_BEDS; if(ebt)ebt.value=MP_EVE_BEDS; if(nbt)nbt.value=MP_NIGHT_BEDS;
+  var ss=document.getElementById('shift-summary');
+  if(ss)ss.textContent='Day '+String(SHIFT_DAY_START).padStart(2,'0')+':00 · Evening '+String(SHIFT_EVE_START).padStart(2,'0')+':00 · Night '+String(SHIFT_NIGHT_START).padStart(2,'0')+':00';
+  calcMpCalc();
+}
+['mp_day_beds_s','mp_eve_beds_s','mp_night_beds_s','shift-day-start','shift-eve-start','shift-night-start'].forEach(function(id){
+  var el=document.querySelector('.tstepper[data-id="'+id+'"]'); if(!el)return;
+  var mn=+el.dataset.min,mx2=+el.dataset.max,st=+el.dataset.step,inp=el.querySelector('.tsval');
+  el.querySelectorAll('.tsbtn').forEach(function(b){b.addEventListener('click',function(){
+    var v=Math.max(mn,Math.min(mx2,(+inp.value||0)+(+this.dataset.d*st))); inp.value=v; onShiftChange();
+  });});
+  inp.addEventListener('change',function(){onShiftChange();});
+});
+
+// Clock
+function mpTick(){
+  var h=new Date().getHours();
+  if(S.in_hour!==h){S.in_hour=h;var inp=document.querySelector('.tstepper[data-id="in_hour"] .tsval');if(inp)inp.value=h;var d=$$('d-hour');if(d&&d!==_DUMMY_EL)d.textContent=h;renderMpedocs();renderComposite();}
+}
+setInterval(mpTick,60000);
+
+// Hook composite into surge render cycle
+var _origRD=typeof renderDashboard==='function'?renderDashboard:null;
+if(_origRD){
+  renderDashboard=function(iliData,wxMod,wxLabel,wxTemp){
+    _origRD(iliData,wxMod,wxLabel,wxTemp);
+    renderMpedocs();
+    renderComposite();
+  };
+}
+
+// Settings
+function renderGradEntries(){
+  var list=$$('gradEntriesList');
+  if(list===_DUMMY_EL)return;
+  if(!GRADUATION_EVENTS.length){list.innerHTML='<div style="font-size:11px;color:#8892b0;padding:10px 0;">No ceremonies added yet.</div>';return;}
+  list.innerHTML=GRADUATION_EVENTS.slice().sort(function(a,b){return a.date.localeCompare(b.date);}).map(function(ev,i){
+    return '<div class="gerow"><input type="date" value="'+ev.date+'" data-i="'+i+'" data-f="date">'+
+      '<input type="text" value="'+ev.name.replace(/"/g,'&quot;')+'" data-i="'+i+'" data-f="name">'+
+      '<input type="time" value="'+(ev.time||'')+'" data-i="'+i+'" data-f="time">'+
+      '<button class="delbtn" data-i="'+i+'">✕</button></div>';
+  }).join('');
+  list.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){GRADUATION_EVENTS[+this.dataset.i][this.dataset.f]=this.value;});});
+  list.querySelectorAll('.delbtn').forEach(function(btn){btn.addEventListener('click',function(){GRADUATION_EVENTS.splice(+this.dataset.i,1);renderGradEntries();});});
+}
+var _agb=document.getElementById('add-grad-btn');
+if(_agb)_agb.addEventListener('click',function(){
+  var date=$$('newDate').value,name=$$('newName').value.trim(),time=$$('newTime').value;
+  if(!date||!name)return;
+  GRADUATION_EVENTS.push({date:date,name:name,time:time||null});
+  GRADUATION_EVENTS.sort(function(a,b){return a.date.localeCompare(b.date);});
+  $$('newDate').value='';$$('newName').value='';$$('newTime').value='';
+  renderGradEntries();
+});
+var _ssb=document.getElementById('save-settings-btn');
+if(_ssb)_ssb.addEventListener('click',function(){
+  GRAD_SEASON_START=$$('seasonStart').value||'2026-06-01';
+  GRAD_SEASON_END=$$('seasonEnd').value||'2026-06-20';
+  var s={events:GRADUATION_EVENTS,seasonStart:GRAD_SEASON_START,seasonEnd:GRAD_SEASON_END};
+  saveGradSettings(s);GRAD_SETTINGS=s;ALL_EVENTS=buildAllEvents();
+  var b=$$('savedBadge');if(b!==_DUMMY_EL){b.classList.add('show');setTimeout(function(){b.classList.remove('show');},2500);}
+  renderSurgeDashboard();
+});
+var _rsb=document.getElementById('reset-settings-btn');
+if(_rsb)_rsb.addEventListener('click',function(){
+  GRADUATION_EVENTS=DEFAULT_GRAD_EVENTS.map(function(e){return Object.assign({},e);});
+  GRAD_SEASON_START='2026-06-01';GRAD_SEASON_END='2026-06-20';
+  MP_DAY_BEDS=30;MP_EVE_BEDS=25;MP_NIGHT_BEDS=21;
+  SHIFT_DAY_START=7;SHIFT_EVE_START=15;SHIFT_NIGHT_START=23;
+  localStorage.removeItem('pedED_gradSettings');
+  GRAD_SETTINGS={events:GRADUATION_EVENTS,seasonStart:GRAD_SEASON_START,seasonEnd:GRAD_SEASON_END};
+  ALL_EVENTS=buildAllEvents();renderGradEntries();
+  $$('seasonStart').value=GRAD_SEASON_START;$$('seasonEnd').value=GRAD_SEASON_END;
+  // Reset shift inputs
+  var dbs=document.querySelector('.tstepper[data-id="mp_day_beds_s"] .tsval');
+  var ebs=document.querySelector('.tstepper[data-id="mp_eve_beds_s"] .tsval');
+  var nbs=document.querySelector('.tstepper[data-id="mp_night_beds_s"] .tsval');
+  var dss=document.getElementById('shift-day-start');
+  var ess=document.getElementById('shift-eve-start');
+  var nss=document.getElementById('shift-night-start');
+  if(dbs)dbs.value=30; if(ebs)ebs.value=25; if(nbs)nbs.value=21;
+  if(dss)dss.value=7;  if(ess)ess.value=15; if(nss)nss.value=23;
+  updateBCCFDisplays();
+  onShiftChange();
+  var badge=document.getElementById('savedBadge');
+  if(badge){badge.textContent='✓ Reset';badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2000);}
+});
+
+// Sync season inputs when settings tab opens
+var _tbSettings=document.getElementById('tb-settings');
+if(_tbSettings)_tbSettings.addEventListener('click',function(){
+  var ss=document.getElementById('seasonStart'),se=document.getElementById('seasonEnd');
+  if(ss)ss.value=GRAD_SEASON_START;
+  if(se)se.value=GRAD_SEASON_END;
+  renderGradEntries();
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// mPEDOCS CALCULATOR
+// ═══════════════════════════════════════════════════════════════════════
+var BCCF_TABLE = [[10,4.0],[15,2.7],[20,2.0],[25,1.6],[30,1.3],[35,1.1],[40,1.0],[45,0.9],[50,0.8]];
+function bedsToBCCF(beds){
+  if(beds<=10)return 4.0; if(beds>=50)return 0.8;
+  for(var i=0;i<BCCF_TABLE.length-1;i++){
+    var b0=BCCF_TABLE[i][0],b1=BCCF_TABLE[i+1][0];
+    if(beds>=b0&&beds<=b1){var c0=BCCF_TABLE[i][1],c1=BCCF_TABLE[i+1][1];return Math.round((c0+(beds-b0)/(b1-b0)*(c1-c0))*100)/100;}
+  }return 1.0;
+}
+var MP_DAY_BEDS=30, MP_EVE_BEDS=25, MP_NIGHT_BEDS=21;
+var SHIFT_DAY_START=7, SHIFT_EVE_START=15, SHIFT_NIGHT_START=23;
+var MP_BCCF=1.3;
+var MP_LEVELS = [
+  {max:20,  label:'L1', desc:'Not busy',                 color:'#22c55e'},
+  {max:60,  label:'L2', desc:'Busy',                     color:'#22c55e'},
+  {max:100, label:'L3', desc:'Extremely busy',            color:'#60a5fa'},
+  {max:140, label:'L4', desc:'Crowded ← tipping pt', color:'#ffd166'},
+  {max:180, label:'L5', desc:'Significantly crowded',     color:'#ff9a3c'},
+  {max:200, label:'L6', desc:'Severely crowded',          color:'#ff4d6d'},
+  {max:9999,label:'L7', desc:'Dangerously crowded',       color:'#dc2626'},
+];
+function getMpLevel(s){return MP_LEVELS.find(function(l){return s<l.max;})||MP_LEVELS[MP_LEVELS.length-1];}
+function getCurrentBCCF(){
+  var h=new Date().getHours();
+  if(SHIFT_DAY_START<SHIFT_EVE_START&&h>=SHIFT_DAY_START&&h<SHIFT_EVE_START)return{bccf:bedsToBCCF(MP_DAY_BEDS),shift:'Day'};
+  if(SHIFT_EVE_START<SHIFT_NIGHT_START&&h>=SHIFT_EVE_START&&h<SHIFT_NIGHT_START)return{bccf:bedsToBCCF(MP_EVE_BEDS),shift:'Evening'};
+  if(SHIFT_DAY_START>=SHIFT_EVE_START&&(h>=SHIFT_DAY_START||h<SHIFT_EVE_START))return{bccf:bedsToBCCF(MP_DAY_BEDS),shift:'Day'};
+  if(SHIFT_EVE_START>=SHIFT_NIGHT_START&&(h>=SHIFT_EVE_START||h<SHIFT_NIGHT_START))return{bccf:bedsToBCCF(MP_EVE_BEDS),shift:'Evening'};
+  return{bccf:bedsToBCCF(MP_NIGHT_BEDS),shift:'Night'};
+}
+function updateBCCFDisplays(){
+  var dayBCCF=bedsToBCCF(MP_DAY_BEDS),eveBCCF=bedsToBCCF(MP_EVE_BEDS),nightBCCF=bedsToBCCF(MP_NIGHT_BEDS);
+  var dv=document.getElementById('bccf-day-val'),ev=document.getElementById('bccf-eve-val'),nv=document.getElementById('bccf-night-val');
+  if(dv)dv.textContent=dayBCCF.toFixed(2);
+  if(ev)ev.textContent=eveBCCF.toFixed(2);
+  if(nv)nv.textContent=nightBCCF.toFixed(2);
+  var cur=getCurrentBCCF();MP_BCCF=cur.bccf;
+  var si=document.getElementById('bccf-shift-active');
+  if(si)si.textContent=cur.shift+' shift active · BCCF '+MP_BCCF.toFixed(2);
+}
+function autoMpBCCF(){
+  var dayInp=document.querySelector('.tstepper[data-id="mp_day_beds"] .tsval');
+  var eveInp=document.querySelector('.tstepper[data-id="mp_eve_beds"] .tsval');
+  var nightInp=document.querySelector('.tstepper[data-id="mp_night_beds"] .tsval');
+  if(dayInp)MP_DAY_BEDS=parseInt(dayInp.value)||30;
+  if(eveInp)MP_EVE_BEDS=parseInt(eveInp.value)||25;
+  if(nightInp)MP_NIGHT_BEDS=parseInt(nightInp.value)||21;
+  updateBCCFDisplays();
+  calcMpCalc();
+}
+
+function calcMpCalc(){
+  var wrEl=document.querySelector('.tstepper[data-id="mp_wr"] .tsval');
+  var tpEl=document.querySelector('.tstepper[data-id="mp_tp"] .tsval');
+  var wr=wrEl?parseFloat(wrEl.value)||0:0;
+  var tp=tpEl?parseFloat(tpEl.value)||0:0;
+  var score=33.3*(0.11+0.07*wr+0.04*tp)*MP_BCCF;
+  var lv=getMpLevel(score);
+
+  var scoreEl=document.getElementById('mp-calc-score');
+  var fmtEl=document.getElementById('mp-calc-formula');
+  var lvlEl=document.getElementById('mp-calc-level');
+  var descEl=document.getElementById('mp-calc-desc');
+  var barEl=document.getElementById('mp-calc-bar');
+  var wrD=document.getElementById('d-mp-wr');
+  var tpD=document.getElementById('d-mp-tp');
+
+  if(scoreEl){scoreEl.textContent=score.toFixed(1);scoreEl.style.color=lv.color;}
+  if(fmtEl)fmtEl.textContent='WR='+wr+' · TP='+tp+' · BCCF='+MP_BCCF;
+  if(lvlEl){lvlEl.textContent=lv.label;lvlEl.style.color=lv.color;lvlEl.style.borderColor=lv.color;}
+  if(descEl){descEl.textContent=lv.desc;descEl.style.color=lv.color;}
+  if(barEl){barEl.style.width=Math.min(100,score/260*100)+'%';barEl.style.background=lv.color;}
+  if(wrD)wrD.textContent=wr;
+  if(tpD)tpD.textContent=tp;
+  var rounded=Math.round(score);S.in_mpedocs=rounded;ED_STATE_ACTIVE=(wr>0||tp>0);
+  var sfWr=document.querySelector('.tstepper[data-sfid="mp_wr"] .tsval'),sfTp=document.querySelector('.tstepper[data-sfid="mp_tp"] .tsval');
+  if(sfWr)sfWr.value=wr; if(sfTp)sfTp.value=tp;
+  var sfWrD=document.getElementById('sf-d-wr'),sfTpD=document.getElementById('sf-d-tp');
+  if(sfWrD)sfWrD.textContent=wr; if(sfTpD)sfTpD.textContent=tp;
+  var sfSc=document.getElementById('sf-calc-score'),sfFm=document.getElementById('sf-calc-formula');
+  var sfCol=rounded>=100?'#ff4d6d':rounded>=80?'#ff9a3c':rounded>=60?'#ffd166':'#8892b0';
+  if(sfSc){sfSc.textContent=rounded;sfSc.style.color=sfCol;} if(sfFm)sfFm.textContent='WR='+wr+' · TP='+tp+' · BCCF='+MP_BCCF;
+}
+
+function applyMpCalc(){
+  var wrEl=document.querySelector('.tstepper[data-id="mp_wr"] .tsval');
+  var tpEl=document.querySelector('.tstepper[data-id="mp_tp"] .tsval');
+  var wr=wrEl?parseFloat(wrEl.value)||0:0;
+  var tp=tpEl?parseFloat(tpEl.value)||0:0;
+  var score=Math.round(33.3*(0.11+0.07*wr+0.04*tp)*MP_BCCF);
+  // Push into the mPEDOCS model input
+  S.in_mpedocs=score;
+  var mpInp=document.querySelector('.tstepper[data-id="in_mpedocs"] .tsval');
+  var mpDisp=$$('d-mpedocs');
+  if(mpInp) mpInp.value=score;
+  if(mpDisp&&mpDisp!==_DUMMY_EL) mpDisp.textContent=score;
+  renderMpedocs();
+  renderComposite();
+}
+
+// Wire up bed capacity steppers
+document.querySelectorAll('.tstepper[data-id="mp_day_beds"],.tstepper[data-id="mp_night_beds"]').forEach(function(el){
+  var inp=el.querySelector('.tsval');
+  el.querySelectorAll('.tsbtn').forEach(function(b){
+    b.addEventListener('click',function(){
+      var mn=+el.dataset.min,mx=+el.dataset.max,st=+el.dataset.step;
+      inp.value=Math.max(mn,Math.min(mx,(parseFloat(inp.value)||0)+(+this.dataset.d)*st));
+      if(el.dataset.id==='mp_day_beds') MP_DAY_BEDS=parseInt(inp.value)||30;
+      else if(el.dataset.id==='mp_eve_beds') MP_EVE_BEDS=parseInt(inp.value)||25;
+      else MP_NIGHT_BEDS=parseInt(inp.value)||21;
+      updateBCCFDisplays();
+      calcMpCalc();
+    });
+  });
+  inp.addEventListener('input',function(){
+    if(el.dataset.id==='mp_day_beds') MP_DAY_BEDS=parseInt(this.value)||30;
+    else MP_NIGHT_BEDS=parseInt(this.value)||21;
+    updateBCCFDisplays();
+    calcMpCalc();
+  });
+});
+
+// Wire up mp_wr and mp_tp steppers
+document.querySelectorAll('.tstepper[data-id="mp_wr"],.tstepper[data-id="mp_tp"]').forEach(function(el){
+  var inp=el.querySelector('.tsval');
+  el.querySelectorAll('.tsbtn').forEach(function(b){
+    b.addEventListener('click',function(){
+      var mn=+el.dataset.min,mx=+el.dataset.max,st=+el.dataset.step;
+      inp.value=Math.max(mn,Math.min(mx,(parseFloat(inp.value)||0)+(+this.dataset.d)*st));
+      calcMpCalc();
+    });
+  });
+  inp.addEventListener('input',function(){calcMpCalc();});
+  inp.addEventListener('change',function(){calcMpCalc();});
+});
+
+// Auto-set BCCF on load
+autoMpBCCF();
+
+// Boot
+(function(){
+  var h=new Date().getHours();S.in_hour=h;
+  var inp=document.querySelector('.tstepper[data-id="in_hour"] .tsval');if(inp)inp.value=h;
+  var d=$$('d-hour');if(d!==_DUMMY_EL)d.textContent=h;
+})();
+renderMpedocs();
+renderComposite();
 renderSurgeDashboard();
+setTimeout(function(){var _s=document.getElementById('sc-surge');if(_s)_s.scrollTop=0;},200);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MH TAB
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Empirical MH lookup tables from 3yr Throughput data (2023-2025)
+// MH visits = suicidal ideation, self-harm, psychiatric, behavioral, etc.
+const MH_BY_HOUR=[0.17,0.11,0.055,0.044,0.033,0.037,0.024,0.034,0.086,0.178,0.234,0.294,0.342,0.319,0.332,0.338,0.356,0.389,0.39,0.406,0.359,0.315,0.308,0.232];
+const MH_BY_DOW=[6.62,6.11,6.19,6.21,5.23,3.47,3.84]; // Mon=0
+const MH_BY_MONTH=[0,1.145,1.064,1.161,1.172,1.234,0.898,0.659,0.637,0.978,1.133,1.018,0.909]; // index 1-12
+const MH_DOW_HOUR=[[0.237,0.127,0.068,0.042,0.017,0.034,0.034,0.042,0.093,0.246,0.331,0.492,0.627,0.466,0.356,0.424,0.475,0.636,0.568,0.466,0.551,0.339,0.305,0.288],[0.195,0.11,0.076,0.042,0.025,0.042,0.051,0.034,0.059,0.347,0.381,0.441,0.424,0.415,0.508,0.441,0.415,0.593,0.508,0.525,0.381,0.364,0.347,0.169],[0.144,0.085,0.042,0.034,0.017,0.017,0.017,0.042,0.186,0.212,0.347,0.381,0.356,0.449,0.331,0.466,0.5,0.475,0.568,0.568,0.432,0.449,0.347,0.28],[0.164,0.095,0.103,0.017,0.034,0.009,0.0,0.043,0.095,0.25,0.397,0.353,0.483,0.474,0.5,0.431,0.448,0.56,0.448,0.552,0.353,0.319,0.414,0.284],[0.137,0.154,0.068,0.051,0.009,0.034,0.017,0.017,0.188,0.248,0.188,0.316,0.436,0.385,0.462,0.41,0.436,0.444,0.385,0.342,0.419,0.256,0.222,0.205],[0.121,0.138,0.043,0.034,0.026,0.069,0.017,0.026,0.06,0.086,0.129,0.207,0.164,0.241,0.19,0.207,0.276,0.121,0.25,0.345,0.25,0.233,0.216,0.216],[0.103,0.06,0.034,0.068,0.043,0.051,0.026,0.034,0.034,0.06,0.111,0.137,0.188,0.137,0.205,0.325,0.162,0.248,0.316,0.299,0.333,0.316,0.325,0.231]];
+const MH_LOS_BY_HOUR={0:691,1:589,2:572,3:547,4:558,5:399,6:623,7:364,8:351,9:335,10:347,11:330,12:316,13:348,14:351,15:344,16:336,17:367,18:343,19:383,20:399,21:424,22:702,23:619};
+
+function getMHExpected(hour, dow, month){
+  // Use DOW×hour lookup (school-year empirical), adjusted for monthly factor
+  var school=[9,10,11,12,1,2,3,4,5].indexOf(month) >= 0;
+  var base = school ? MH_DOW_HOUR[dow][hour] : MH_BY_HOUR[hour] * 0.67;
+  var monthFactor = MH_BY_MONTH[month] || 1.0;
+  return Math.max(0, base * monthFactor);
+}
+
+function getMHTier(visits, thresh){
+  if(visits >= thresh*1.5) return {lbl:'HIGH',   cls:'IMMINENT', col:'#ff4d6d', action:'Consider early social work/psych consult. Bed management alert.'};
+  if(visits >= thresh)     return {lbl:'ELEVATED',cls:'WARNING',  col:'#ff9a3c', action:'Monitor MH queue. Ensure psychiatric resources available.'};
+  if(visits >= thresh*0.6) return {lbl:'MODERATE',cls:'ADVISORY', col:'#ffd166', action:'Typical MH load for this time. Normal operations.'};
+  return                          {lbl:'LOW',     cls:'CLEAR',    col:'#39d98a', action:'Below typical MH volume for this hour.'};
+}
+
+// MH-specific event modifiers (empirically derived from 3yr Throughput data)
+const MH_EVENT_MODIFIERS = [
+  // STATISTICALLY SIGNIFICANT (p<0.05)
+  {start:'2023-12-26',end:'2023-12-29',mod:0.58,label:'Christmas Week',note:'Family gatherings — MH visits 42% below baseline (p=0.016)'},
+  {start:'2024-12-26',end:'2024-12-29',mod:0.58,label:'Christmas Week',note:'Family gatherings — MH visits 42% below baseline'},
+  {start:'2025-12-26',end:'2025-12-29',mod:0.58,label:'Christmas Week',note:'Family gatherings — MH visits 42% below baseline'},
+  {start:'2026-12-26',end:'2026-12-29',mod:0.58,label:'Christmas Week',note:'Family gatherings — MH visits 42% below baseline'},
+  {start:'2023-11-20',end:'2023-11-22',mod:0.57,label:'Thanksgiving Week',note:'Family gatherings — MH 43% below baseline (p=0.019)'},
+  {start:'2024-11-25',end:'2024-11-27',mod:0.57,label:'Thanksgiving Week',note:'Family gatherings — MH 43% below baseline'},
+  {start:'2025-11-24',end:'2025-11-26',mod:0.57,label:'Thanksgiving Week',note:'Family gatherings — MH 43% below baseline'},
+  {start:'2026-11-23',end:'2026-11-25',mod:0.57,label:'Thanksgiving Week',note:'Family gatherings — MH 43% below baseline'},
+  // End of semester: strongest school stress signal (×1.50, p=0.007)
+  {start:'2023-12-11',end:'2023-12-15',mod:1.50,label:'End of Semester',note:'Exam/grade stress — MH 50% above baseline (p=0.007)'},
+  {start:'2024-12-09',end:'2024-12-13',mod:1.50,label:'End of Semester',note:'Exam/grade stress — MH 50% above baseline'},
+  {start:'2025-12-08',end:'2025-12-12',mod:1.50,label:'End of Semester',note:'Exam/grade stress — MH 50% above baseline'},
+  {start:'2026-12-07',end:'2026-12-11',mod:1.50,label:'End of Semester',note:'Exam/grade stress — MH 50% above baseline'},
+  // State testing weeks April (×1.26, p=0.030)
+  {start:'2024-04-15',end:'2024-04-25',mod:1.26,label:'State Testing Week',note:'Academic stress — MH 26% above baseline (p=0.030)'},
+  {start:'2025-04-14',end:'2025-04-24',mod:1.26,label:'State Testing Week',note:'Academic stress — MH 26% above baseline'},
+  {start:'2026-04-13',end:'2026-04-23',mod:1.26,label:'State Testing Week',note:'Academic stress — MH 26% above baseline'},
+
+  // CLINICALLY PLAUSIBLE (underpowered but large effects)
+  {start:'2023-12-25',end:'2023-12-25',mod:0.26,label:'Christmas Day',note:'Near shutdown — MH 74% below baseline'},
+  {start:'2024-12-25',end:'2024-12-25',mod:0.26,label:'Christmas Day',note:'Near shutdown — MH 74% below baseline'},
+  {start:'2025-12-25',end:'2025-12-25',mod:0.26,label:'Christmas Day',note:'Near shutdown — MH 74% below baseline'},
+  {start:'2026-12-25',end:'2026-12-25',mod:0.26,label:'Christmas Day',note:'Near shutdown — MH 74% below baseline'},
+  {start:'2023-11-23',end:'2023-11-23',mod:0.48,label:'Thanksgiving Day',note:'MH 52% below baseline'},
+  {start:'2024-11-28',end:'2024-11-28',mod:0.48,label:'Thanksgiving Day',note:'MH 52% below baseline'},
+  {start:'2025-11-27',end:'2025-11-27',mod:0.48,label:'Thanksgiving Day',note:'MH 52% below baseline'},
+  {start:'2026-11-26',end:'2026-11-26',mod:0.48,label:'Thanksgiving Day',note:'MH 52% below baseline'},
+  {start:'2024-01-01',end:'2024-01-01',mod:0.32,label:'New Year Day',note:'MH 68% below baseline'},
+  {start:'2025-01-01',end:'2025-01-01',mod:0.32,label:'New Year Day',note:'MH 68% below baseline'},
+  {start:'2026-01-01',end:'2026-01-01',mod:0.32,label:'New Year Day',note:'MH 68% below baseline'},
+  // First week back Jan (×1.32, p=0.065)
+  {start:'2024-01-08',end:'2024-01-12',mod:1.32,label:'First Week Back Jan',note:'Post-holiday school return — MH 32% above baseline (p=0.065)'},
+  {start:'2025-01-06',end:'2025-01-10',mod:1.32,label:'First Week Back Jan',note:'Post-holiday school return — MH 32% above baseline'},
+  {start:'2026-01-05',end:'2026-01-09',mod:1.32,label:'First Week Back Jan',note:'Post-holiday school return — MH 32% above baseline'},
+];
+
+function getMHEventModifier(dateStr){
+  var d=new Date(dateStr+'T12:00:00');
+  var mod=1.0, label=null;
+  for(var i=0;i<MH_EVENT_MODIFIERS.length;i++){
+    var ev=MH_EVENT_MODIFIERS[i];
+    var s=new Date(ev.start+'T00:00:00'), e=new Date(ev.end+'T23:59:59');
+    if(d>=s&&d<=e){mod*=ev.mod; label=ev.label;}
+  }
+  return {mod:Math.min(2.0,Math.max(0.1,mod)), label:label};
+}
+
+function renderMHTab(){
+  var now    = new Date();
+  var hour   = now.getHours();
+  var dow    = (now.getDay()+6)%7;
+  var month  = now.getMonth()+1;
+  var thresh = parseInt(document.getElementById('mh-thresh-slider')?.value||8);
+
+  // Update threshold display
+  var tv=document.getElementById('mh-thresh-val'); if(tv)tv.textContent=thresh+'/day';
+
+  // Current hour expected
+  var todayStr = now.toISOString().slice(0,10);
+  var mhMod = getMHEventModifier(todayStr);
+  var expected = getMHExpected(hour, dow, month) * mhMod.mod;
+  var tier = getMHTier(expected, thresh/24); // daily thresh → hourly
+
+  // Hero
+  var hero=document.getElementById('mh-risk-hero');
+  if(hero){hero.className='mhero '+tier.cls;}
+  var vn=document.getElementById('mh-visits-now'); if(vn){vn.textContent=expected.toFixed(2);vn.style.color=tier.col;}
+  var rt=document.getElementById('mh-risk-tier');  if(rt){rt.textContent=tier.lbl;rt.style.color=tier.col;}
+  var ra=document.getElementById('mh-risk-action');if(ra)ra.textContent=tier.action;
+
+  // Daily estimate
+  var dailyEst = 0;
+  for(var h=0;h<24;h++) dailyEst+=getMHExpected(h,dow,month)*mhMod.mod;
+  var de=document.getElementById('mh-daily-est'); if(de)de.textContent=dailyEst.toFixed(1);
+
+  // LOS
+  var los=MH_LOS_BY_HOUR[hour]||360;
+  var le=document.getElementById('mh-los-est'); if(le)le.textContent=Math.round(los/60*10)/10+'h';
+
+  // % above threshold
+  var days_above_pct = (dailyEst/thresh*100);
+  var sp=document.getElementById('mh-surge-pct'); if(sp)sp.textContent=Math.min(999,Math.round(days_above_pct))+'%';
+
+  // Threshold context
+  var tc=document.getElementById('mh-thresh-context');
+  if(tc){
+    var pctDays = {'3':90,'4':79,'5':64,'6':50,'7':37,'8':25,'9':17,'10':10,'11':6,'12':4,'13':3,'14':2,'15':1};
+    tc.textContent='≥'+thresh+'/day occurs on ~'+( pctDays[String(thresh)]||'<1')+'% of days historically.';
+  }
+
+  // 24h bars
+  var bars=document.getElementById('mh-bars-inner');
+  if(bars){
+    var html='';
+    var maxExp=0;
+    var vals=[];
+    for(var i=0;i<24;i++){
+      var fh=new Date(now.getTime()+i*3600000);
+      var fHour=fh.getHours(), fDow=(fh.getDay()+6)%7, fMonth=fh.getMonth()+1;
+      var fDateStr=fh.toISOString().slice(0,10);
+      var fMhMod=getMHEventModifier(fDateStr);
+      var v=getMHExpected(fHour,fDow,fMonth)*fMhMod.mod;
+      vals.push(v);
+      if(v>maxExp)maxExp=v;
+    }
+    var hourlyThresh=thresh/24;
+    for(var i=0;i<24;i++){
+      var fh2=new Date(now.getTime()+i*3600000);
+      var lbl=String(fh2.getHours()).padStart(2,'0')+':00';
+      var v=vals[i];
+      var pct=maxExp>0?Math.round(v/maxExp*90):4;
+      var col=v>=hourlyThresh?'#a78bfa':'#39d98a';
+      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;">';
+      html+='<div style="font-size:9px;color:var(--muted);">'+lbl+'</div>';
+      html+='<div style="flex:1;width:100%;display:flex;align-items:flex-end;min-height:60px;">';
+      html+='<div style="width:100%;height:'+Math.max(4,pct)+'px;background:'+col+';border-radius:2px 2px 0 0;opacity:0.85;"></div>';
+      html+='</div>';
+      html+='<div style="font-size:8.5px;color:'+col+';">'+v.toFixed(1)+'</div>';
+      html+='</div>';
+    }
+    bars.innerHTML=html;
+  }
+
+  // Context panel
+  var cp=document.getElementById('mh-context-panel');
+  if(cp){
+    var dow_names=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    var month_names=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var school=[9,10,11,12,1,2,3,4,5].indexOf(month)>=0;
+    var lines=[];
+    lines.push('📅 '+dow_names[dow]+' · '+month_names[month]+' · '+(school?'School year (×1.18 vs summer)':'Summer (lower MH baseline)'));
+    if(mhMod.label) lines.push('⚡ '+mhMod.label+': ×'+mhMod.mod.toFixed(2)+' MH modifier active');
+    if(dow===0) lines.push('⚡ Monday: highest MH day (7.3/day avg vs 3.5 weekends)');
+    if(month===10) lines.push('🍂 October: peak MH month (6.1/day avg — 74% above August)');
+    if(month>=9&&month<=11) lines.push('📚 Back-to-school season: MH elevated Sep-Nov');
+    lines.push('🕐 Peak MH hours: 17:00-20:00 (post-school dismissal)');
+    lines.push('⏱ Expected LOS this hour: ~'+Math.round(los/60*10)/10+'h (median)');
+    if(los>700) lines.push('⚠️ Late arrivals have longest waits — psychiatric bed access often limited overnight');
+    cp.innerHTML=lines.map(function(l){return '<div>'+l+'</div>';}).join('');
+  }
+}
+
+// Init MH tab — defer until DOM ready, re-render on tab switch
+// Initial MH render + periodic refresh
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ renderMHTab(); });
+} else {
+  renderMHTab();
+}
+setInterval(renderMHTab, 60000);
+
 </script>
 </body>
 </html>
