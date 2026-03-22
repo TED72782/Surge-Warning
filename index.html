@@ -2160,7 +2160,9 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fWxLagMod7, fPostMod7) * internalMod7);
     const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => {
       const { modifier: hMod } = getLocalEventModifier(fds, h);
-      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod,fWxLagMod7,fPostMod7) * internalMod7);
+      // internalMod (resp×GI load) was calibrated at thresh=12; only apply to peak hours ≥12 to avoid double-counting illness burden at lower thresholds
+      const hInternalMod = h >= 12 ? internalMod7 : 1.0;
+      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod,fWxLagMod7,fPostMod7) * hInternalMod);
     }, 0) / 11;
     const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
     // Weather for this day from lookup
