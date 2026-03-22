@@ -1045,20 +1045,6 @@ to { opacity:1; transform:translateY(0); }
     <div class="tpb" id="mh-context-panel" style="font-size:11px;color:#8892b0;line-height:2.0;padding:12px 14px;"></div>
   </div>
 
-  <div class="sdiv">7-Day Weather · MH Lag Effects</div>
-  <div class="panel">
-    <div class="ph"><div class="pt">Weather Forecast · MH Surge Modifier from Lag</div><div class="badge" style="background:rgba(167,139,250,0.1);color:#a78bfa;border-color:rgba(167,139,250,0.3);">EMPIRICAL · LAGGED</div></div>
-    <div class="pb">
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <div class="forecast-grid" id="mh-wx-7day" style="min-width:320px;"></div>
-      </div>
-      <div style="margin-top:10px;font-size:10px;color:var(--muted);">
-        MH surge modifier = empirical lag effect from past 7 days of weather.
-        ❄️ Snow ×1.20-1.24 · 🌫️ Dark/overcast lag+3-5 ×1.15-1.17 · ☀️ Hot ×0.67-0.77 (protective) · <span style="color:#c084fc;">■ elevating</span> · <span style="color:#22d3ee;">■ protective</span>
-      </div>
-    </div>
-  </div>
-
   <div class="sdiv">MH LOS Reference</div>
   <div class="panel">
     <div class="tpb" style="padding:12px 14px;">
@@ -1281,7 +1267,6 @@ function calcPersistenceProb(horizon,mpedocs,arr_3h,hour,dow){
   return Math.min(0.99,Math.max(0.01,1/(1+Math.exp(-logit))));
 }
 // Cache last-fetched API data so slider can re-render without refetching
-let _cachedIliData = null, _cachedWxMod = 1.0, _cachedWxLabel = '', _cachedWxTemp = null;
 let _initialRenderDone = false;
 
 const HM_BY_THRESH = {"6": [[0.1133, 0.0867, 0.1224, 0.08, 0.0855, 0.1299, 0.0774], [0.042, 0.021, 0.0352, 0.0432, 0.0329, 0.0629, 0.04], [0.0, 0.0, 0.0074, 0.0074, 0.0076, 0.0148, 0.0146], [0.0303, 0.0083, 0.0, 0.0236, 0.0, 0.0, 0.0073], [0.0078, 0.0, 0.0, 0.0081, 0.0, 0.0082, 0.0], [0.0084, 0.0171, 0.0, 0.0, 0.0, 0.0083, 0.0], [0.0079, 0.008, 0.0, 0.0174, 0.0079, 0.0082, 0.0083], [0.0352, 0.0, 0.0074, 0.0222, 0.0072, 0.0149, 0.036], [0.14, 0.0584, 0.0927, 0.1224, 0.0676, 0.1007, 0.1226], [0.5099, 0.3947, 0.4183, 0.351, 0.183, 0.1765, 0.461], [0.5948, 0.5742, 0.5484, 0.4416, 0.329, 0.4387, 0.5962], [0.6323, 0.6026, 0.5705, 0.5548, 0.4487, 0.5161, 0.7389], [0.6065, 0.6603, 0.6129, 0.5613, 0.5161, 0.5577, 0.6242], [0.6129, 0.5742, 0.6218, 0.5226, 0.5161, 0.5064, 0.707], [0.5806, 0.6282, 0.5385, 0.5226, 0.529, 0.5641, 0.7389], [0.6234, 0.5449, 0.5355, 0.539, 0.5577, 0.6, 0.6731], [0.7484, 0.7051, 0.6645, 0.5779, 0.5577, 0.6282, 0.7643], [0.6968, 0.7436, 0.7692, 0.6516, 0.6026, 0.6282, 0.828], [0.8387, 0.7821, 0.8141, 0.7935, 0.5833, 0.5962, 0.8535], [0.8129, 0.8333, 0.8269, 0.7161, 0.6667, 0.7308, 0.9108], [0.7792, 0.7564, 0.8141, 0.7935, 0.7308, 0.7564, 0.7771], [0.7078, 0.7308, 0.75, 0.7032, 0.6, 0.6859, 0.6369], [0.4416, 0.4581, 0.5, 0.4156, 0.391, 0.4258, 0.4522], [0.183, 0.2727, 0.2323, 0.2857, 0.2258, 0.2418, 0.2548]], "7": [[0.08, 0.0467, 0.0612, 0.0333, 0.0461, 0.0779, 0.0323], [0.007, 0.014, 0.0141, 0.0072, 0.0066, 0.028, 0.0333], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0083, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0079, 0.008, 0.0, 0.0087, 0.0079, 0.0, 0.0], [0.0141, 0.0, 0.0, 0.0074, 0.0072, 0.0, 0.0], [0.0733, 0.026, 0.0265, 0.0748, 0.0203, 0.0268, 0.0516], [0.3245, 0.2434, 0.2549, 0.2715, 0.0915, 0.1176, 0.3377], [0.4967, 0.5032, 0.3871, 0.3571, 0.2, 0.3097, 0.5], [0.4774, 0.5064, 0.4679, 0.4065, 0.3077, 0.3935, 0.6242], [0.4839, 0.5321, 0.4839, 0.4194, 0.3871, 0.4103, 0.5287], [0.5484, 0.4645, 0.4487, 0.4, 0.3871, 0.3654, 0.5796], [0.4581, 0.4167, 0.4231, 0.4, 0.3806, 0.4551, 0.5987], [0.461, 0.4423, 0.4387, 0.4156, 0.4295, 0.4194, 0.5513], [0.6065, 0.5641, 0.5097, 0.4156, 0.4103, 0.4808, 0.6879], [0.5677, 0.6474, 0.6346, 0.5226, 0.4615, 0.5, 0.7006], [0.7484, 0.6731, 0.7179, 0.6452, 0.4295, 0.4615, 0.7516], [0.7097, 0.7692, 0.7244, 0.6258, 0.5577, 0.6218, 0.8599], [0.6883, 0.6987, 0.6538, 0.6387, 0.609, 0.6154, 0.6815], [0.5909, 0.6026, 0.609, 0.5613, 0.4194, 0.5449, 0.4904], [0.3312, 0.3484, 0.3205, 0.3247, 0.2756, 0.3097, 0.2994], [0.1111, 0.1883, 0.1355, 0.1494, 0.1226, 0.1569, 0.172]], "8": [[0.0267, 0.02, 0.0204, 0.0067, 0.0263, 0.0584, 0.0129], [0.0, 0.007, 0.007, 0.0, 0.0066, 0.007, 0.0067], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0083, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.008, 0.0, 0.0, 0.0079, 0.0, 0.0], [0.007, 0.0, 0.0, 0.0074, 0.0, 0.0, 0.0], [0.0333, 0.013, 0.0132, 0.0408, 0.0135, 0.0067, 0.0194], [0.2517, 0.1711, 0.1699, 0.1921, 0.0131, 0.0654, 0.2338], [0.3922, 0.3871, 0.271, 0.2597, 0.1097, 0.2, 0.3269], [0.3677, 0.4103, 0.3526, 0.2968, 0.2179, 0.2452, 0.5032], [0.3419, 0.3718, 0.3613, 0.2968, 0.271, 0.3141, 0.4204], [0.4194, 0.3161, 0.3397, 0.2839, 0.2903, 0.3013, 0.4459], [0.3484, 0.3333, 0.2821, 0.2903, 0.2774, 0.3526, 0.4713], [0.3117, 0.3526, 0.2968, 0.2662, 0.3077, 0.2839, 0.4103], [0.4516, 0.4167, 0.3871, 0.3117, 0.2949, 0.3846, 0.5478], [0.4516, 0.4679, 0.4936, 0.4387, 0.3333, 0.3974, 0.5669], [0.6323, 0.5513, 0.5833, 0.5613, 0.3269, 0.3654, 0.6688], [0.5935, 0.6474, 0.6346, 0.5097, 0.4487, 0.5064, 0.7643], [0.526, 0.6026, 0.5321, 0.4903, 0.4487, 0.4872, 0.5605], [0.4416, 0.4808, 0.4103, 0.4387, 0.329, 0.4359, 0.3439], [0.2208, 0.2129, 0.2179, 0.2208, 0.1859, 0.2258, 0.2038], [0.0784, 0.1039, 0.0839, 0.0649, 0.0774, 0.0588, 0.1083]], "9": [[0.0067, 0.0133, 0.0, 0.0, 0.0197, 0.0195, 0.0129], [0.0, 0.0, 0.0, 0.0, 0.0066, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0065, 0.0066, 0.0136, 0.0068, 0.0067, 0.0129], [0.1854, 0.1447, 0.1046, 0.0927, 0.0065, 0.0392, 0.1818], [0.2418, 0.271, 0.1871, 0.1234, 0.0645, 0.1097, 0.2885], [0.2645, 0.3141, 0.2628, 0.1935, 0.1731, 0.1419, 0.3885], [0.2516, 0.2628, 0.271, 0.2194, 0.2, 0.2051, 0.3248], [0.2903, 0.2, 0.2628, 0.1871, 0.1613, 0.2436, 0.3567], [0.2387, 0.2308, 0.1987, 0.1806, 0.2, 0.2436, 0.3631], [0.2143, 0.2436, 0.2194, 0.1688, 0.1987, 0.1677, 0.3397], [0.3161, 0.2821, 0.2968, 0.2143, 0.1923, 0.2821, 0.4204], [0.3806, 0.3333, 0.359, 0.3613, 0.2436, 0.2564, 0.4713], [0.4839, 0.4744, 0.4487, 0.4, 0.1795, 0.2756, 0.5796], [0.4968, 0.5449, 0.5385, 0.4194, 0.2885, 0.3782, 0.6497], [0.4026, 0.4551, 0.4167, 0.4129, 0.3397, 0.391, 0.4522], [0.3701, 0.3205, 0.2756, 0.2774, 0.2581, 0.3333, 0.2357], [0.1169, 0.1548, 0.1474, 0.1558, 0.0641, 0.1484, 0.1274], [0.0196, 0.0649, 0.0194, 0.026, 0.0387, 0.0392, 0.0764]], "10": [[0.0, 0.0067, 0.0, 0.0, 0.0, 0.0, 0.0129], [0.0, 0.0, 0.0, 0.0, 0.0066, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0065, 0.0066, 0.0068, 0.0068, 0.0, 0.0], [0.1523, 0.0789, 0.0719, 0.0331, 0.0, 0.0196, 0.1299], [0.1569, 0.2065, 0.1226, 0.0779, 0.0387, 0.0839, 0.1923], [0.2129, 0.2051, 0.2051, 0.1419, 0.1154, 0.0968, 0.3121], [0.1677, 0.1731, 0.1677, 0.1677, 0.1161, 0.141, 0.2293], [0.2129, 0.0968, 0.1795, 0.1548, 0.0968, 0.1667, 0.2484], [0.1742, 0.1538, 0.1346, 0.1226, 0.1226, 0.1603, 0.242], [0.1364, 0.1603, 0.1484, 0.1169, 0.1154, 0.1226, 0.2308], [0.2065, 0.1987, 0.1806, 0.1364, 0.1282, 0.1538, 0.293], [0.2839, 0.2051, 0.2436, 0.2452, 0.1603, 0.1538, 0.3949], [0.4, 0.391, 0.3526, 0.2903, 0.109, 0.2051, 0.4841], [0.3677, 0.4038, 0.4423, 0.3484, 0.2051, 0.25, 0.5287], [0.2987, 0.2949, 0.3462, 0.2968, 0.25, 0.3013, 0.3758], [0.2727, 0.2308, 0.1923, 0.1806, 0.1742, 0.1859, 0.1529], [0.0714, 0.0774, 0.0962, 0.0909, 0.0321, 0.071, 0.0764], [0.0131, 0.0065, 0.0129, 0.013, 0.0194, 0.0327, 0.0382]], "11": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0066, 0.0068, 0.0, 0.0, 0.0], [0.106, 0.0461, 0.0327, 0.0331, 0.0, 0.0131, 0.0844], [0.1111, 0.0968, 0.0774, 0.0649, 0.0194, 0.0581, 0.109], [0.1419, 0.1346, 0.1346, 0.0968, 0.0513, 0.0581, 0.2357], [0.1097, 0.0833, 0.1226, 0.1097, 0.0839, 0.0897, 0.1529], [0.129, 0.0516, 0.0897, 0.0839, 0.0903, 0.0897, 0.1783], [0.129, 0.1154, 0.0705, 0.0839, 0.0774, 0.0897, 0.1656], [0.0909, 0.0769, 0.1161, 0.0649, 0.0641, 0.0839, 0.1282], [0.1548, 0.1346, 0.1226, 0.0909, 0.0577, 0.0897, 0.1783], [0.2129, 0.1603, 0.1795, 0.1355, 0.109, 0.0833, 0.3057], [0.3226, 0.2564, 0.25, 0.1548, 0.0577, 0.1346, 0.3885], [0.2839, 0.3333, 0.2821, 0.2581, 0.1218, 0.1923, 0.4013], [0.2273, 0.2372, 0.2692, 0.2129, 0.1923, 0.1859, 0.2739], [0.1948, 0.1346, 0.1026, 0.0903, 0.0839, 0.1154, 0.0892], [0.0455, 0.0452, 0.0513, 0.039, 0.0128, 0.0194, 0.0382], [0.0, 0.0, 0.0065, 0.0065, 0.0194, 0.0196, 0.0255]], "12": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0066, 0.0068, 0.0, 0.0, 0.0], [0.0728, 0.0329, 0.0196, 0.0265, 0.0, 0.0, 0.0584], [0.0784, 0.0645, 0.0581, 0.0455, 0.0129, 0.0258, 0.0641], [0.0774, 0.0833, 0.0897, 0.0452, 0.0321, 0.0258, 0.1338], [0.071, 0.0449, 0.0839, 0.0581, 0.0516, 0.0513, 0.1019], [0.0774, 0.0323, 0.0256, 0.0581, 0.0452, 0.0577, 0.1146], [0.0774, 0.0449, 0.0321, 0.0516, 0.0452, 0.0513, 0.0892], [0.0455, 0.0385, 0.0581, 0.0519, 0.0128, 0.0516, 0.1154], [0.1226, 0.109, 0.0903, 0.0584, 0.0449, 0.0641, 0.1338], [0.1355, 0.1218, 0.141, 0.0903, 0.0641, 0.0769, 0.2484], [0.2323, 0.1731, 0.1987, 0.0968, 0.0256, 0.0769, 0.293], [0.2065, 0.2628, 0.1987, 0.2, 0.0833, 0.1346, 0.3185], [0.1429, 0.1474, 0.1795, 0.129, 0.1282, 0.0897, 0.1911], [0.1429, 0.0833, 0.0641, 0.0452, 0.0645, 0.0577, 0.0573], [0.0325, 0.0258, 0.0321, 0.0065, 0.0064, 0.0129, 0.0127], [0.0, 0.0, 0.0065, 0.0065, 0.0129, 0.0131, 0.0127]], "13": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0265, 0.0197, 0.0131, 0.0066, 0.0, 0.0, 0.0325], [0.0261, 0.0452, 0.0323, 0.0325, 0.0065, 0.0065, 0.0449], [0.0516, 0.0769, 0.0513, 0.0194, 0.0128, 0.0194, 0.1146], [0.0452, 0.0321, 0.0581, 0.0323, 0.0194, 0.0385, 0.0828], [0.0452, 0.0194, 0.0128, 0.0387, 0.0194, 0.0513, 0.0701], [0.0516, 0.0321, 0.0128, 0.0387, 0.0065, 0.0192, 0.0637], [0.0325, 0.0256, 0.0452, 0.039, 0.0, 0.0194, 0.0705], [0.0645, 0.0641, 0.0452, 0.0455, 0.0256, 0.0385, 0.0701], [0.1097, 0.0513, 0.0641, 0.0323, 0.0321, 0.0513, 0.1656], [0.1548, 0.1154, 0.1474, 0.0581, 0.0192, 0.0385, 0.2166], [0.1419, 0.2179, 0.1731, 0.1161, 0.0449, 0.0962, 0.1975], [0.1104, 0.0833, 0.0833, 0.0903, 0.0897, 0.0513, 0.1146], [0.0844, 0.0449, 0.0513, 0.0194, 0.0194, 0.0321, 0.051], [0.0195, 0.0129, 0.0192, 0.0, 0.0064, 0.0, 0.0064], [0.0, 0.0, 0.0065, 0.0, 0.0, 0.0131, 0.0127]], "14": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0132, 0.0066, 0.0065, 0.0066, 0.0, 0.0, 0.0325], [0.0196, 0.0323, 0.0258, 0.013, 0.0, 0.0, 0.0385], [0.0323, 0.0449, 0.0321, 0.0065, 0.0128, 0.0129, 0.0828], [0.0323, 0.0256, 0.0387, 0.0258, 0.0194, 0.0192, 0.0701], [0.0452, 0.0129, 0.0128, 0.0065, 0.0194, 0.0192, 0.051], [0.0258, 0.0192, 0.0064, 0.0258, 0.0065, 0.0064, 0.0573], [0.026, 0.0064, 0.0258, 0.0195, 0.0, 0.0065, 0.0256], [0.0516, 0.0321, 0.0323, 0.039, 0.0128, 0.0321, 0.0318], [0.071, 0.0385, 0.0513, 0.0258, 0.0256, 0.0321, 0.1338], [0.0903, 0.0641, 0.0705, 0.0387, 0.0192, 0.0385, 0.1401], [0.071, 0.1282, 0.1026, 0.0839, 0.0321, 0.0321, 0.1274], [0.0584, 0.0321, 0.0321, 0.0774, 0.0513, 0.0385, 0.0892], [0.039, 0.0321, 0.0256, 0.0194, 0.0065, 0.0128, 0.0127], [0.0195, 0.0065, 0.0128, 0.0, 0.0064, 0.0, 0.0064], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0065, 0.0]], "15": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0132, 0.0066, 0.0, 0.0066, 0.0, 0.0, 0.013], [0.0196, 0.0258, 0.0194, 0.0, 0.0, 0.0, 0.0321], [0.0323, 0.0256, 0.0128, 0.0065, 0.0128, 0.0, 0.0637], [0.0258, 0.0128, 0.0323, 0.0194, 0.0065, 0.0128, 0.051], [0.0258, 0.0065, 0.0, 0.0, 0.0129, 0.0, 0.0255], [0.0065, 0.0064, 0.0, 0.0194, 0.0, 0.0064, 0.0382], [0.013, 0.0064, 0.0194, 0.0065, 0.0, 0.0065, 0.0192], [0.0258, 0.0192, 0.0129, 0.0195, 0.0128, 0.0192, 0.0191], [0.0452, 0.0321, 0.0385, 0.0258, 0.0256, 0.0192, 0.0828], [0.071, 0.0449, 0.0385, 0.0258, 0.0064, 0.0128, 0.0701], [0.0387, 0.0769, 0.0577, 0.0581, 0.0128, 0.0256, 0.0828], [0.0325, 0.0064, 0.0256, 0.0323, 0.0321, 0.0256, 0.0382], [0.026, 0.0256, 0.0064, 0.0129, 0.0065, 0.0, 0.0064], [0.0195, 0.0, 0.0064, 0.0, 0.0, 0.0, 0.0064], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0065, 0.0]]};
@@ -1676,55 +1661,6 @@ const POST_EVENT_MODIFIERS = [
   }
 ];
 
-function getWeatherLagModifier(dateStr) {
-  // Look back up to 7 days from dateStr and apply empirical lag modifiers
-  // based on what the weather was on each of those days
-  const lookup = window._wxDailyLookup || {};
-  const mods   = window._wxLagMods || {};
-  if (!Object.keys(mods).length) return { modifier: 1.0, label: null };
-
-  const d = new Date(dateStr + 'T12:00:00');
-  let combined = 1.0;
-  const labels = [];
-
-  for (let lag = 0; lag <= 7; lag++) {
-    const pastDate = new Date(d.getTime() - lag * 86400000);
-    const pastStr  = pastDate.toISOString().slice(0,10);
-    const wx = lookup[pastStr];
-    if (!wx) continue;
-
-    const isSnow = wx.snow > 0.1;
-    const isCold = wx.tmax < 40;
-    const isRain = wx.precip > 0.5;
-    const isHot  = wx.tmax > 80;
-
-    // Pressure change: compare to previous day
-    const prevStr = new Date(pastDate.getTime() - 86400000).toISOString().slice(0,10);
-    const wxPrev  = lookup[prevStr];
-    const isPDrop = wx.pressure && wxPrev && wxPrev.pressure && (wx.pressure - wxPrev.pressure) < -5;
-    const isPRise = wx.pressure && wxPrev && wxPrev.pressure && (wx.pressure - wxPrev.pressure) > 5;
-
-    let dayMod = 1.0;
-    if (isSnow && mods.snow && mods.snow[lag]) dayMod *= mods.snow[lag];
-    else if (isCold && mods.cold && mods.cold[lag]) dayMod *= mods.cold[lag];
-    else if (isRain && mods.rain && mods.rain[lag]) dayMod *= mods.rain[lag];
-    if (isHot  && mods.hot  && mods.hot[lag])  dayMod *= mods.hot[lag];
-    if (isPDrop && mods.pdrop && mods.pdrop[lag] && mods.pdrop[lag] !== 1.0) dayMod *= mods.pdrop[lag];
-    if (isPRise && mods.prise && mods.prise[lag] && mods.prise[lag] !== 1.0) dayMod *= mods.prise[lag];
-
-    if (dayMod !== 1.0) {
-      combined *= dayMod;
-      const wxType = isSnow ? '❄️' : isCold ? '🥶' : isRain ? '🌧️' : isHot ? '☀️' :
-                     isPDrop ? '📉' : isPRise ? '📈' : '';
-      if (lag === 0) labels.push(`${wxType} today ×${dayMod.toFixed(2)}`);
-      else labels.push(`${wxType} lag+${lag} ×${dayMod.toFixed(2)}`);
-    }
-  }
-
-  combined = Math.min(3.0, Math.max(0.15, combined));
-  const label = labels.length > 0 ? labels.slice(0,3).join(', ') : null;
-  return { modifier: combined, label };
-}
 
 function getPostEventModifier(dateStr, surgeThresh) {
   surgeThresh = surgeThresh || SURGE_THRESH || 15;
@@ -1890,10 +1826,10 @@ function onThreshChange(val) {
     calibNote.style.fontStyle = val < 12 ? 'normal' : 'italic';
   }
   // Re-render using cached API data — no network fetch needed
-  renderDashboard(_cachedIliData, _cachedWxMod, _cachedWxLabel, _cachedWxTemp);
+  renderDashboard(_cachedIliData);
 }
 
-function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, gradMod = 1.0, iliMod = 1.0, wxMod = 1.0, postEventMod = 1.0) {
+function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, gradMod = 1.0, iliMod = 1.0, postEventMod = 1.0) {
   // Weather removed (ΔR²<0.001). ILI validated: r=0.65, p<0.0001.
   const base   = HEATMAP[hour][dow];
   const hBlend = 0.6 * base + 0.25 * SURGE_BY_HOUR[hour] + 0.15 * SURGE_BY_MONTH[month];
@@ -1902,7 +1838,7 @@ function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, g
   else if (schoolStatus.type === 'return') schoolMod = 1.20;
   else if (schoolStatus.type === 'weekend') schoolMod = 0.85;
   if (schoolStatus.type === 'return' && dow === 0) schoolMod = 1.30;
-  return Math.min(0.95, hBlend * schoolMod * localEventMod * gradMod * iliMod * wxMod * postEventMod);
+  return Math.min(0.95, hBlend * schoolMod * localEventMod * gradMod * iliMod * postEventMod);
 }
 
 function surgeLevel(p) {
@@ -1958,75 +1894,7 @@ function actionItems(level, hour, schoolStatus) {
 async function renderSurgeDashboard() {
   // Fetch live ILI data from CMU Delphi Epidata API (CORS-enabled, free, no key)
   // HHS Region 10 = WA, OR, ID, AK — best available regional proxy for Tacoma
-  // Fetch weather — Open-Meteo, past_days=7 gives 7 days history + forecast
-  // Same-day wx removed (ΔR²<0.001) but LAGGED weather validated:
-  //   Snow lag 0-7: ×1.51-1.96 (p<0.02)
-  //   Cold (<40F) lag 1-7: ×1.91-2.60 (p<0.006)
-  //   Heavy rain lag 1-6: ×1.34-1.50 (p<0.05)
-  //   Hot (>80F) lag 0-7: ×0.24-0.32 (p<0.0001) — protective
-  let wxMod = 1.0, wxLabel = '', wxTemp = null;
-  let _wxDailyLookup = {};   // date string -> {tmax, precip, snow}
-
-  // Weather lag modifier lookup tables (empirical, Fisher's exact, 3yr data)
-  const WX_LAG_MODS = {
-    snow: {0:1.92, 1:1.51, 2:1.51, 3:1.0,  4:1.51, 5:1.58, 6:1.75, 7:1.96},
-    cold: {0:1.0,  1:1.91, 2:1.91, 3:2.19, 4:2.14, 5:2.14, 6:2.60, 7:2.29},
-    rain: {0:1.0,  1:1.50, 2:1.34, 3:1.38, 4:1.42, 5:1.46, 6:1.50, 7:1.0 },
-    hot:  {0:0.29, 1:0.29, 2:0.32, 3:0.24, 4:0.24, 5:0.24, 6:0.32, 7:0.29},
-    // Barometric pressure changes — empirical, Fisher's exact, 3yr data
-    // Both drop AND rise elevate surge risk (different mechanisms: storm arrival vs clearing)
-    pdrop:{0:1.0,  1:1.0,  2:1.33, 3:1.33, 4:1.28, 5:1.51, 6:1.33, 7:1.43},
-    prise:{0:1.0,  1:1.42, 2:1.30, 3:1.40, 4:1.0,  5:1.39, 6:1.37, 7:1.0 },
-  };
-
-  try {
-    const wxResp = await fetch(
-      'https://api.open-meteo.com/v1/forecast?latitude=47.25&longitude=-122.44' +
-      '&daily=temperature_2m_max,precipitation_sum,snowfall_sum,sunshine_duration,surface_pressure_mean' +
-      '&current=temperature_2m,snowfall,weather_code' +
-      '&past_days=7&forecast_days=1' +
-      '&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America/Los_Angeles'
-    );
-    const wxJson = await wxResp.json();
-
-    // Build daily lookup from historical data
-    if (wxJson.daily) {
-      wxJson.daily.time.forEach((dateStr, i) => {
-        _wxDailyLookup[dateStr] = {
-          tmax:       wxJson.daily.temperature_2m_max[i],
-          precip:     wxJson.daily.precipitation_sum[i] || 0,
-          snow:       wxJson.daily.snowfall_sum[i] || 0,
-          sunshine_h: wxJson.daily.sunshine_duration ? (wxJson.daily.sunshine_duration[i] || 0) / 3600 : undefined,
-          pressure:   wxJson.daily.surface_pressure_mean ? wxJson.daily.surface_pressure_mean[i] : null,
-        };
-      });
-    }
-
-    // Current conditions for display
-    if (wxJson.current) {
-      wxTemp = wxJson.current.temperature_2m;
-      const wxCode = wxJson.current.weather_code;
-      const snowfall = wxJson.current.snowfall || 0;
-      const isSnow = (wxCode >= 71 && wxCode <= 77) || wxCode === 85 || wxCode === 86 || snowfall > 0;
-      if (wxTemp !== null) {
-        wxLabel = isSnow ? `Snow (${wxTemp.toFixed(0)}°F)` :
-                  wxTemp > 80 ? `Hot (${wxTemp.toFixed(0)}°F)` :
-                  wxTemp < 40 ? `Cold (${wxTemp.toFixed(0)}°F)` :
-                  `${wxTemp.toFixed(0)}°F`;
-      }
-    }
-
-    // Store lookup globally for use in getWeatherLagModifier
-    window._wxDailyLookup = _wxDailyLookup;
-    window._wxLagMods = WX_LAG_MODS;
-
-    // Compute today's weather lag modifier for hero/rationale display
-    const todayStr = new Date().toISOString().slice(0,10);
-    const wlm = getWeatherLagModifier(todayStr);
-    wxMod = wlm.modifier;
-    if (wlm.label) wxLabel += (wxLabel ? ' · ' : '') + wlm.label;
-
-  } catch(e) { console.warn('Weather fetch failed:', e.message); }
+  const todayStr = new Date().toISOString().slice(0,10);
 
   let iliData = null;
   try {
@@ -2048,13 +1916,13 @@ async function renderSurgeDashboard() {
     console.warn('ILI fetch failed:', e.message);
   }
   // Cache for slider re-renders
-  _cachedIliData = iliData; _cachedWxMod = wxMod; _cachedWxLabel = wxLabel; _cachedWxTemp = wxTemp;
+  _cachedIliData = iliData;
   _initialRenderDone = true;
-  renderDashboard(iliData, wxMod, wxLabel, wxTemp);
+  renderDashboard(iliData);
   
 }
 
-function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = null) {
+function renderDashboard(iliData = null) {
   const now = new Date();
   const hour = now.getHours();
   const dow = (now.getDay() + 6) % 7; // convert Sun=0 to Mon=0
@@ -2065,7 +1933,6 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
   const { modifier: localEventMod, activeEvents: todayEvents } = getLocalEventModifier(todayStr);
   const gradInfo = getGraduationModifier(todayStr);
   const { modifier: postEventMod, activeEvents: todayPostEvents } = getPostEventModifier(todayStr, SURGE_THRESH);
-  // wxMod is passed in from cache (getWeatherLagModifier already called for today in renderSurgeDashboard)
 
   // ── ILI modifier (empirical: r=0.65, p<0.0001, 3-year regression) ──────────
   // Formula: modifier = exp(0.1232 × (current_ILI - 1.0))
@@ -2088,7 +1955,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     iliLevel = iliPct < 1.0 ? 'Low' : iliPct < 2.0 ? 'Moderate' : iliPct < 3.5 ? 'Elevated' : iliPct < 6.0 ? 'High' : 'Very High';
   }
 
-  const surgeProb = computeSurgeProb(hour, dow, month, schoolStatus, localEventMod, gradInfo.modifier, iliMod, wxMod, postEventMod);
+  const surgeProb = computeSurgeProb(hour, dow, month, schoolStatus, localEventMod, gradInfo.modifier, iliMod, postEventMod);
   window._lastSurgeProb = surgeProb; window._lastIliMod = iliMod;
 
   // If persistence model is active, use it for the hero card (h+1)
@@ -2122,8 +1989,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const { modifier: fLocalMod } = getLocalEventModifier(fd, h);
     const fGradMod = getGraduationModifier(fd).modifier;
     const { modifier: fPostMod } = getPostEventModifier(fd, SURGE_THRESH);
-    const { modifier: fWxLagMod } = getWeatherLagModifier(fd);
-    let fp = computeSurgeProb(h, fdow, fm, fSchool, fLocalMod, fGradMod, iliMod, fWxLagMod, fPostMod);
+    let fp = computeSurgeProb(h, fdow, fm, fSchool, fLocalMod, fGradMod, iliMod, fPostMod);
     let isSurvival = false, isPersistence = false;
     if(!SURGE_FLAG_ACTIVE && !ED_STATE_ACTIVE) {
       // Apply surge window multiplier if in/past surge window with no confirmed surge
@@ -2199,20 +2065,18 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     const fGradInfo7 = getGraduationModifier(fds);
     const fGradMod7 = fGradInfo7.modifier;
     const { modifier: fPostMod7 } = getPostEventModifier(fds, SURGE_THRESH);
-    const { modifier: fWxLagMod7 } = getWeatherLagModifier(fds);
     const respMod7 = getRespLoadMod();
     const giMod7   = getGILoadMod();
     const internalMod7 = Math.min(2.5, respMod7 * giMod7); // cap combined internal modifier
-    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fWxLagMod7, fPostMod7) * internalMod7);
+    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7) * internalMod7);
     const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => {
       const { modifier: hMod } = getLocalEventModifier(fds, h);
       // internalMod (resp×GI load) calibrated at thresh=12; only apply to peak hours ≥12 to avoid double-counting illness burden at lower thresholds
       const hInternalMod = h >= 12 ? internalMod7 : 1.0;
-      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod,fWxLagMod7,fPostMod7) * hInternalMod);
+      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod,fPostMod7) * hInternalMod);
     }, 0) / 11;
     const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
     // Weather for this day from lookup
-    const fWxRaw = (window._wxDailyLookup || {})[fds] || null;
     days7.push({
       dowLabel: DOW_NAMES[fdow],
       dateLabel: `${MON_NAMES[fm-1]} ${fd.getDate()}`,
@@ -2223,8 +2087,6 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
       localEvents: fEvents7,
       gradInfo: fGradInfo7,
       census,
-      wx: fWxRaw,
-      wxLagMod: fWxLagMod7,
       respMod: respMod7,
       giMod: giMod7,
       internalMod: internalMod7,
@@ -2245,7 +2107,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
   const gradNote = gradInfo.isGraduation
     ? `🎓 ${gradInfo.label} (×${gradInfo.modifier.toFixed(2)} empirical — surge rate +71% above June baseline).`
     : '';
-  const wxNote = wxLabel ? `🌨️ Weather: ${wxLabel}.` : '';
+  const wxNote = '';
   const iliNote = iliData
     ? `🦠 ILI ${iliPct.toFixed(1)}% (HHS Region 10, ${iliLevel}) → ×${iliMod.toFixed(2)} modifier.`
     : '';
@@ -2305,39 +2167,6 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
     </div>`;
   }).join('');
 
-  // ── 7-day weather forecast grid ───────────────────────────────────────
-  const wx7HTML = days7.map(d => {
-    const wx = d.wx;
-    const lagMod = d.wxLagMod || 1.0;
-    // Weather icon + description
-    let wxIcon = '—', wxDesc = 'No data', wxColor = '#64748b';
-    if (wx) {
-      const isSnow  = wx.snow > 0.1;
-      const isRain  = wx.precip > 0.25;
-      const isHeavy = wx.precip > 0.5;
-      const isHot   = wx.tmax > 80;
-      const isCold  = wx.tmax < 40;
-      const isMild  = !isSnow && !isRain && !isHot && !isCold;
-      if (isSnow)        { wxIcon = '❄️'; wxDesc = `Snow · ${wx.tmax.toFixed(0)}°F`; wxColor = '#22d3ee'; }
-      else if (isHeavy)  { wxIcon = '🌧️'; wxDesc = `Rain ${wx.precip.toFixed(2)}" · ${wx.tmax.toFixed(0)}°F`; wxColor = '#60a5fa'; }
-      else if (isRain)   { wxIcon = '🌦️'; wxDesc = `Light rain · ${wx.tmax.toFixed(0)}°F`; wxColor = '#60a5fa'; }
-      else if (isHot)    { wxIcon = '☀️'; wxDesc = `Hot · ${wx.tmax.toFixed(0)}°F`; wxColor = '#ffd166'; }
-      else if (isCold)   { wxIcon = '🥶'; wxDesc = `Cold · ${wx.tmax.toFixed(0)}°F`; wxColor = '#a78bfa'; }
-      else               { wxIcon = '🌤️'; wxDesc = `${wx.tmax.toFixed(0)}°F`; wxColor = '#39d98a'; }
-    }
-    const modColor = lagMod > 1.05 ? '#c084fc' : lagMod < 0.95 ? '#22d3ee' : '#64748b';
-    const modStr   = lagMod !== 1.0 ? `×${lagMod.toFixed(2)}` : '—';
-    return `<div class="fc-day ${d.isToday ? 'today' : ''}" style="text-align:center;">
-      <div class="fc-dow">${d.dowLabel}</div>
-      <div class="fc-date">${d.dateLabel}</div>
-      <div style="font-size:18px;margin:4px 0;">${wxIcon}</div>
-      <div style="font-size:8px;color:${wxColor};line-height:1.4;">${wxDesc}</div>
-      <div style="margin-top:5px;padding-top:5px;border-top:1px solid var(--border);">
-        <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:${modColor};">${modStr}</div>
-        <div style="font-size:8px;color:#8892b0;">surge mod</div>
-      </div>
-    </div>`;
-  }).join('');
 
   const upcomingHTML = upcoming.map(ev => {
     const catColor = ev.category === 'sports' ? 'var(--red)' : ev.category === 'regional' ? 'var(--orange)' : ev.category === 'local' ? 'var(--blue)' : ev.category === 'graduation' ? 'var(--purple)' : ev.category === 'holiday' ? 'var(--red)' : ev.category === 'post-event' ? '#22d3ee' : 'var(--muted)';
@@ -2424,14 +2253,7 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
       maxScore: 0.40,
       rawLabel: postEventMod !== 1.0 ? `×${postEventMod.toFixed(2)}` : 'NONE',
     },
-    {
-      icon: '🌨️',
-      name: 'Weather (lagged)',
-      desc: wxLabel ? wxLabel : `${wxTemp !== null ? wxTemp.toFixed(1) + '°F — checking past 7 days for lag effects…' : 'Fetching current conditions…'}`,
-      score: wxMod !== 1.0 ? (wxMod > 1 ? 0.20 : 0.10) : 0.01,
-      maxScore: 0.30,
-      rawLabel: wxMod !== 1.0 ? `×${wxMod.toFixed(2)}` : '—',
-    },
+
     {
       icon: '🦠',
       name: 'Regional ILI (HHS-10)',
@@ -2632,19 +2454,6 @@ function renderDashboard(iliData = null, wxMod = 1.0, wxLabel = '', wxTemp = nul
         </div>
       </div>
 
-    </div>
-
-    <!-- 24h FORECAST -->
-    <div class="sdiv">7-Day Weather &amp; Lag Effects</div>
-    <div class="panel">
-      <div class="ph"><div class="pt">Weather Forecast · Surge Modifier from Lag</div><div class="badge badge-b">OPEN-METEO · LAGGED EMPIRICAL</div></div>
-      <div class="pb">
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><div class="forecast-grid" style="min-width:320px;">${wx7HTML.length ? wx7HTML : '<div style="font-size:11px;color:var(--muted);padding:10px;">Weather data loading… refresh in a moment.</div>'}</div></div>
-        <div style="margin-top:10px;font-size:10px;color:var(--muted);">
-          Surge modifier = empirical lag effect from past 7 days of weather. 
-          ❄️ Snow ×1.5–2.0 · 🥶 Cold ×1.9–2.6 · 🌧️ Rain ×1.3–1.5 · ☀️ Hot ×0.24–0.32 · 📉📈 Pressure change ×1.3–1.5 · <span style="color:#c084fc;">■ elevating</span> · <span style="color:#22d3ee;">■ protective</span>
-        </div>
-      </div>
     </div>
 
     <div class="sdiv">24-Hour Surge Forecast</div>
@@ -2918,15 +2727,14 @@ function setSurgeFlag(val){
 function updateForecastBars(){
   var bi=document.querySelector('.forecast-bars-inner');
   if(!bi)return;
-  var now=new Date(),iliMod=getIliMod(),wxMod=typeof _cachedWxMod!=='undefined'?_cachedWxMod:1.0;
+  var now=new Date(),iliMod=getIliMod();
   var cols=bi.children;
   for(var i=0;i<Math.min(cols.length,24);i++){
     var fh=new Date(now.getTime()+i*3600000),h=fh.getHours(),dw=(fh.getDay()+6)%7,mo=fh.getMonth()+1;
     var ds=fh.toISOString().slice(0,10);
     var school=getSchoolStatus(ds),ev=getLocalEventModifier(ds,h),grad=getGraduationModifier(ds);
     var postEv=getPostEventModifier(ds, SURGE_THRESH);
-    var wxLag=getWeatherLagModifier(ds);
-    var fp=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,wxLag.modifier,postEv.modifier);
+    var fp=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,postEv.modifier);
     var isSurv=false,isPers=false;
     if(!SURGE_FLAG_ACTIVE&&!ED_STATE_ACTIVE){
       if(h>=15&&h<=21){
@@ -3008,11 +2816,11 @@ document.querySelectorAll('.tstepper[data-id]').forEach(function(el){
     if(disp&&disp!==_DUMMY_EL)disp.textContent=v;
     renderMpedocs();
     if(id==='in_resp_load') return; // handled by slider
-    if(id==='in_resp_load') { updateRespLoad(); renderDashboard(_cachedIliData, _cachedWxMod, _cachedWxLabel, _cachedWxTemp); }
+    if(id==='in_resp_load') { updateRespLoad(); renderDashboard(_cachedIliData); }
   }
   el.querySelectorAll('.tsbtn').forEach(function(b){b.addEventListener('click',function(){set(+inp.value + +this.dataset.d*st);});});
   inp.addEventListener('change',function(){set(this.value);});
-  inp.addEventListener('input',function(){var v=+this.value;if(!isNaN(v)){S[id]=v;renderMpedocs();if(id==='in_resp_load'){updateRespLoad();renderDashboard(_cachedIliData,_cachedWxMod,_cachedWxLabel,_cachedWxTemp);}}});
+  inp.addEventListener('input',function(){var v=+this.value;if(!isNaN(v)){S[id]=v;renderMpedocs();if(id==='in_resp_load'){updateRespLoad();renderDashboard(_cachedIliData);}}});
 });
 
 // ── Surge panel ─────────────────────────────────────────────────────────────
@@ -3116,7 +2924,7 @@ function onGISlider(val) {
   val = parseInt(val) || 0;
   S.in_gi_load = val;
   updateGILoad();
-  renderDashboard(_cachedIliData, _cachedWxMod, _cachedWxLabel, _cachedWxTemp);
+  renderDashboard(_cachedIliData);
 }
 
 function updateGILoad() {
@@ -3169,7 +2977,7 @@ function onRespSlider(val) {
   val = parseInt(val) || 0;
   S.in_resp_load = val;
   updateRespLoad();
-  renderDashboard(_cachedIliData, _cachedWxMod, _cachedWxLabel, _cachedWxTemp);
+  renderDashboard(_cachedIliData);
 }
 
 function updateRespLoad() {
@@ -3309,8 +3117,8 @@ setInterval(mpTick,60000);
 // Hook mPEDOCS into surge render cycle
 var _origRD=typeof renderDashboard==='function'?renderDashboard:null;
 if(_origRD){
-  renderDashboard=function(iliData,wxMod,wxLabel,wxTemp){
-    _origRD(iliData,wxMod,wxLabel,wxTemp);
+  renderDashboard=function(iliData){
+    _origRD(iliData);
     renderMpedocs();
   };
 }
@@ -3609,19 +3417,19 @@ const TRENDS_BASELINE = {
     'urgent care near me': {p25:55, p50:63, p75:73},
     'croup':               {p25:12, p50:15, p75:20},
   },
-  // Embedded snapshot: week of 2026-03-22 — update monthly
+  // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
   latest: {
-    'norovirus':6,'child cough':0,'Mary Bridge':5,'kids sick':0,
-    'child fever':4,'urgent care near me':35,'croup':16,
+    'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
+    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,
   },
   sparklines: {
-    'norovirus':          [10,10,10,9,12,11,9,9,10,13,11,6],
-    'child cough':        [0,0,3,0,0,0,0,0,0,1,1,0],
-    'Mary Bridge':        [12,10,12,12,13,9,11,11,12,11,12,5],
-    'kids sick':          [0,2,2,2,2,0,2,0,2,1,1,0],
-    'child fever':        [0,3,2,3,2,0,2,2,3,2,2,4],
-    'urgent care near me':[53,56,55,56,53,62,65,63,47,53,54,35],
-    'croup':              [23,14,18,21,19,20,22,17,18,16,14,16],
+    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
+    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 4.0],
+    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 51.0],
+    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 7.0],
+    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
+    'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
+    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
   },
   fetched: '2026-03-22',
 };
@@ -3825,45 +3633,6 @@ const MH_EVENT_MODIFIERS = [
   {start:'2026-04-12',end:'2026-04-23',mod:1.38,label:'Post-Spring Fair (MH +2-4d)',note:'Spring Fair lag — MH ×1.29-1.43 on days 2-4 after fair (p<0.004). Peak lag+4.'},
 ];
 
-// MH weather lag modifiers — empirically derived, 3yr data, Mann-Whitney
-// Different from surge weather model: MH responds to dark/overcast (SAD mechanism)
-// and snow (isolation/disruption), hot days protective (summer suppression)
-const MH_WX_LAG_MODS = {
-  snow: {0:1.20, 1:1.10, 2:1.19, 3:1.0,  4:1.0,  5:1.0,  6:1.0,  7:1.24},
-  hot:  {0:0.72, 1:0.67, 2:0.71, 3:0.71, 4:0.74, 5:0.77, 6:0.73, 7:0.69},
-  dark: {0:1.0,  1:1.0,  2:1.0,  3:1.17, 4:1.16, 5:1.15, 6:1.0,  7:1.0 },
-  rain: {0:1.0,  1:1.0,  2:1.0,  3:1.0,  4:1.0,  5:1.11, 6:1.0,  7:1.0 },
-};
-
-function getMHWeatherLagModifier(dateStr) {
-  var lookup = window._wxDailyLookup || {};
-  if (!Object.keys(lookup).length) return { modifier: 1.0, label: null };
-  var d = new Date(dateStr + 'T12:00:00');
-  var combined = 1.0;
-  var labels = [];
-  for (var lag = 0; lag <= 7; lag++) {
-    var pastDate = new Date(d.getTime() - lag * 86400000);
-    var pastStr  = pastDate.toISOString().slice(0,10);
-    var wx = lookup[pastStr];
-    if (!wx) continue;
-    var isSnow = wx.snow > 0.1;
-    var isHot  = wx.tmax > 80;
-    var isDark = (wx.sunshine_h !== undefined) ? wx.sunshine_h < 1.0 : false;
-    var isRain = wx.precip > 0.5;
-    var dayMod = 1.0;
-    if      (isSnow && MH_WX_LAG_MODS.snow[lag]) dayMod *= MH_WX_LAG_MODS.snow[lag];
-    if      (isHot  && MH_WX_LAG_MODS.hot[lag])  dayMod *= MH_WX_LAG_MODS.hot[lag];
-    if      (isDark && MH_WX_LAG_MODS.dark[lag])  dayMod *= MH_WX_LAG_MODS.dark[lag];
-    else if (isRain && MH_WX_LAG_MODS.rain[lag])  dayMod *= MH_WX_LAG_MODS.rain[lag];
-    if (dayMod !== 1.0) {
-      combined *= dayMod;
-      var wxType = isSnow ? '❄️' : isHot ? '☀️' : isDark ? '🌫️' : '🌧️';
-      labels.push(wxType + (lag === 0 ? ' today' : ' lag+'+lag) + ' ×'+dayMod.toFixed(2));
-    }
-  }
-  combined = Math.min(2.5, Math.max(0.3, combined));
-  return { modifier: combined, label: labels.length ? labels.slice(0,3).join(', ') : null };
-}
 
 function getMHEventModifier(dateStr){
   var d=new Date(dateStr+'T12:00:00');
@@ -3889,19 +3658,19 @@ function renderMHTab(){
   // 4h rolling window expected visits for hero
   var todayStr = now.toISOString().slice(0,10);
   var mhMod     = getMHEventModifier(todayStr);
-  var mhWxMod   = getMHWeatherLagModifier(todayStr);
+  var mhWxMod   = { modifier: 1.0, label: null };
   var mhLoadMod = getMHLoadMod();
-  var combinedMod = mhMod.mod * mhWxMod.modifier * mhLoadMod;
+  var combinedMod = mhMod.mod * mhLoadMod;
 
   var expected4h = 0;
   for(var hi=0;hi<4;hi++){
     var fh4=new Date(now.getTime()+hi*3600000);
     var fH4=fh4.getHours(), fD4=(fh4.getDay()+6)%7, fM4=fh4.getMonth()+1;
     var fDs4=fh4.toISOString().slice(0,10);
-    // Per-hour combined modifier (event + weather lag + MH load)
+    // Per-hour combined modifier (event + MH load)
     var fEvMod4  = getMHEventModifier(fDs4).mod;
-    var fWxMod4  = getMHWeatherLagModifier(fDs4).modifier;
-    var fCombined4 = fEvMod4 * fWxMod4 * mhLoadMod;
+    var fWxMod4  = 1.0;
+    var fCombined4 = fEvMod4 * mhLoadMod;
     expected4h += getMHExpected(fH4,fD4,fM4) * fCombined4;
   }
   var tier = getMHTier(expected4h, thresh/6);
@@ -3945,8 +3714,7 @@ function renderMHTab(){
       var fHour=fh.getHours(), fDow=(fh.getDay()+6)%7, fMonth=fh.getMonth()+1;
       var fDateStr=fh.toISOString().slice(0,10);
       var fMhMod    = getMHEventModifier(fDateStr);
-      var fMhWxMod  = getMHWeatherLagModifier(fDateStr);
-      var fBarMod   = fMhMod.mod * fMhWxMod.modifier * mhLoadMod;
+      var fBarMod   = fMhMod.mod * mhLoadMod;
       var lam = getMHExpected(fHour,fDow,fMonth) * fBarMod;
       var p=1-Math.exp(-lam); // Poisson P(>=1)
       pVals.push({p:p, lam:lam, lbl:String(fh.getHours()).padStart(2,'0')+':00'});
@@ -4006,49 +3774,6 @@ function renderMHTab(){
     }
   }
 
-  // 7-day MH weather forecast grid
-  var mhWx7=document.getElementById('mh-wx-7day');
-  if(mhWx7){
-    var DOW_NAMES7=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    var MON_NAMES7=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var wx7html='';
-    for(var d7=0;d7<7;d7++){
-      var fd7=new Date(now.getTime()+d7*86400000);
-      var fds7=fd7.toISOString().slice(0,10);
-      var fdow7=(fd7.getDay()+6)%7;
-      var fmon7=fd7.getMonth();
-      var wx7=( window._wxDailyLookup||{})[fds7]||null;
-      var mhWxL=getMHWeatherLagModifier(fds7);
-      var lagMod=mhWxL.modifier;
-      var wxIcon7='—',wxDesc7='No data',wxColor7='#64748b';
-      if(wx7){
-        var isSnow7=wx7.snow>0.1, isRain7=wx7.precip>0.25, isHeavy7=wx7.precip>0.5;
-        var isHot7=wx7.tmax>80, isCold7=wx7.tmax<40;
-        if(isSnow7)       {wxIcon7='❄️';wxDesc7='Snow · '+wx7.tmax.toFixed(0)+'°F';wxColor7='#22d3ee';}
-        else if(isHeavy7) {wxIcon7='🌧️';wxDesc7='Rain '+wx7.precip.toFixed(2)+'" · '+wx7.tmax.toFixed(0)+'°F';wxColor7='#60a5fa';}
-        else if(isRain7)  {wxIcon7='🌦️';wxDesc7='Light rain · '+wx7.tmax.toFixed(0)+'°F';wxColor7='#60a5fa';}
-        else if(isHot7)   {wxIcon7='☀️';wxDesc7='Hot · '+wx7.tmax.toFixed(0)+'°F';wxColor7='#ffd166';}
-        else if(isCold7)  {wxIcon7='🥶';wxDesc7='Cold · '+wx7.tmax.toFixed(0)+'°F';wxColor7='#a78bfa';}
-        else              {
-          var sunH7=wx7.sunshine_h||0;
-          if(sunH7<1){wxIcon7='🌫️';wxDesc7='Overcast · '+wx7.tmax.toFixed(0)+'°F';wxColor7='#8892b0';}
-          else       {wxIcon7='🌤️';wxDesc7=wx7.tmax.toFixed(0)+'°F';wxColor7='#39d98a';}
-        }
-      }
-      var modColor7=lagMod>1.05?'#c084fc':lagMod<0.95?'#22d3ee':'#64748b';
-      var modStr7=lagMod!==1.0?'×'+lagMod.toFixed(2):'—';
-      wx7html+='<div class="fc-day'+(d7===0?' today':'')+'" style="text-align:center;">';
-      wx7html+='<div class="fc-dow">'+DOW_NAMES7[fdow7]+'</div>';
-      wx7html+='<div class="fc-date">'+MON_NAMES7[fmon7]+' '+fd7.getDate()+'</div>';
-      wx7html+='<div style="font-size:18px;margin:4px 0;">'+wxIcon7+'</div>';
-      wx7html+='<div style="font-size:8px;color:'+wxColor7+';line-height:1.4;">'+wxDesc7+'</div>';
-      wx7html+='<div style="margin-top:5px;padding-top:5px;border-top:1px solid var(--border);">';
-      wx7html+='<div style="font-family:\'Space Mono\',monospace;font-size:10px;font-weight:700;color:'+modColor7+';">'+modStr7+'</div>';
-      wx7html+='<div style="font-size:8px;color:#8892b0;">MH mod</div>';
-      wx7html+='</div></div>';
-    }
-    mhWx7.innerHTML=wx7html;
-  }
 
   // Context panel
   var cp=document.getElementById('mh-context-panel');
