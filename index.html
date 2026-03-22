@@ -619,7 +619,7 @@ to { opacity:1; transform:translateY(0); }
 .app-scroll{position:fixed;top:0;left:0;right:0;bottom:56px;overflow:hidden;height:calc(100% - 56px);}
 .app-screen{display:none;}
 .app-screen.on{display:block;position:absolute;top:0;left:0;right:0;bottom:0;height:100%;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060810;}
-.app-tabs{position:fixed;bottom:0;left:0;right:0;height:56px;background:#0c0e1a;border-top:1px solid #1a1e30;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;z-index:9999;}
+.app-tabs{position:fixed;bottom:0;left:0;right:0;height:56px;background:#0c0e1a;border-top:1px solid #1a1e30;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;z-index:9999;}
 .app-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:#8892b0;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.8px;text-transform:uppercase;position:relative;transition:color .15s;}
 .app-tab.on{color:#00e5c3;}
 .app-tab.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:#00e5c3;border-radius:0 0 2px 2px;}
@@ -1165,6 +1165,395 @@ to { opacity:1; transform:translateY(0); }
 </div><!-- /t-body -->
 </div><!-- /sc-settings -->
 
+<!-- TAB: ABOUT -->
+<div class="app-screen" id="sc-about">
+  <div style="padding:16px 14px 80px;">
+
+    <!-- Header -->
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);letter-spacing:2px;line-height:1;">MBED SURGE WATCH</div>
+      <div style="font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Mary Bridge Emergency Department · Model Reference</div>
+    </div>
+
+    <!-- Surge Model -->
+    <div class="sdiv">Surge Prediction Model</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Core Surge Model</div><div class="badge badge-g">AUC 0.838</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 8px;">Predicts probability of a surge hour (≥threshold arrivals/hr) using an empirical heatmap blended from 3 years of ED throughput data (2023–2025, ~146K visits). The model combines:</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;">
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;white-space:nowrap;">60%</span><span>Hour × Day-of-Week heatmap (empirical surge rate)</span>
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;white-space:nowrap;">25%</span><span>Hour-of-day marginal rate</span>
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;white-space:nowrap;">15%</span><span>Month-of-year seasonal rate</span>
+        </div>
+        <p style="margin:8px 0 0;color:var(--muted);font-size:10px;">Multipliers applied: school calendar · local events · post-event lags · graduation · ILI. Output capped at 95%.</p>
+      </div>
+    </div>
+
+    <!-- Threshold -->
+    <div class="sdiv">Surge Threshold</div>
+    <div class="panel">
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 6px;">The slider defines what counts as a "surge hour." All modifiers (post-event lags, ILI) are calibrated at specific thresholds:</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;font-family:'Space Mono',monospace;">
+          <span style="color:#ff4d6d;">t &lt; 12</span><span style="font-family:inherit;color:var(--muted);">No significant modifiers detected in data — model runs on base rates only</span>
+          <span style="color:#ffd166;">t = 12–18</span><span style="font-family:inherit;color:var(--muted);">Calibrated range — post-event RRs interpolated between t=12, 15, 18</span>
+          <span style="color:#ffd166;">t &gt; 18</span><span style="font-family:inherit;color:var(--muted);">Small n, unstable estimates — modifiers suppressed</span>
+        </div>
+        <p style="margin:8px 0 0;color:var(--muted);font-size:10px;">Default t=15. Derived from 2023–2025 throughput data via Fisher's exact test on binary surge-day outcome.</p>
+      </div>
+    </div>
+
+    <!-- Post-Event Lag Modifiers -->
+    <div class="sdiv">Post-Event Lag Modifiers</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Empirical Incubation & Lag Effects</div><div class="badge badge-b">FISHER'S EXACT · 3YR DATA</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+        <p style="margin:0 0 10px;color:var(--muted);font-size:10px;">Derived from binary surge-day analysis (Fisher's exact, p&lt;0.05 threshold). RRs interpolated between calibrated thresholds t=12/15/18. Suppressed outside that range.</p>
+
+        <div style="border-top:1px solid var(--border);padding:10px 0 6px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:16px;">🎡</span>
+            <div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:11px;">Post–State Fair</div>
+              <div style="font-size:9px;color:var(--accent);font-family:'Space Mono',monospace;">Days +3 to +7 · RR up to 11x at t=15</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5;">Respiratory incubation curve. ~900K visitors → illness peaks 6–7 days post-fair. Most significant modifier in dataset (p&lt;0.0001).</div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding:10px 0 6px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:16px;">🦃</span>
+            <div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:11px;">Post–Thanksgiving</div>
+              <div style="font-size:9px;color:var(--accent);font-family:'Space Mono',monospace;">Days +1 to +7 · Suppressed lag+1/+2, surge lag+6/+7</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5;">Families home suppresses day+1–2 (RR×0.20). Deferred care + gathering illness wave peaks day+6–7 (RR×2.6, p=0.0002).</div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding:10px 0 6px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:16px;">🦒</span>
+            <div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:11px;">Zoolights Lag</div>
+              <div style="font-size:9px;color:var(--accent);font-family:'Space Mono',monospace;">Days 0 to +7 · RR ×1.14–3.67 by threshold</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5;">Cold-weather crowd exposure. Sustained lag 0–7 days. Effect strongest at higher thresholds (t=18: ×3.67).</div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding:10px 0 6px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:16px;">🏈</span>
+            <div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:11px;">WIAA Football Playoffs</div>
+              <div style="font-size:9px;color:var(--accent);font-family:'Space Mono',monospace;">Days 0 to +7 · RR ×2.2–5.9 at t=15–18</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5;">Cold crowds + November respiratory baseline. Not significant at t=12. Entire playoff window elevated.</div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding:10px 0 6px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:16px;">🎠</span>
+            <div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:11px;">Post–Pierce County Fair</div>
+              <div style="font-size:9px;color:var(--accent);font-family:'Space Mono',monospace;">Days 0 to +12 · Peak RR ×2.0 at lags 9–11</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5;">Same incubation mechanism as State Fair. Same-day protective (displacement). Peaks later (lag+9–11) due to 10-day fair duration.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- School Calendar -->
+    <div class="sdiv">School Calendar Modifiers</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">School Status → Surge Rate Adjustment</div><div class="badge badge-b">EMPIRICAL · 3YR</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+        <p style="margin:0 0 8px;font-size:10px;color:var(--muted);">Applied multiplicatively to base surge probability. School calendar status is one of the strongest structural predictors in the model.</p>
+        <div style="display:grid;grid-template-columns:auto auto 1fr;gap:4px 10px;font-size:10px;">
+          <span style="color:#ff4d6d;">↑ ×1.30</span><span style="color:#e2e8f0;">Monday post-break return</span><span style="color:var(--muted);">Highest single modifier — deferred illness presents Monday AM</span>
+          <span style="color:#ffd166;">↑ ×1.20</span><span style="color:#e2e8f0;">School return (general)</span><span style="color:var(--muted);">Any day school resumes after break</span>
+          <span style="color:#ffd166;">↑ ×1.15</span><span style="color:#e2e8f0;">Holiday / school break</span><span style="color:var(--muted);">No school — kids home, illness visits accumulate</span>
+          <span style="color:#8892b0;">— ×1.00</span><span style="color:#e2e8f0;">Normal school day</span><span style="color:var(--muted);">Baseline</span>
+          <span style="color:#39d98a;">↓ ×0.85</span><span style="color:#e2e8f0;">Weekend</span><span style="color:var(--muted);">Lower volume — families defer non-urgent visits</span>
+        </div>
+        <p style="margin:8px 0 0;font-size:10px;color:var(--muted);">Key return dates tracked: Winter break return (Jan), Spring break return (Apr). Summer is treated as low-baseline rather than a break/return pattern.</p>
+      </div>
+    </div>
+
+    <!-- Holidays -->
+    <div class="sdiv">Holiday Same-Day Modifiers</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Empirical Holiday Surge Rates</div><div class="badge badge-b">DAILY · 3YR DATA</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+        <p style="margin:0 0 8px;font-size:10px;color:var(--muted);">Daily surge modifiers vs same-month controls. Protective holidays reflect families deferring non-urgent visits. Elevating holidays reflect deferred care presenting + injury patterns.</p>
+        <div style="display:grid;grid-template-columns:auto auto 1fr;gap:5px 10px;font-size:10px;">
+          <span style="color:#ff4d6d;">↑ ×1.48</span><span>👷 Labor Day</span><span style="color:var(--muted);">End-of-summer injuries + deferred care. 15:00 and 17:00 spikes</span>
+          <span style="color:#ffd166;">↑ ×1.16</span><span>🎄 Christmas Week</span><span style="color:var(--muted);">Dec 26–29. Post-holiday deferred care + travel injuries (p&lt;0.05)</span>
+          <span style="color:#8892b0;">— ×1.00</span><span>🎆 NYE / 🎉 NYD</span><span style="color:var(--muted);">Daily average neutral — strong hourly variation (see hourly modifiers)</span>
+          <span style="color:#39d98a;">↓ ×0.60</span><span>🇺🇸 Memorial Day</span><span style="color:var(--muted);">Suppressed overall. Late evening rise 19–22:00</span>
+          <span style="color:#39d98a;">↓ ×0.58</span><span>🐣 Easter</span><span style="color:var(--muted);">42% below controls. Families occupied with gatherings</span>
+          <span style="color:#39d98a;">↓ ×0.48</span><span>🎆 July 4th</span><span style="color:var(--muted);">Strong suppression. Fireworks window returns to normal at 20:00</span>
+          <span style="color:#39d98a;">↓ ×0.40</span><span>🎃 Halloween</span><span style="color:var(--muted);">Suppressed 17–20:00. Post trick-or-treat spike 21:00 ×1.38</span>
+          <span style="color:#39d98a;">↓ ×0.28</span><span>🎄 Christmas Eve</span><span style="color:var(--muted);">Strong suppression. Morning pre-travel spike 08:00 ×1.35</span>
+          <span style="color:#39d98a;">↓ ×0.36</span><span>🎄 Christmas Day</span><span style="color:var(--muted);">Suppressed AM. Late night spike 23:00 ×1.66</span>
+          <span style="color:#39d98a;">↓ ×0.10</span><span>🦃 Thanksgiving</span><span style="color:var(--muted);">Strongest protective day — 90% below controls. Families defer all non-urgent visits</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regional/Local Events -->
+    <div class="sdiv">Local & Regional Event Modifiers</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Same-Day Surge Rate vs Controls</div><div class="badge badge-b">FISHER'S EXACT · 3YR</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+        <p style="margin:0 0 8px;font-size:10px;color:var(--muted);">Applied on the event date itself (same-day). Stacked multiplicatively with post-event lag modifiers where both apply. Combined cap at ×1.40.</p>
+        <div style="display:grid;grid-template-columns:auto auto 1fr;gap:5px 10px;font-size:10px;">
+          <span style="color:#ffd166;">↑ ×1.07</span><span>🎡 WA State Fair</span><span style="color:var(--muted);">p=0.0015. Breathing difficulty CC +35%. ~912K visitors over 3 weeks</span>
+          <span style="color:#8892b0;">— ×1.00</span><span>🎭 Zoolights</span><span style="color:var(--muted);">Same-day not significant — effect is entirely in post-event lag (days 0–7)</span>
+          <span style="color:#39d98a;">↓ ×0.87</span><span>🌸 Spring Fair</span><span style="color:var(--muted);">PROTECTIVE. p&lt;0.0001. Surge −43% vs April controls. Family displacement</span>
+          <span style="color:#39d98a;">↓ ×0.87</span><span>🍴 Taste Northwest</span><span style="color:var(--muted);">PROTECTIVE. p=0.001. Late June. Surge −36% vs June controls</span>
+          <span style="color:#39d98a;">↓ ×0.92</span><span>🔫 Gun Shows</span><span style="color:var(--muted);">PROTECTIVE. p=0.002. Adult-focused. Displacement effect</span>
+          <span style="color:#39d98a;">↓ ×0.91</span><span>🛒 Swap Meets</span><span style="color:var(--muted);">PROTECTIVE. p=0.016. Same displacement mechanism</span>
+        </div>
+        <p style="margin:8px 0 0;font-size:10px;color:var(--muted);">Not significant and excluded: Oktoberfest, Sportsman Expo, Home Show, WIAA Wrestling (adult-focused or insufficient pediatric signal).</p>
+      </div>
+    </div>
+
+    <!-- Graduation -->
+    <div class="sdiv">Graduation Modifier</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Tacoma Dome Graduation Ceremonies</div><div class="badge badge-g">↑ ×1.15 · p &lt; 0.0001</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 6px;">Empirical ×1.15 daily modifier on confirmed graduation days at the Tacoma Dome. Mechanism: families with children in warm, crowded arena → evening surge. Dates are manually configured in Settings each year.</p>
+        <p style="margin:0;font-size:10px;color:var(--muted);">Graduation ceremonies run May–June. The modifier is applied on the ceremony date only — no lag effect validated.</p>
+      </div>
+    </div>
+
+    <!-- ILI Modifier -->
+    <div class="sdiv">Regional ILI Modifier</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">CDC FluView · HHS Region 10</div><div class="badge badge-g">r = 0.65 · p &lt; 0.0001</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 6px;">Weekly influenza-like illness percentage for HHS Region 10 (WA, OR, ID, AK) fetched live from CMU Delphi Epidata API. Strongest external predictor in the model.</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;font-family:'Space Mono',monospace;">
+          <span style="color:#39d98a;">ILI &lt; 2%</span><span style="font-family:inherit;color:var(--muted);">Baseline · modifier ×1.0</span>
+          <span style="color:#ffd166;">ILI 2–5%</span><span style="font-family:inherit;color:var(--muted);">Moderate · modifier ×1.2–1.8</span>
+          <span style="color:#ff4d6d;">ILI &gt; 5%</span><span style="font-family:inherit;color:var(--muted);">Elevated · modifier up to ×2.5</span>
+        </div>
+        <p style="margin:8px 0 0;color:var(--muted);font-size:10px;">Applied multiplicatively to base surge probability. Falls back gracefully if API unavailable.</p>
+      </div>
+    </div>
+
+    <!-- mPEDOCS -->
+    <div class="sdiv">mPEDOCS 8-Hour Model</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">ED Crowding Prediction</div><div class="badge badge-b">AUC 0.84–0.87</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 8px;">Logistic regression predicting whether mPEDOCS will exceed your selected threshold within 8 hours. Inputs: current mPEDOCS score, 3-hour arrivals, hour of day.</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;">
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;">BCCF</span><span>0.9 day (07:00–23:00) · 1.35 night · applied to WR + TP</span>
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;">ATR</span><span>&lt;60: 8 min · 60–100: 14 min · 100–140: 83 min · &gt;140: 116+ min</span>
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;">NPV</span><span>88–99% — most reliable for ruling out near-term surge</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mental Health -->
+    <div class="sdiv">Mental Health Model</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">MH Visit Prediction</div><div class="badge" style="background:rgba(167,139,250,0.1);color:#a78bfa;border-color:rgba(167,139,250,0.3);">EMPIRICAL · 3YR</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 8px;">Predicts expected MH visits using hour × day-of-week empirical lookup, adjusted for school calendar and local events. Post-event lag modifiers validated for State Fair and Spring Fair.</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;">
+          <span style="color:#a78bfa;font-family:'Space Mono',monospace;">Peak</span><span>Monday 17:00–20:00 (post-school dismissal)</span>
+          <span style="color:#a78bfa;font-family:'Space Mono',monospace;">Season</span><span>October peak (6.1/day avg — 74% above August baseline)</span>
+          <span style="color:#a78bfa;font-family:'Space Mono',monospace;">LOS</span><span>Median 4.2h — longest waits for late arrivals (&gt;22:00)</span>
+        </div>
+        <p style="margin:8px 0 0;color:var(--muted);font-size:10px;">Weather lag modifiers were tested but removed — ΔR²≈0 after controlling for month and day-of-week (multivariate logistic, L1 regularization, 5-fold CV AUC delta = −0.003).</p>
+      </div>
+    </div>
+
+    <!-- Persistence Model -->
+    <div class="sdiv">ED-State Persistence Model</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Crowding Persistence · 8-Horizon Logistic Regression</div><div class="badge badge-g">AUC 0.58–0.98 by horizon</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+        <p style="margin:0 0 8px;">Activated when staff enter current ED state (WR/TP counts) or confirm a surge. Replaces the calendar model for h+1 through h+8 bars. Answers: <em style="color:#e2e8f0;">"Given how crowded we are right now, will mPEDOCS still exceed the threshold in N hours?"</em></p>
+
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;margin-bottom:10px;">
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;">Inputs</span><span>Current mPEDOCS · 3-hour arrivals · hour of day · day of week</span>
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;">Method</span><span>Logistic regression, one model per horizon (h+1 to h+8) × mPEDOCS threshold (70/80/100/120)</span>
+          <span style="color:var(--accent);font-family:'Space Mono',monospace;">Trigger</span><span>Any non-zero WR or TP entry, OR staff confirming surge active</span>
+        </div>
+
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">AUC degrades predictably with horizon — strong near-term, weak at h+8. This is expected: crowding state is highly predictive over the next 1–2 hours but reverts toward base rates by h+6–8.</div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:9px;font-family:'Space Mono',monospace;text-align:center;">
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px;padding:6px 4px;">
+            <div style="color:var(--accent);font-size:11px;margin-bottom:2px;">h+1</div>
+            <div style="color:#39d98a;">mPEDOCS≥70</div>
+            <div style="color:#e2e8f0;">AUC 0.94</div>
+            <div style="color:#a78bfa;margin-top:3px;">mPEDOCS≥100</div>
+            <div style="color:#e2e8f0;">AUC 0.977</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px;padding:6px 4px;">
+            <div style="color:var(--accent);font-size:11px;margin-bottom:2px;">h+2</div>
+            <div style="color:#39d98a;">mPEDOCS≥70</div>
+            <div style="color:#e2e8f0;">AUC 0.888</div>
+            <div style="color:#a78bfa;margin-top:3px;">mPEDOCS≥100</div>
+            <div style="color:#e2e8f0;">AUC 0.938</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px;padding:6px 4px;">
+            <div style="color:var(--accent);font-size:11px;margin-bottom:2px;">h+4</div>
+            <div style="color:#39d98a;">mPEDOCS≥70</div>
+            <div style="color:#e2e8f0;">AUC 0.771</div>
+            <div style="color:#a78bfa;margin-top:3px;">mPEDOCS≥100</div>
+            <div style="color:#e2e8f0;">AUC 0.833</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px;padding:6px 4px;">
+            <div style="color:var(--accent);font-size:11px;margin-bottom:2px;">h+8</div>
+            <div style="color:#39d98a;">mPEDOCS≥70</div>
+            <div style="color:#e2e8f0;">AUC 0.575</div>
+            <div style="color:#a78bfa;margin-top:3px;">mPEDOCS≥100</div>
+            <div style="color:#e2e8f0;">AUC 0.583</div>
+          </div>
+        </div>
+
+        <p style="margin:10px 0 0;font-size:10px;color:var(--muted);">The label <span style="color:#ff4d6d;font-family:'Space Mono',monospace;">⬤ persistence model</span> appears on the hero card when this model is active. Bars revert to the calendar model beyond h+8 or when ED state is cleared.</p>
+      </div>
+    </div>
+
+    <!-- Hourly Modifiers -->
+    <div class="sdiv">Hourly & Intra-Day Modifiers</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Three Intra-Day Adjustment Mechanisms</div><div class="badge badge-b">EMPIRICAL · 3YR</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:4px;">1 · Holiday Hour-Specific Multipliers</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7;">Several holidays have within-day surge patterns that differ sharply from the daily average. These are applied to specific clock hours only:</div>
+          <div style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:10px;">
+            <span>🎆 NYE</span><span style="color:var(--muted);">23:00 spike ×2.18 (pre-midnight injuries) · 16:00 ×1.34 · evening suppressed</span>
+            <span>🎉 NYD</span><span style="color:var(--muted);">Morning suppressed · midday 13–14:00 ×1.44–1.64 (post-midnight presenting)</span>
+            <span>🎄 Xmas Eve</span><span style="color:var(--muted);">08:00 ×1.35 (pre-travel) · 17:00 ×0.42 (families home)</span>
+            <span>🎄 Xmas Day</span><span style="color:var(--muted);">Morning suppressed · 23:00 ×1.66 (post-dinner injuries)</span>
+            <span>🎃 Halloween</span><span style="color:var(--muted);">17–20:00 suppressed ×0.40 (trick-or-treating) · 21:00 ×1.38 (injuries/candy)</span>
+            <span>🎆 July 4th</span><span style="color:var(--muted);">Overall ×0.48 · 19:00 nearly zero · 20:00 fireworks window returns to normal</span>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:4px;">2 · Afternoon Surge Window Decay</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7;">When no surge is confirmed and the current time is in the 15:00–21:00 window, hourly bars are adjusted downward by empirical survival multipliers — reflecting the observed probability that a surge hasn't started by a given hour, conditional on no surge yet occurring. Values are threshold-specific.</div>
+          <div style="margin-top:6px;font-size:10px;color:var(--muted);">Example at t=15: 15:00 ×1.0 → 16:00 ×1.02 → 18:00 ×0.92 → 19:00 ×0.88 → 21:00 ×0.70</div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:12px;">
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:4px;">3 · Respiratory & GI Load Modifiers</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7;">Staff enter yesterday's respiratory or GI visit counts. These feed multiplicative surge modifiers applied to the 7-day forecast (capped at ×2.5 combined). Derived from correlation of prior-day illness volume with next-day surge rates.</div>
+          <div style="margin-top:6px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:10px;font-family:'Space Mono',monospace;">
+            <span style="color:#c8cfe8;">Resp</span><span style="color:#ffd166;">≥30 visits</span><span style="color:var(--muted);font-family:inherit;">×2.40 surge modifier</span>
+            <span style="color:#c8cfe8;">Resp</span><span style="color:#ffd166;">≥15 visits</span><span style="color:var(--muted);font-family:inherit;">×1.57</span>
+            <span style="color:#c8cfe8;">Resp</span><span style="color:#39d98a;">1–7 visits</span><span style="color:var(--muted);font-family:inherit;">×0.93 (slight protective)</span>
+            <span style="color:#c8cfe8;">GI</span><span style="color:#ffd166;">≥30 visits</span><span style="color:var(--muted);font-family:inherit;">×2.17 surge modifier</span>
+            <span style="color:#c8cfe8;">GI</span><span style="color:#ffd166;">≥15 visits</span><span style="color:var(--muted);font-family:inherit;">×1.36</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Google Trends -->
+    <div class="sdiv">Community Search Signal (Google Trends)</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Pierce County DMA 819 · 7 Keywords</div><div class="badge badge-b">DISPLAY ONLY · NOT IN MODEL</div></div>
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.6;">
+
+        <p style="margin:0 0 8px;font-size:10px;color:var(--muted);">Situational awareness panel only — Google Trends data is <strong style="color:#e2e8f0;">not wired into surge probability calculations.</strong> It is a leading indicator to watch alongside the model output.</p>
+
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:5px;">What the numbers mean</div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:10px;">
+            <span style="color:var(--accent);font-family:'Space Mono',monospace;">Index 0–100</span><span style="color:var(--muted);">Google's relative search interest scale for Pierce County (DMA 819). 100 = peak search volume for that keyword in that region over the data period. Values are relative, not absolute search counts.</span>
+            <span style="color:var(--accent);font-family:'Space Mono',monospace;">12 bars</span><span style="color:var(--muted);">Sparkline showing the last 12 weeks of weekly index values. Google Trends reports on calendar weeks (Sun–Sat), not rolling 7-day windows. The rightmost bar is the current calendar week — which may only reflect 1–2 days of data early in the week. Bar height is proportional to that week's value vs the highest value in the window.</span>
+            <span style="color:var(--accent);font-family:'Space Mono',monospace;">Corner number</span><span style="color:var(--muted);">Current week's index / p75 historical threshold. A value of 16/20 means current index is 16, and the 75th percentile historically is 20.</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:5px;">Alert levels</div>
+          <div style="display:grid;grid-template-columns:auto auto 1fr;gap:4px 10px;font-size:10px;">
+            <span style="color:#39d98a;font-family:'Space Mono',monospace;">NORMAL</span><span style="color:#e2e8f0;">&lt; p50</span><span style="color:var(--muted);">Below historical median — background level</span>
+            <span style="color:#ffd166;font-family:'Space Mono',monospace;">ELEVATED</span><span style="color:#e2e8f0;">p50–p75</span><span style="color:var(--muted);">Above median — worth monitoring</span>
+            <span style="color:#ff4d6d;font-family:'Space Mono',monospace;">HIGH</span><span style="color:#e2e8f0;">≥ p75</span><span style="color:var(--muted);">Top quartile — elevated community illness signal</span>
+          </div>
+          <p style="margin:6px 0 0;font-size:10px;color:var(--muted);">Thresholds derived from 2023–2026 Pierce County weekly data. Overall banner shows ELEVATED COMMUNITY SIGNAL if ≥2 keywords are HIGH, MODERATE SIGNAL if ≥1 HIGH or ≥3 ELEVATED.</p>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:5px;">Validated keywords & lead times</div>
+          <div style="display:grid;grid-template-columns:auto auto auto 1fr;gap:4px 10px;font-size:10px;">
+            <span style="color:#e2e8f0;">🦠 Norovirus</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.31</span><span style="color:var(--muted);">lag 0–7d</span><span style="color:var(--muted);">GI outbreak warning</span>
+            <span style="color:#e2e8f0;">😮‍💨 Child Cough</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.36</span><span style="color:var(--muted);">lag 4–7d</span><span style="color:var(--muted);">Strongest predictor — respiratory wave 4–7 days ahead</span>
+            <span style="color:#e2e8f0;">🏥 Mary Bridge</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.21</span><span style="color:var(--muted);">lag 0–7d</span><span style="color:var(--muted);">Direct visit intent signal</span>
+            <span style="color:#e2e8f0;">🤒 Kids Sick</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.25</span><span style="color:var(--muted);">lag 0–3d</span><span style="color:var(--muted);">General illness wave</span>
+            <span style="color:#e2e8f0;">🌡️ Child Fever</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.18</span><span style="color:var(--muted);">lag 0–7d</span><span style="color:var(--muted);">Febrile illness signal</span>
+            <span style="color:#e2e8f0;">🚑 Urgent Care</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.14</span><span style="color:var(--muted);">lag 0–7d</span><span style="color:var(--muted);">Diversion pressure signal</span>
+            <span style="color:#e2e8f0;">🫁 Croup</span><span style="color:var(--accent);font-family:'Space Mono',monospace;">r=0.15</span><span style="color:var(--muted);">lag 0–7d</span><span style="color:var(--muted);">Respiratory illness signal</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight:600;color:#e2e8f0;margin-bottom:5px;">Data freshness</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7;">Snapshot is embedded in the app and updated weekly by running <span style="color:#e2e8f0;font-family:'Space Mono',monospace;">refresh_trends.py</span> (Sunday 2:00 AM via Task Scheduler / cron). The staleness badge turns red after 30 days. Google Trends is not accessible via browser due to CORS restrictions — the script must be run locally.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- What Was Removed -->
+    <div class="sdiv">Model Decisions & Exclusions</div>
+    <div class="panel">
+      <div class="pb" style="font-size:11px;color:#c8cfe8;line-height:1.7;">
+        <p style="margin:0 0 6px;font-weight:600;color:#e2e8f0;">Removed after empirical testing:</p>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8;">
+          <div>❌ <strong style="color:#c8cfe8;">Weather lag modifiers</strong> — ΔR²≈0, AUC delta −0.003 after month/DOW control. Prior single-threshold Fisher's exact RRs were inflated by seasonal confounding and correlated adjacent-day stacking.</div>
+          <div>❌ <strong style="color:#c8cfe8;">Barometric pressure</strong> — signal absorbed by seasonality in multivariate model.</div>
+          <div>❌ <strong style="color:#c8cfe8;">IPS backlog variables</strong> — AUC ticked up when removed from 12h surge model (endogeneity concern).</div>
+          <div>❌ <strong style="color:#c8cfe8;">DST transitions, full moon, SNAP/payday cycles</strong> — null results in 3yr data.</div>
+        </div>
+        <p style="margin:10px 0 6px;font-weight:600;color:#e2e8f0;">Known limitations:</p>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8;">
+          <div>⚠️ Post-event modifiers only calibrated at t=12–18/hr. No validated signal outside this range.</div>
+          <div>⚠️ Google Trends panel is display-only — not wired into surge probability.</div>
+          <div>⚠️ mPEDOCS reconstruction excludes observation/boarding patients not captured in Throughput.csv.</div>
+          <div>⚠️ All models trained on 2023–2025 data — performance may shift with operational or population changes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="sdiv">Data Sources</div>
+    <div class="panel">
+      <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.9;">
+        <div><span style="color:#c8cfe8;font-weight:600;">Throughput.csv</span> — ~146K ED visits, Jan 2023–Dec 2025, Mary Bridge Children's ED</div>
+        <div><span style="color:#c8cfe8;font-weight:600;">CMU Delphi Epidata</span> — Weekly ILI %, HHS Region 10. Live fetch, no API key required.</div>
+        <div><span style="color:#c8cfe8;font-weight:600;">Google Trends</span> — Pierce County DMA 819, 7 keywords. Updated weekly via refresh_trends.py.</div>
+        <div><span style="color:#c8cfe8;font-weight:600;">Event dates</span> — WA State Fair, Pierce County Fair, Zoolights, WIAA playoffs, graduations, school calendar. Manually confirmed annually.</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:9px;color:var(--muted);padding:10px 0 4px;letter-spacing:1px;">MBED SURGE WATCH · MARY BRIDGE CHILDREN'S · MULTICARE · v2026.03</div>
+
+  </div>
+</div><!-- /sc-about -->
+
 </div><!-- /app-scroll -->
 
 <div class="app-tabs">
@@ -1172,6 +1561,7 @@ to { opacity:1; transform:translateY(0); }
   <button class="app-tab"     id="tb-now">     <div class="app-tab-ico">🔢</div><div>Now</div></button>
   <button class="app-tab"     id="tb-mh">      <div class="app-tab-ico">🐧</div><div>Mental Health</div></button>
   <button class="app-tab"     id="tb-settings"><div class="app-tab-ico">⚙</div><div>Settings</div></button>
+  <button class="app-tab"     id="tb-about">   <div class="app-tab-ico">ℹ️</div><div>About</div></button>
 </div>
 
 <script>
@@ -2692,7 +3082,7 @@ function switchTab(name){
   if(name==='mh'&&typeof renderMHTab==='function') renderMHTab();
   document.getElementById('tb-'+name).classList.add('on');
 }
-['surge','now','mh','settings'].forEach(function(name){
+['surge','now','mh','settings','about'].forEach(function(name){
   var btn=document.getElementById('tb-'+name);
   if(btn)btn.addEventListener('click',function(){switchTab(name);});
 });
@@ -3419,17 +3809,17 @@ const TRENDS_BASELINE = {
   },
   // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
   latest: {
-    'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
-    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,
+    'norovirus':44.0,'child cough':4.0,'Mary Bridge':52.0,'kids sick':6.0,
+    'child fever':10.0,'urgent care near me':51.0,'croup':14.0,
   },
   sparklines: {
-    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
-    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 4.0],
-    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 51.0],
-    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 7.0],
-    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
+    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 34.0, 58.0, 44.0],
+    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 4.0],
+    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 52.0],
+    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 6.0],
+    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 8.0, 10.0],
     'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
-    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
+    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 14.0],
   },
   fetched: '2026-03-22',
 };
