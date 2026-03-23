@@ -1235,13 +1235,32 @@ to { opacity:1; transform:translateY(0); }
     </div>
   </div>
 
+  <!-- Hourly Modifiers -->
+  <div class="sdiv">Holiday Hourly Modifiers</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div style="margin-bottom:6px;">Select holidays have empirically-derived hour-specific multipliers applied on top of the day-level surge modifier. All computed via Fisher's exact vs. matched controls, 3yr data.</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#ffd166;">🎄 Christmas Eve</span><span>Day modifier ×0.28. 08:00 ×1.35 (pre-travel spike). 17:00 ×0.42 (family gathering suppression). Evening normalizes.</span>
+        <span style="color:#ffd166;">🎄 Christmas Day</span><span>Day modifier ×0.36. Morning suppressed (10:00 ×0.55, 11:00 ×0.77). 23:00 ×1.66 (post-dinner injuries).</span>
+        <span style="color:#ffd166;">🎃 Halloween</span><span>Day modifier ×0.40. 17:00–20:00 suppressed ×0.40 (trick-or-treating). 21:00 rebound ×1.38 (post–trick-or-treat injuries/candy ingestion).</span>
+        <span style="color:#ffd166;">🎆 New Year's Eve</span><span>Day modifier ×1.0. 23:00 ×2.18 (pre-midnight injuries). 16:00 ×1.34 (early celebrations). 17:00–21:00 suppressed ×0.62–0.96.</span>
+        <span style="color:#ffd166;">🎉 New Year's Day</span><span>Day modifier ×1.0. Morning suppressed (08:00 ×0.44, 09:00 ×0.80). 13:00–14:00 ×1.44–1.64 (post-midnight presentations delayed to midday).</span>
+        <span style="color:#ffd166;">🎆 July 4th</span><span>Day modifier ×0.48. 19:00 near-zero ×0.20 (fireworks). 20:00 returns to normal ×1.0. 21:00 ×0.85.</span>
+        <span style="color:#ffd166;">👷 Labor Day</span><span>Day modifier ×1.48. 15:00 ×1.58 and 17:00 ×1.52 (afternoon injury spikes). 12:00 suppressed ×0.44.</span>
+        <span style="color:#60a5fa;">🇺🇸 Memorial Day</span><span>Day modifier ×0.60 (protective). 19:00–20:00 moderate rise. 22:00 ×1.32 (late end-of-weekend surge).</span>
+      </div>
+      <div style="margin-top:6px;font-size:9px;color:#4a5568;">Hourly modifiers are multiplied on top of the day-level modifier and the base hourly rate. Graduation events use a flat day modifier only (×1.13–×1.18, no hourly breakdown).</div>
+    </div>
+  </div>
+
   <!-- Model Decisions -->
   <div class="sdiv">Model Decisions &amp; Exclusions</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
       <div style="display:flex;flex-direction:column;gap:4px;">
-        <div>❌ <span style="color:#c8cfe8;">Weather (same-day)</span> — ΔR²&lt;0.001 after ILI controlled. Removed from surge and MH models.</div>
-        <div>❌ <span style="color:#c8cfe8;">Barometric pressure lag</span> — Removed with weather. ILI subsumes the respiratory load signal.</div>
+        <div>❌ <span style="color:#c8cfe8;">Weather (same-day)</span> — Multivariate analysis confirmed weather lag effects were confounded by seasonality. Cold/rainy weather co-occurs with respiratory season; once month and ILI are controlled, ΔR²&lt;0.001. The ILI modifier and empirical (hour × DOW × month) heatmap already capture the underlying seasonal signal. Intraday weather timing (e.g. afternoon rain → evening surge) also tested — not significant (RR=1.08, p=0.37).</div>
+        <div>❌ <span style="color:#c8cfe8;">Barometric pressure lag</span> — Same confounding mechanism. Pressure changes correlate with storm systems that cluster in winter respiratory season. No independent predictive value after ILI and month controlled.</div>
         <div>❌ <span style="color:#c8cfe8;">Moon phase</span> — No significant effect detected (p=0.31).</div>
         <div>❌ <span style="color:#c8cfe8;">SNAP cycle</span> — No significant effect (p=0.44).</div>
         <div>❌ <span style="color:#c8cfe8;">DST transitions</span> — Single-hour artifact only; effect too small to model.</div>
@@ -3742,21 +3761,21 @@ const TRENDS_BASELINE = {
     'urgent care near me': {p25:55, p50:63, p75:73},
     'croup':               {p25:12, p50:15, p75:20},
   },
-  // Embedded snapshot: week of 2026-03-23 — auto-updated weekly
+  // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
   latest: {
-    'norovirus':40.0,'child cough':3.0,'Mary Bridge':45.0,'kids sick':5.0,
-    'child fever':9.0,'urgent care near me':52.0,'croup':13.0,
+    'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
+    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,
   },
   sparklines: {
-    'norovirus':          [16, 24, 7, 24, 22, 23, 21, 32, 28, 21, 54, 40],
-    'child cough':        [0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 3, 3],
-    'Mary Bridge':        [41, 47, 16, 42, 36, 30, 15, 38, 22, 53, 44, 45],
-    'kids sick':          [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 5],
-    'child fever':        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 9],
-    'urgent care near me':[43, 38, 55, 46, 53, 41, 72, 52, 48, 29, 47, 52],
-    'croup':              [0, 0, 0, 7, 9, 0, 0, 0, 6, 3, 15, 13],
+    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
+    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 4.0],
+    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 51.0],
+    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 7.0],
+    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
+    'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
+    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
   },
-  fetched: '2026-03-23',
+  fetched: '2026-03-22',
 };
 
 const TRENDS_META = {
@@ -3773,11 +3792,7 @@ function getTrendsData() {
   // Try localStorage override first (from manual refresh)
   try {
     var stored = localStorage.getItem('pedED_trendsData');
-    if (stored) {
-      var parsed = JSON.parse(stored);
-      // Use stored only if it is newer than (or same as) the embedded baseline
-      if (parsed.fetched && parsed.fetched >= TRENDS_BASELINE.fetched) return parsed;
-    }
+    if (stored) return JSON.parse(stored);
   } catch(e) {}
   return TRENDS_BASELINE;
 }
@@ -3792,12 +3807,8 @@ function renderCommunitySignal() {
   var sparks = data.sparklines || TRENDS_BASELINE.sparklines;
   var fetched = data.fetched || TRENDS_BASELINE.fetched;
 
-  // Days since last update (compare local calendar dates to avoid timezone drift)
-  var _fp = fetched.split('-');
-  var _fetchedLocal = new Date(+_fp[0], +_fp[1]-1, +_fp[2]);
-  var _now = new Date();
-  var _todayLocal = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate());
-  var daysSince = Math.round((_todayLocal - _fetchedLocal) / 86400000);
+  // Days since last update
+  var daysSince = Math.round((new Date() - new Date(fetched)) / 86400000);
   var staleBadge = daysSince > 30
     ? '<span style="color:#ff4d6d;font-size:9px;font-family:\'Space Mono\',monospace;">⚠️ '+daysSince+'d old — refresh in Settings</span>'
     : '<span style="color:#8892b0;font-size:9px;font-family:\'Space Mono\',monospace;">updated '+daysSince+'d ago</span>';
