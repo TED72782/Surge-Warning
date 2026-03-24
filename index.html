@@ -3087,6 +3087,42 @@ function renderDashboard(iliData = null) {
       </div>
     </div>
 
+    <!-- 24h FORECAST -->
+
+    <div class="sdiv">24-Hour Surge Forecast</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Hourly Surge Probability · Next 24h</div><div class="badge badge-g">SCHOOL + LOCAL EVENTS</div></div>
+      <div class="pb">
+        <div class="forecast-bars-wrap">
+        <div class="forecast-bars-inner" style="display:flex;gap:3px;height:90px;align-items:flex-end;">
+          ${forecastBarsHTML}
+        </div></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);">
+          ▪ Bar height = surge probability for that hour &nbsp;·&nbsp; 
+          <span style="color:var(--green);">■ LOW</span> &nbsp;
+          <span style="color:var(--accent3);">■ WATCH</span> &nbsp;
+          <span style="color:var(--orange);">■ ELEVATED</span> &nbsp;
+          <span style="color:var(--red);">■ SURGE RISK</span> &nbsp;·&nbsp;
+          <span style="color:#ff4d6d;">● crowding risk (mPEDOCS-based, ED state entered)</span> &nbsp;·&nbsp;
+          <span style="color:#00e5c3;">● surge window reduction (no surge confirmed)</span>
+        </div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <div style="font-size:9px;color:#8892b0;">Surge window reduction (15–21:00 decay when no surge confirmed)</div>
+          <button id="surge-window-toggle" onclick="toggleSurgeWindowReduction()" class="bccf-toggle-btn on" style="white-space:nowrap;flex-shrink:0;">ON</button>
+        </div>
+        <!-- Late-night surge warning — shown when evening build-up threshold crossed -->
+        <div id="late-night-warning" style="display:none;margin-top:10px;padding:8px 10px;border-radius:6px;border:1px solid #ffd166;background:rgba(255,209,102,0.07);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <span style="font-size:14px;">🌙</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;" id="late-night-warning-level">WATCH</span>
+            <span style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;">Late-Night Surge Risk</span>
+          </div>
+          <div style="font-size:9px;color:#c8cfe8;" id="late-night-warning-text"></div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- CURRENT STATUS -->
     <div class="sdiv">Current Status</div>
     <div class="panel">
@@ -3245,41 +3281,6 @@ function renderDashboard(iliData = null) {
         </div>
       </div>
 
-    </div>
-
-    <!-- 24h FORECAST -->
-
-    <div class="sdiv">24-Hour Surge Forecast</div>
-    <div class="panel">
-      <div class="ph"><div class="pt">Hourly Surge Probability · Next 24h</div><div class="badge badge-g">SCHOOL + LOCAL EVENTS</div></div>
-      <div class="pb">
-        <div class="forecast-bars-wrap">
-        <div class="forecast-bars-inner" style="display:flex;gap:3px;height:90px;align-items:flex-end;">
-          ${forecastBarsHTML}
-        </div></div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);">
-          ▪ Bar height = surge probability for that hour &nbsp;·&nbsp; 
-          <span style="color:var(--green);">■ LOW</span> &nbsp;
-          <span style="color:var(--accent3);">■ WATCH</span> &nbsp;
-          <span style="color:var(--orange);">■ ELEVATED</span> &nbsp;
-          <span style="color:var(--red);">■ SURGE RISK</span> &nbsp;·&nbsp;
-          <span style="color:#ff4d6d;">● crowding risk (mPEDOCS-based, ED state entered)</span> &nbsp;·&nbsp;
-          <span style="color:#00e5c3;">● surge window reduction (no surge confirmed)</span>
-        </div>
-        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
-          <div style="font-size:9px;color:#8892b0;">Surge window reduction (15–21:00 decay when no surge confirmed)</div>
-          <button id="surge-window-toggle" onclick="toggleSurgeWindowReduction()" class="bccf-toggle-btn on" style="white-space:nowrap;flex-shrink:0;">ON</button>
-        </div>
-        <!-- Late-night surge warning — shown when evening build-up threshold crossed -->
-        <div id="late-night-warning" style="display:none;margin-top:10px;padding:8px 10px;border-radius:6px;border:1px solid #ffd166;background:rgba(255,209,102,0.07);">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-            <span style="font-size:14px;">🌙</span>
-            <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;" id="late-night-warning-level">WATCH</span>
-            <span style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;">Late-Night Surge Risk</span>
-          </div>
-          <div style="font-size:9px;color:#c8cfe8;" id="late-night-warning-text"></div>
-        </div>
-      </div>
     </div>
 
     <!-- 7-DAY FORECAST -->
@@ -4364,70 +4365,56 @@ autoMpBCCF();
 // ═══════════════════════════════════════════════════════════════════════════
 const TRENDS_BASELINE = {
   thresholds: {
-    'norovirus': {p25:4, p50:6, p75:11},
-    'child cough': {p25:2, p50:2, p75:2},
-    'Mary Bridge': {p25:9, p50:10, p75:11},
-    'kids sick': {p25:2, p50:2, p75:2},
-    'child fever': {p25:2, p50:2, p75:3},
+    'norovirus':           {p25:4,  p50:6,  p75:11},
+    'child cough':         {p25:2,  p50:2,  p75:2 },
+    'Mary Bridge':         {p25:9,  p50:10, p75:11},
+    'kids sick':           {p25:2,  p50:2,  p75:2 },
+    'child fever':         {p25:2,  p50:2,  p75:3 },
     'urgent care near me': {p25:55, p50:63, p75:73},
-    'croup': {p25:12, p50:15, p75:20},
-    'mass shooting': {p25:3, p50:4, p75:7},
-    'suicide': {p25:48, p50:51, p75:55},
-    'crisis hotline': {p25:0, p50:0, p75:0},
-    'overdose symptoms': {p25:0, p50:0, p75:58},
-    'anxiety attack': {p25:49, p50:59, p75:69},
-    'teen suicide': {p25:0, p50:0, p75:0},
-    'how to commit suicide': {p25:0, p50:0, p75:0},
-    'fentanyl overdose': {p25:0, p50:0, p75:0},
-    'melatonin overdose': {p25:0, p50:0, p75:0},
-    'Tylenol overdose': {p25:0, p50:0, p75:0},
-    'MultiCare behavioral health': {p25:0, p50:0, p75:0},
-    'youth crisis line': {p25:0, p50:0, p75:23},
+    'croup':               {p25:12, p50:15, p75:20},
+    'mass shooting':       {p25:3,  p50:4,  p75:7 },
+    'suicide':             {p25:48, p50:51, p75:55},
+    'overdose symptoms':   {p25:0,  p50:0,  p75:58},
+    'crisis hotline':      {p25:0,  p50:0,  p75:0 },
+    'teen suicide':        {p25:0,  p50:0,  p75:0 },
+    'how to commit suicide':{p25:0, p50:0,  p75:0 },
+    'fentanyl overdose':   {p25:0,  p50:0,  p75:0 },
+    'melatonin overdose':  {p25:0,  p50:0,  p75:0 },
+    'Tylenol overdose':    {p25:0,  p50:0,  p75:0 },
+    'MultiCare behavioral health':{p25:0,p50:0,p75:0},
+    'anxiety attack':      {p25:49, p50:59, p75:69},
+    'youth crisis line':   {p25:0,  p50:0,  p75:23},
   },
-  // Embedded snapshot: week of 2026-03-24 — auto-updated weekly
+  // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
   latest: {
-    'norovirus':48.0,
-    'child cough':4.0,
-    'Mary Bridge':46.0,
-    'kids sick':8.0,
-    'child fever':13.0,
-    'urgent care near me':16.0,
-    'croup':5.0,
-    'mass shooting':2.0,
-    'suicide':48.0,
-    'crisis hotline':1.0,
-    'overdose symptoms':9.0,
-    'anxiety attack':24.0,
-    'teen suicide':27.0,
-    'how to commit suicide':22.0,
-    'fentanyl overdose':31.0,
-    'melatonin overdose':17.0,
-    'Tylenol overdose':22.0,
-    'MultiCare behavioral health':2.0,
-    'youth crisis line':2.0,
+    'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
+    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,'mass shooting':3.0,
+    'suicide':60.0,'overdose symptoms':67.0,'crisis hotline':0.0,
+    'teen suicide':0.0,'how to commit suicide':0.0,'fentanyl overdose':0.0,
+    'melatonin overdose':0.0,'Tylenol overdose':0.0,'MultiCare behavioral health':0.0,
   },
   sparklines: {
-    'norovirus':          [32.0, 22.0, 46.0, 19.0, 54.0, 57.0, 33.0, 47.0, 42.0, 67.0, 62.0, 48.0],
-    'child cough':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 4.0],
-    'Mary Bridge':          [25.0, 35.0, 25.0, 33.0, 44.0, 28.0, 16.0, 34.0, 24.0, 54.0, 45.0, 46.0],
-    'kids sick':          [0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 8.0],
-    'child fever':          [0.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 10.0, 13.0],
-    'urgent care near me':          [14.0, 13.0, 14.0, 20.0, 13.0, 17.0, 20.0, 19.0, 13.0, 16.0, 16.0, 16.0],
-    'croup':          [3.0, 2.0, 2.0, 2.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 5.0, 5.0],
-    'mass shooting':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 9.0, 0.0, 2.0, 2.0],
-    'suicide':          [68.0, 50.0, 52.0, 55.0, 72.0, 70.0, 66.0, 76.0, 75.0, 63.0, 47.0, 48.0],
-    'crisis hotline':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
-    'overdose symptoms':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 10.0, 9.0],
-    'anxiety attack':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 0.0, 0.0, 3.0, 25.0, 24.0],
-    'teen suicide':          [26.0, 30.0, 22.0, 31.0, 43.0, 50.0, 52.0, 46.0, 41.0, 43.0, 28.0, 27.0],
-    'how to commit suicide':          [21.0, 10.0, 13.0, 25.0, 26.0, 24.0, 19.0, 23.0, 25.0, 21.0, 23.0, 22.0],
-    'fentanyl overdose':          [50.0, 39.0, 48.0, 45.0, 47.0, 48.0, 56.0, 51.0, 59.0, 53.0, 32.0, 31.0],
-    'melatonin overdose':          [13.0, 20.0, 13.0, 15.0, 17.0, 8.0, 12.0, 17.0, 11.0, 16.0, 18.0, 17.0],
-    'Tylenol overdose':          [19.0, 24.0, 19.0, 25.0, 22.0, 22.0, 26.0, 18.0, 25.0, 23.0, 22.0, 22.0],
-    'MultiCare behavioral health':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 2.0],
-    'youth crisis line':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 2.0, 2.0],
+    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
+    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 4.0],
+    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 51.0],
+    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 7.0],
+    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
+    'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
+    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
+    'mass shooting':      [4.0, 4.0, 2.0, 0.0, 3.0, 2.0, 3.0, 14.0, 4.0, 26.0, 3.0, 3.0],
+    'suicide':            [47.0, 51.0, 52.0, 51.0, 50.0, 53.0, 48.0, 52.0, 51.0, 52.0, 52.0, 60.0],
+    'overdose symptoms':  [86.0, 0.0, 83.0, 68.0, 65.0, 0.0, 0.0, 77.0, 0.0, 0.0, 0.0, 67.0],
+    'crisis hotline':     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 77.0, 0.0, 0.0, 78.0],
+    'teen suicide':       [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'how to commit suicide':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 89.0, 0.0],
+    'fentanyl overdose':  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'melatonin overdose': [0.0, 0.0, 0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'Tylenol overdose':   [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'MultiCare behavioral health':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'anxiety attack':      [44.0, 36.0, 63.0, 80.0, 66.0, 79.0, 74.0, 49.0, 62.0, 71.0, 44.0, 43.0],
+    'youth crisis line':   [19.0, 19.0, 14.0, 23.0, 25.0, 17.0, 40.0, 20.0, 23.0, 23.0, 0.0, 16.0],
   },
-  fetched: '2026-03-24',
+  fetched: '2026-03-22',
 };
 
 const TRENDS_META = {
@@ -4802,7 +4789,7 @@ function renderMHTab(){
 
   // LOS
   var los=MH_LOS_BY_HOUR[hour]||360;
-  var le=document.getElementById('mh-los-est'); if(le)le.textContent=Math.round(los/60*10)/10+'h';
+  var le=document.getElementById('mh-los-est'); if(le)le.textContent=Math.round(los/60*10)/10+' hours';
 
   // % above threshold
   var days_above_pct = (dailyEst/thresh*100);
@@ -4899,7 +4886,7 @@ function renderMHTab(){
     if(month===10) lines.push('🍂 October: peak MH month (6.1/day avg — 74% above August)');
     if(month>=9&&month<=11) lines.push('📚 Back-to-school season: MH elevated Sep-Nov');
     lines.push('🕐 Peak MH hours: 17:00-20:00 (post-school dismissal)');
-    lines.push('⏱ Expected LOS this hour: ~'+Math.round(los/60*10)/10+'h (median)');
+    lines.push('⏱ Expected LOS this hour: ~'+Math.round(los/60*10)/10+' hours (median)');
     if(los>700) lines.push('⚠️ Late arrivals have longest waits — psychiatric bed access often limited overnight');
     cp.innerHTML=lines.map(function(l){return '<div>'+l+'</div>';}).join('');
   }
