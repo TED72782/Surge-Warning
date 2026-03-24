@@ -999,6 +999,13 @@ to { opacity:1; transform:translateY(0); }
     </div>
   </div>
 
+  <div class="sdiv">Community Search Signal · MH</div>
+  <div class="panel">
+    <div class="pb">
+      <div id="mh-community-signal-content" style="font-size:11px;color:var(--muted);padding:4px 0;">Loading…</div>
+    </div>
+  </div>
+
   <div class="sdiv">MH LOS Reference</div>
   <div class="panel">
     <div class="tpb" style="padding:12px 14px;">
@@ -1251,6 +1258,27 @@ to { opacity:1; transform:translateY(0); }
         <span style="color:#60a5fa;">🇺🇸 Memorial Day</span><span>Day modifier ×0.60 (protective). 19:00–20:00 moderate rise. 22:00 ×1.32 (late end-of-weekend surge).</span>
       </div>
       <div style="margin-top:6px;font-size:9px;color:#4a5568;">Hourly modifiers are multiplied on top of the day-level modifier and the base hourly rate. Graduation events use a flat day modifier only (×1.13–×1.18, no hourly breakdown).</div>
+    </div>
+  </div>
+
+  <!-- MH Community Search Signal -->
+  <div class="sdiv">Mental Health · Community Search Signal</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div style="margin-bottom:6px;">Google Trends keywords validated against weekly MH surge rate (≥8 MH visits/day) and suicidal CC visits, 2023–2025. All correlations season-adjusted (partial correlation controlling for summer). Displayed in the MH tab grouped by lead time — the risk badge reflects the search volume from <em>lag weeks ago</em>, not the current week.</div>
+      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">suicide (WA)</span><span>r=+0.25 · lag+2w · MH surge</span>
+        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">teen suicide</span><span>r=+0.21 · lag+4w · MH surge · national data (WA sparse)</span>
+        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">crisis hotline</span><span>r=+0.21 · lag+3w · suicidal CC — help-seeking before ED escalation</span>
+        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">mass shooting</span><span>r=+0.32 · lag+2w · MH surge — anxiety/contagion effect, season-independent</span>
+        <span style="color:#ffd166;">1w lead</span><span style="color:#c8cfe8;">overdose symptoms</span><span>r=+0.21 · lag+1w · MH surge — caregiver searching after near-miss</span>
+        <span style="color:#ffd166;">1w lead</span><span style="color:#c8cfe8;">Tylenol overdose</span><span>r=+0.20 · lag+1w · overdose CC — common self-harm method in adolescents</span>
+        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">how to commit suicide</span><span>r=+0.20 · lag0w · MH surge + suicidal CC</span>
+        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">fentanyl overdose</span><span>r=+0.25 · lag0w · MH surge — community opioid crisis activity</span>
+        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">melatonin overdose</span><span>r=+0.18 · lag0w · MH surge — pediatric intentional ingestion</span>
+        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">MultiCare behavioral health</span><span>r=+0.25 · lag0w · MH surge — direct health system search intent</span>
+      </div>
+      <div style="margin-top:6px;font-size:9px;color:#4a5568;">Not included: cyberbullying/school bullying (seasonal confounding only), 988/suicide hotline/WISE/CCS (insufficient WA volume), suicide prevention (negative correlation — public awareness counter-cycle).</div>
     </div>
   </div>
 
@@ -3760,11 +3788,24 @@ const TRENDS_BASELINE = {
     'child fever':         {p25:2,  p50:2,  p75:3 },
     'urgent care near me': {p25:55, p50:63, p75:73},
     'croup':               {p25:12, p50:15, p75:20},
+    'mass shooting':       {p25:3,  p50:4,  p75:7 },
+    'suicide':             {p25:48, p50:51, p75:55},
+    'overdose symptoms':   {p25:0,  p50:0,  p75:58},
+    'crisis hotline':      {p25:0,  p50:0,  p75:0 },
+    'teen suicide':        {p25:0,  p50:0,  p75:0 },
+    'how to commit suicide':{p25:0, p50:0,  p75:0 },
+    'fentanyl overdose':   {p25:0,  p50:0,  p75:0 },
+    'melatonin overdose':  {p25:0,  p50:0,  p75:0 },
+    'Tylenol overdose':    {p25:0,  p50:0,  p75:0 },
+    'MultiCare behavioral health':{p25:0,p50:0,p75:0},
   },
   // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
   latest: {
     'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
-    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,
+    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,'mass shooting':3.0,
+    'suicide':60.0,'overdose symptoms':67.0,'crisis hotline':0.0,
+    'teen suicide':0.0,'how to commit suicide':0.0,'fentanyl overdose':0.0,
+    'melatonin overdose':0.0,'Tylenol overdose':0.0,'MultiCare behavioral health':0.0,
   },
   sparklines: {
     'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
@@ -3774,6 +3815,16 @@ const TRENDS_BASELINE = {
     'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
     'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
     'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
+    'mass shooting':      [4.0, 4.0, 2.0, 0.0, 3.0, 2.0, 3.0, 14.0, 4.0, 26.0, 3.0, 3.0],
+    'suicide':            [47.0, 51.0, 52.0, 51.0, 50.0, 53.0, 48.0, 52.0, 51.0, 52.0, 52.0, 60.0],
+    'overdose symptoms':  [86.0, 0.0, 83.0, 68.0, 65.0, 0.0, 0.0, 77.0, 0.0, 0.0, 0.0, 67.0],
+    'crisis hotline':     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 77.0, 0.0, 0.0, 78.0],
+    'teen suicide':       [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'how to commit suicide':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 89.0, 0.0],
+    'fentanyl overdose':  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'melatonin overdose': [0.0, 0.0, 0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'Tylenol overdose':   [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'MultiCare behavioral health':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
   },
   fetched: '2026-03-22',
 };
@@ -3786,6 +3837,19 @@ const TRENDS_META = {
   'child fever':         {icon:'🌡️', label:'Child Fever',   lag:'0-7d', r:0.18, use:'Febrile illness signal'},
   'urgent care near me': {icon:'🚑', label:'Urgent Care',   lag:'0-7d', r:0.14, use:'Diversion pressure signal'},
   'croup':               {icon:'🫁', label:'Croup',         lag:'0-7d', r:0.15, use:'Respiratory illness signal'},
+  'mass shooting':       {icon:'📰', label:'Mass Shooting',  lag:'2w',   r:0.32, use:'MH surge lead indicator — anxiety/contagion effect peaks ~2 weeks after news event. Season-independent.'},
+  // MH lead-time signals (2-4 weeks)
+  'suicide':             {icon:'⚠️',  label:'Suicide (WA)',   lag:'+2w',  r:0.25, group:'lead', use:'MH surge lead — elevated search precedes ED presentations by ~2 weeks'},
+  'teen suicide':        {icon:'⚠️',  label:'Teen Suicide',   lag:'+4w',  r:0.21, group:'lead', use:'MH surge lead — 4-week lead. National data (WA volume too low)'},
+  'crisis hotline':      {icon:'📞',  label:'Crisis Hotline', lag:'+3w',  r:0.21, group:'lead', use:'Suicidal CC lead — people searching hotlines before ED escalation'},
+  // MH short lead (1 week)
+  'overdose symptoms':   {icon:'💊',  label:'OD Symptoms',   lag:'+1w',  r:0.21, group:'lead1', use:'MH surge lead 1 week — caregiver searching after near-miss'},
+  'Tylenol overdose':    {icon:'💊',  label:'Tylenol OD',    lag:'+1w',  r:0.20, group:'lead1', use:'Overdose CC lead 1 week — common self-harm method in adolescents'},
+  // MH same-week signals
+  'how to commit suicide':{icon:'🔴', label:'Suicide Method', lag:'0w',   r:0.20, group:'same', use:'Same-week MH demand signal — direct intent search'},
+  'fentanyl overdose':   {icon:'🔴',  label:'Fentanyl OD',   lag:'0w',   r:0.25, group:'same', use:'Same-week MH surge corroborator — community opioid crisis activity'},
+  'melatonin overdose':  {icon:'🔴',  label:'Melatonin OD',  lag:'0w',   r:0.18, group:'same', use:'Same-week signal — common pediatric intentional ingestion'},
+  'MultiCare behavioral health':{icon:'🏥',label:'MultiCare BH',lag:'0w',r:0.25, group:'same', use:'Same-week MH demand — direct health system search intent'},
 };
 
 function getTrendsData() {
@@ -3992,12 +4056,111 @@ function getMHEventModifier(dateStr){
   return {mod:Math.min(2.0,Math.max(0.1,mod)), label:label};
 }
 
+function renderMHTrends() {
+  var el = document.getElementById('mh-community-signal-content');
+  if (!el) return;
+
+  var data = getTrendsData();
+  var latest = data.latest || TRENDS_BASELINE.latest;
+  var thresh = data.thresholds || TRENDS_BASELINE.thresholds;
+  var sparks = data.sparklines || TRENDS_BASELINE.sparklines;
+  var fetched = data.fetched || TRENDS_BASELINE.fetched;
+
+  var daysSince = Math.round((new Date() - new Date(fetched)) / 86400000);
+  var staleNote = daysSince > 30 ? ' · <span style="color:#ff4d6d;">⚠ '+daysSince+'d old</span>' : '';
+
+  var groups = [
+    { label: '2–4 Week Lead', color: '#a78bfa', keywords: ['suicide','teen suicide','crisis hotline','mass shooting'] },
+    { label: '1 Week Lead',   color: '#ffd166', keywords: ['overdose symptoms','Tylenol overdose'] },
+    { label: 'Same Week',     color: '#00e5c3', keywords: ['how to commit suicide','fentanyl overdose','melatonin overdose','MultiCare behavioral health'] },
+  ];
+
+  function sparkHTML(spark, col) {
+    var max = Math.max.apply(null, spark.concat([1]));
+    var h = '<div style="display:flex;align-items:flex-end;gap:1px;height:18px;margin-top:3px;">';
+    spark.forEach(function(v, i) {
+      var ht = Math.max(2, Math.round((v/max)*18));
+      var isLast = i === spark.length-1;
+      h += '<div style="flex:1;height:'+ht+'px;background:'+(isLast?col:'rgba(255,255,255,0.12)')+';border-radius:1px;"></div>';
+    });
+    return h + '</div>';
+  }
+
+  function cardHTML(kw, groupCol) {
+    var meta = TRENDS_META[kw];
+    if (!meta) return '';
+    var v = latest[kw] || 0;
+    var t = thresh[kw] || {p25:0,p50:0,p75:0};
+    var spark = sparks[kw] || [];
+    var noData = t.p75 === 0 && spark.every(function(x){return x===0;});
+
+    // Parse lag in weeks — '0w'->0, '+2w'->2, '3w'->3, '4-7d'->0
+    var lagWeeks = 0;
+    var lagMatch = (meta.lag||'').match(/\+?(\d+)w/);
+    if (lagMatch) lagWeeks = parseInt(lagMatch[1]);
+
+    // Use the spark bar from `lagWeeks` ago to assess current risk
+    // spark[-1] = latest, spark[-1-lagWeeks] = lagWeeks ago
+    var assessIdx = spark.length - 1 - lagWeeks;
+    var assessVal = (assessIdx >= 0 && spark[assessIdx] !== undefined) ? spark[assessIdx] : v;
+    var assessLabel = lagWeeks > 0 ? lagWeeks+'w ago' : 'now';
+
+    var level = noData ? 'SPARSE' : assessVal >= t.p75 && t.p75 > 0 ? 'ELEVATED' : assessVal >= t.p50 && t.p50 > 0 ? 'MODERATE' : 'NORMAL';
+    var col = level==='ELEVATED'?'#ff4d6d':level==='MODERATE'?'#ffd166':level==='SPARSE'?'#4a5568':'#39d98a';
+    var bg  = level==='ELEVATED'?'0.08':level==='MODERATE'?'0.05':'0.02';
+
+    // Sparkline — highlight the assessed bar (lagWeeks ago) in the signal color, dim others
+    var sparkMax = Math.max.apply(null, spark.concat([1]));
+    var sHTML = '<div style="display:flex;align-items:flex-end;gap:1px;height:18px;margin-top:3px;">';
+    spark.forEach(function(sv, i) {
+      var ht = Math.max(2, Math.round((sv/sparkMax)*18));
+      var isAssessed = i === assessIdx;
+      var isLatest   = i === spark.length - 1;
+      var barCol = isAssessed ? col : isLatest ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.10)';
+      var border = isAssessed ? '1px solid '+col : 'none';
+      sHTML += '<div style="flex:1;height:'+ht+'px;background:'+barCol+';border-radius:1px;outline:'+border+';"></div>';
+    });
+    sHTML += '</div>';
+
+    var html = '<div style="background:rgba(255,255,255,'+bg+');border:1px solid '+(level==='NORMAL'||level==='SPARSE'?'var(--border)':col)+';border-radius:6px;padding:7px;">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">';
+    html += '<span style="font-size:12px;">'+meta.icon+'</span>';
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:7px;font-weight:700;color:'+col+';">'+level+'</span>';
+    html += '</div>';
+    html += '<div style="font-size:9px;color:#c8cfe8;font-weight:600;line-height:1.3;">'+meta.label+'</div>';
+    html += '<div style="font-size:7px;color:#8892b0;margin-top:1px;">r='+meta.r+' · lag '+meta.lag+'</div>';
+    if (noData) {
+      html += '<div style="font-size:7px;color:#4a5568;margin-top:4px;font-style:italic;">WA data sparse — weekly refresh needed</div>';
+    } else {
+      html += sHTML;
+      html += '<div style="font-family:\'Space Mono\',monospace;font-size:8px;color:'+col+';text-align:right;margin-top:1px;">'+assessVal.toFixed(0)+(t.p75>0?'<span style="color:#4a5568;font-size:6px;">/'+t.p75+' · '+assessLabel+'</span>':'<span style="color:#4a5568;font-size:6px;"> · '+assessLabel+'</span>')+'</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
+  html += '<div style="font-size:9px;color:#8892b0;font-family:\'Space Mono\',monospace;">WA · US-WA state data · updated '+daysSince+'d ago'+staleNote+'</div>';
+  html += '</div>';
+
+  groups.forEach(function(g) {
+    html += '<div style="margin-bottom:10px;">';
+    html += '<div style="font-size:8px;color:'+g.color+';font-family:\'Space Mono\',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">⬤ '+g.label+'</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:5px;">';
+    g.keywords.forEach(function(kw) { html += cardHTML(kw, g.color); });
+    html += '</div></div>';
+  });
+
+  el.innerHTML = html;
+}
+
 function renderMHTab(){
   var now    = new Date();
   var hour   = now.getHours();
   var dow    = (now.getDay()+6)%7;
   var month  = now.getMonth()+1;
   var thresh = parseInt(document.getElementById('mh-thresh-slider')?.value||8);
+  renderMHTrends();
 
   // Update threshold display
   var tv=document.getElementById('mh-thresh-val'); if(tv)tv.textContent=thresh+'/day';
