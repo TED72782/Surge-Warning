@@ -1301,6 +1301,21 @@ to { opacity:1; transform:translateY(0); }
     </div>
   </div>
 
+  <!-- Late Night Surge Risk -->
+  <div class="sdiv">Evening Build-up · Late Night Surge Risk</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div style="margin-bottom:6px;">Empirical analysis of 22:00 surge events (t=10) across 2023–2025 identified cumulative total arrivals across the 18–21:00 window (all four hours combined, not per-hour) as the strongest actionable real-time predictor of late-night surge. Late-night surges are concentrated in the school year (May 31%, December 25%, April 19%) and essentially absent in summer (July/August 4–8%).</div>
+      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;margin-bottom:8px;">
+        <span style="color:#ffd166;">≥25 arrivals</span><span style="color:#ffd166;">WATCH</span><span>×1.45 modifier on 22:00–23:00 bars — RR=2.54 vs &lt;25 total (p=0.023)</span>
+        <span style="color:#ff9a3c;">≥30 arrivals</span><span style="color:#ff9a3c;">ELEVATED</span><span>×1.80 modifier — RR=2.46 vs &lt;30 total (p&lt;0.0001)</span>
+        <span style="color:#ff4d6d;">≥35 arrivals</span><span style="color:#ff4d6d;">HIGH</span><span>×2.05 modifier — RR=2.05 vs &lt;35 total (p&lt;0.0001)</span>
+      </div>
+      <div>The modifier is applied only to the 22:00 and 23:00 forecast bars and only when no surge is already confirmed (survival model takes precedence when YES is active). The input panel is visible at all times but <strong style="color:#c8cfe8;">only activates between 18:00 and 23:00</strong> — outside that window the badge shows "inactive" and bar modifiers are suppressed. The warning card below the 24h forecast is shown only during the active window when a threshold is crossed. The build-up value <strong style="color:#c8cfe8;">auto-resets at midnight</strong> so stale data never carries into the following day. First stepper press jumps to 25 (minimum meaningful threshold); subsequent presses step by 5.</div>
+      <div style="margin-top:6px;font-size:9px;color:#4a5568;">t=15 and t=20 have insufficient late-night event counts (&lt;10 events over 3 years) to support a predictor at those thresholds. The modifier uses t=10 RR values as the empirical basis.</div>
+    </div>
+  </div>
+
   <!-- Model Decisions -->
   <div class="sdiv">Model Decisions &amp; Exclusions</div>
   <div class="panel">
@@ -2658,9 +2673,9 @@ function renderDashboard(iliData = null) {
   if(SURGE_FLAG_ACTIVE) {
     const startH = SURGE_CONFIRMED_HOUR !== null ? SURGE_CONFIRMED_HOUR : hour;
     const heroOffset = SURGE_START_OFFSET + 1;
-    const pp = heroOffset <= 8 ? getSurvivalProb(startH, heroOffset) : getSurvivalProb(startH, 8);
+    const pp = heroOffset <= 6 ? getSurvivalProb(startH, heroOffset) : getSurvivalProb(startH, 6);
     heroProb = pp; heroModel = 'persistence';
-  } else if(hour >= 15 && hour <= 21) {
+  } else if(hour >= 15 && hour <= 21 && SURGE_WINDOW_REDUCTION_ON) {
     const mult = getSurgeWindowMultiplier(hour);
     if(mult < 1.0) { heroProb = surgeProb * mult; heroModel = 'survival'; }
   }
@@ -2689,17 +2704,23 @@ function renderDashboard(iliData = null) {
     let isSurvival = false, isPersistence = false;
     if(!SURGE_FLAG_ACTIVE) {
       // Apply surge window multiplier if in/past surge window with no confirmed surge
-      if(h>=15 && h<=21){
+      if(h>=15 && h<=21 && SURGE_WINDOW_REDUCTION_ON){
         const mult = getSurgeWindowMultiplier(hour);
         if(mult < 1.0){fp = fp * mult; isSurvival = true;}
       }
-    } else if(SURGE_FLAG_ACTIVE&&i>=0&&i<=8){
+      // Apply evening build-up late-night modifier to 22:00 and 23:00
+      // Only active when current hour is 18-23 (input is contextually relevant)
+      if((h===22 || h===23) && !SURGE_FLAG_ACTIVE && hour >= 18 && hour <= 23) {
+        const lnInfo = getLateNightMod();
+        if(lnInfo.mod > 1.0) { fp = Math.min(1.0, fp * lnInfo.mod); }
+      }
+    } else if(SURGE_FLAG_ACTIVE&&i>=0&&i<=6){
       // Surge confirmed — use empirical survival lookup keyed by confirmed start hour
       const startH = SURGE_CONFIRMED_HOUR !== null ? SURGE_CONFIRMED_HOUR : hour;
       const effOffset = i + SURGE_START_OFFSET;
       if(effOffset===0){ fp=1.0; isPersistence=true; }
-      else if(effOffset<=8){ fp=getSurvivalProb(startH, effOffset); isPersistence=true; }
-      else { fp=getSurvivalProb(startH, 8); isPersistence=true; }
+      else if(effOffset<=6){ fp=getSurvivalProb(startH, effOffset); isPersistence=true; }
+      else { fp=getSurvivalProb(startH, 6); isPersistence=true; }
     }
     nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}:00`, isPersistence, isSurvival });
   }
@@ -3108,6 +3129,22 @@ function renderDashboard(iliData = null) {
           </div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:#8892b0;" id="sf-calc-score">—</div>
         </div>
+        <!-- Evening Build-up Late Night Risk -->
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Evening Build-up · Total Arrivals 18–21:00</div>
+            <div id="eve-build-badge" style="font-size:8px;font-family:'Space Mono',monospace;color:#8892b0;">—</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="tsbtn" onclick="adjustEveBuild(-5)" style="min-width:32px;">−</button>
+            <div style="flex:1;text-align:center;">
+              <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:#8892b0;" id="eve-build-display">0</div>
+              <div style="font-size:8px;color:#8892b0;">combined across 18, 19, 20, 21:00</div>
+            </div>
+            <button class="tsbtn" onclick="adjustEveBuild(5)" style="min-width:32px;">+</button>
+          </div>
+          <div style="font-size:8px;color:#4a5568;margin-top:5px;text-align:center;">4-hour window total · 25=watch · 30=elevated · 35=high</div>
+        </div>
         <button onclick="resetSurgeInputs()" style="margin-top:10px;width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;padding:9px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Reset All Inputs</button>
       </div>
     </div>
@@ -3229,6 +3266,19 @@ function renderDashboard(iliData = null) {
           <span style="color:#ff4d6d;">● crowding risk (mPEDOCS-based, ED state entered)</span> &nbsp;·&nbsp;
           <span style="color:#00e5c3;">● surge window reduction (no surge confirmed)</span>
         </div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <div style="font-size:9px;color:#8892b0;">Surge window reduction (15–21:00 decay when no surge confirmed)</div>
+          <button id="surge-window-toggle" onclick="toggleSurgeWindowReduction()" class="bccf-toggle-btn on" style="white-space:nowrap;flex-shrink:0;">ON</button>
+        </div>
+        <!-- Late-night surge warning — shown when evening build-up threshold crossed -->
+        <div id="late-night-warning" style="display:none;margin-top:10px;padding:8px 10px;border-radius:6px;border:1px solid #ffd166;background:rgba(255,209,102,0.07);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <span style="font-size:14px;">🌙</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;" id="late-night-warning-level">WATCH</span>
+            <span style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;">Late-Night Surge Risk</span>
+          </div>
+          <div style="font-size:9px;color:#c8cfe8;" id="late-night-warning-text"></div>
+        </div>
       </div>
     </div>
 
@@ -3315,6 +3365,14 @@ function renderDashboard(iliData = null) {
     });
     var sfMap = {mp_wr:'sf-d-wr', mp_tp:'sf-d-tp'};
     updateSurgeBacktimeUI();
+    updateEveBuildUI();
+    // Restore surge window reduction toggle state
+    var swBtn = document.getElementById('surge-window-toggle');
+    if (swBtn) {
+      swBtn.textContent = SURGE_WINDOW_REDUCTION_ON ? 'ON' : 'OFF';
+      if (SURGE_WINDOW_REDUCTION_ON) swBtn.classList.add('on');
+      else swBtn.classList.remove('on');
+    }
   })();
 
   // Set up auto-refresh every 30 minutes
@@ -3459,9 +3517,10 @@ if(_obsBtn)_obsBtn.addEventListener('click',function(){switchTab('settings');});
 // ═══ mPEDOCS ═══
 var MP8_THRESH={"70": {"intercept": -2.623783, "mpedocs": 0.036972, "arrivals": 0.176066, "hour": 0.065275, "auc": 0.8418}, "80": {"intercept": -2.992394, "mpedocs": 0.031171, "arrivals": 0.205383, "hour": 0.04129, "auc": 0.8378}, "100": {"intercept": -4.109889, "mpedocs": 0.025049, "arrivals": 0.093652, "hour": 0.018659, "auc": 0.8517}, "120": {"intercept": -5.489003, "mpedocs": 0.022403, "arrivals": 0.113538, "hour": 0.011209, "auc": 0.868}};
 var MP8_SEL=100;
-var S={in_mpedocs:60,in_arrivals:0,in_hour:new Date().getHours(),in_resp_load:0,in_gi_load:0,in_mh_load:0};
+var S={in_mpedocs:60,in_arrivals:0,in_hour:new Date().getHours(),in_resp_load:0,in_gi_load:0,in_mh_load:0,in_eve_build:0};
 var SURGE_FLAG_ACTIVE = false;
-var SURGE_START_OFFSET = 0; // hours before now surge started (0=now, 1=1h ago, etc.)
+var SURGE_START_OFFSET = 0;
+var SURGE_WINDOW_REDUCTION_ON = true; // can be disabled in Settings // hours before now surge started (0=now, 1=1h ago, etc.)
 
 function updateSurgeBacktimeUI() {
   var row  = document.getElementById('surge-backtime-row');
@@ -3481,13 +3540,110 @@ function updateSurgeBacktimeUI() {
 }
 
 function adjustSurgeStartHour(delta) {
-  SURGE_START_OFFSET = Math.max(0, Math.min(8, SURGE_START_OFFSET - delta));
+  SURGE_START_OFFSET = Math.max(0, Math.min(6, SURGE_START_OFFSET - delta));
   var nowH = new Date().getHours();
   SURGE_CONFIRMED_HOUR = ((nowH - SURGE_START_OFFSET) + 24) % 24;
   updateSurgeBacktimeUI();
   updateForecastBars();
   renderDashboard(_cachedIliData);
 }
+
+function toggleSurgeWindowReduction() {
+  SURGE_WINDOW_REDUCTION_ON = !SURGE_WINDOW_REDUCTION_ON;
+  var btn = document.getElementById('surge-window-toggle');
+  if (btn) {
+    btn.textContent = SURGE_WINDOW_REDUCTION_ON ? 'ON' : 'OFF';
+    if (SURGE_WINDOW_REDUCTION_ON) { btn.classList.add('on'); }
+    else { btn.classList.remove('on'); }
+  }
+  updateForecastBars();
+  renderDashboard(_cachedIliData);
+}
+
+// ── Evening Build-up Late Night Risk ──────────────────────────────────────
+function getLateNightMod() {
+  // Returns RR multiplier for 22:00-23:00 based on 18-21 build-up total
+  // Empirical: eve>=35 RR=2.05x, eve>=30 RR=2.46x, eve>=25 RR=2.54x (p<0.05)
+  var v = S.in_eve_build || 0;
+  if (v >= 35) return { mod: 2.05, level: 'HIGH',     col: '#ff4d6d' };
+  if (v >= 30) return { mod: 1.80, level: 'ELEVATED', col: '#ff9a3c' };
+  if (v >= 25) return { mod: 1.45, level: 'WATCH',    col: '#ffd166' };
+  return { mod: 1.0, level: null, col: null };
+}
+
+function adjustEveBuild(delta) {
+  var h = new Date().getHours();
+  if (h < 18 || h > 23) return;  // inactive outside 18:00-23:00
+  var current = S.in_eve_build || 0;
+  // First press from 0 jumps to 25 (minimum meaningful threshold)
+  if (current === 0 && delta > 0) {
+    S.in_eve_build = 25;
+  } else {
+    S.in_eve_build = Math.max(0, Math.min(80, current + delta));
+  }
+  updateEveBuildUI();
+  updateForecastBars();
+  renderDashboard(_cachedIliData);
+}
+
+function updateEveBuildUI() {
+  var disp  = document.getElementById('eve-build-display');
+  var badge = document.getElementById('eve-build-badge');
+  var warn  = document.getElementById('late-night-warning');
+  var wlvl  = document.getElementById('late-night-warning-level');
+  var wtxt  = document.getElementById('late-night-warning-text');
+  if (!disp) return;
+
+  var h = new Date().getHours();
+  var active = h >= 18 && h <= 23;  // only active 18:00-23:00
+  var v = S.in_eve_build || 0;
+  var info = getLateNightMod();
+
+  // Display value — dim when outside active window
+  if (disp) {
+    disp.textContent = v;
+    disp.style.color = active ? (info.col || '#8892b0') : '#4a5568';
+  }
+
+  // Badge — show inactive state outside window
+  if (badge) {
+    if (!active) {
+      badge.textContent = 'inactive until 18:00';
+      badge.style.color = '#4a5568';
+    } else if (info.level) {
+      badge.textContent = info.level;
+      badge.style.color = info.col;
+    } else {
+      badge.textContent = v > 0 ? 'NORMAL' : '—';
+      badge.style.color = '#8892b0';
+    }
+  }
+
+  // Warning card — only when active window AND threshold crossed
+  var showWarn = active && info.level !== null;
+  if (warn) warn.style.display = showWarn ? 'block' : 'none';
+  if (showWarn && wlvl && wtxt) {
+    wlvl.textContent = info.level;
+    wlvl.style.color = info.col;
+    warn.style.borderColor = info.col;
+    warn.style.background  = info.col + '12';
+    wtxt.textContent = 'Evening build-up ' + v + ' arrivals (18–21:00). '
+      + 'Empirical RR ×' + info.mod.toFixed(2) + ' for 22:00 surge (4-hour window total). '
+      + '22:00–23:00 bars adjusted.';
+  }
+}
+
+// Auto-clear eve build at midnight so stale data doesn't carry to next day
+(function scheduleEveBuildReset() {
+  var now = new Date();
+  var msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1) - now;
+  setTimeout(function() {
+    S.in_eve_build = 0;
+    updateEveBuildUI();
+    updateForecastBars();
+    scheduleEveBuildReset();  // reschedule for next midnight
+  }, msUntilMidnight);
+})();
 var SURGE_CONFIRMED_HOUR = null;  // hour-of-day when surge was confirmed
  // true once staff enter any WR/TP/arrivals value
 function setSurgeFlag(val){
@@ -3525,16 +3681,23 @@ function updateForecastBars(){
     var fp=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,postEv.modifier);
     var isSurv=false,isPers=false;
     if(!SURGE_FLAG_ACTIVE){
-      if(h>=15&&h<=21){
+      if(h>=15&&h<=21&&SURGE_WINDOW_REDUCTION_ON){
         var mult2=getSurgeWindowMultiplier(now.getHours());
         if(mult2<1.0){fp=fp*mult2;isSurv=true;}
       }
-    } else if(SURGE_FLAG_ACTIVE&&i>=0&&i<=8){
+      // Apply evening build-up late-night modifier to 22:00 and 23:00
+      // Only active when current hour is 18-23
+      var nowHr=now.getHours();
+      if((h===22||h===23)&&nowHr>=18&&nowHr<=23){
+        var lnInfo2=getLateNightMod();
+        if(lnInfo2.mod>1.0){fp=Math.min(1.0,fp*lnInfo2.mod);}
+      }
+    } else if(SURGE_FLAG_ACTIVE&&i>=0&&i<=6){
       var startH2 = SURGE_CONFIRMED_HOUR !== null ? SURGE_CONFIRMED_HOUR : now.getHours();
       var effOff2 = i + SURGE_START_OFFSET;
       if(effOff2===0){ fp=1.0; isPers=true; }
-      else if(effOff2<=8){ fp=getSurvivalProb(startH2,effOff2); isPers=true; }
-      else { fp=getSurvivalProb(startH2,8); isPers=true; }
+      else if(effOff2<=6){ fp=getSurvivalProb(startH2,effOff2); isPers=true; }
+      else { fp=getSurvivalProb(startH2,6); isPers=true; }
     }
     var col=surgeBarColor(fp),pct=Math.round(fp*100);
     var divs=cols[i].children; if(divs.length<3)continue;
@@ -3623,6 +3786,7 @@ function resetSurgeInputs(){
   });
   // Reset state
   S.in_arrivals=0;
+  S.in_eve_build=0;
   // Reset displays
   var ids=['sf-d-wr','sf-d-tp'];
   ids.forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=0;});
@@ -3636,6 +3800,7 @@ function resetSurgeInputs(){
   if(arrInp)arrInp.value=0;
   if(arrD)arrD.textContent=0;
   updateSurgeBacktimeUI();
+  updateEveBuildUI();
   updateForecastBars();
   renderMpedocs();
 }
@@ -4199,52 +4364,70 @@ autoMpBCCF();
 // ═══════════════════════════════════════════════════════════════════════════
 const TRENDS_BASELINE = {
   thresholds: {
-    'norovirus':           {p25:4,  p50:6,  p75:11},
-    'child cough':         {p25:2,  p50:2,  p75:2 },
-    'Mary Bridge':         {p25:9,  p50:10, p75:11},
-    'kids sick':           {p25:2,  p50:2,  p75:2 },
-    'child fever':         {p25:2,  p50:2,  p75:3 },
+    'norovirus': {p25:4, p50:6, p75:11},
+    'child cough': {p25:2, p50:2, p75:2},
+    'Mary Bridge': {p25:9, p50:10, p75:11},
+    'kids sick': {p25:2, p50:2, p75:2},
+    'child fever': {p25:2, p50:2, p75:3},
     'urgent care near me': {p25:55, p50:63, p75:73},
-    'croup':               {p25:12, p50:15, p75:20},
-    'mass shooting':       {p25:3,  p50:4,  p75:7 },
-    'suicide':             {p25:48, p50:51, p75:55},
-    'overdose symptoms':   {p25:0,  p50:0,  p75:58},
-    'crisis hotline':      {p25:0,  p50:0,  p75:0 },
-    'teen suicide':        {p25:0,  p50:0,  p75:0 },
-    'how to commit suicide':{p25:0, p50:0,  p75:0 },
-    'fentanyl overdose':   {p25:0,  p50:0,  p75:0 },
-    'melatonin overdose':  {p25:0,  p50:0,  p75:0 },
-    'Tylenol overdose':    {p25:0,  p50:0,  p75:0 },
-    'MultiCare behavioral health':{p25:0,p50:0,p75:0},
+    'croup': {p25:12, p50:15, p75:20},
+    'mass shooting': {p25:3, p50:4, p75:7},
+    'suicide': {p25:48, p50:51, p75:55},
+    'crisis hotline': {p25:0, p50:0, p75:0},
+    'overdose symptoms': {p25:0, p50:0, p75:58},
+    'anxiety attack': {p25:49, p50:59, p75:69},
+    'teen suicide': {p25:0, p50:0, p75:0},
+    'how to commit suicide': {p25:0, p50:0, p75:0},
+    'fentanyl overdose': {p25:0, p50:0, p75:0},
+    'melatonin overdose': {p25:0, p50:0, p75:0},
+    'Tylenol overdose': {p25:0, p50:0, p75:0},
+    'MultiCare behavioral health': {p25:0, p50:0, p75:0},
+    'youth crisis line': {p25:0, p50:0, p75:23},
   },
-  // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
+  // Embedded snapshot: week of 2026-03-24 — auto-updated weekly
   latest: {
-    'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
-    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,'mass shooting':3.0,
-    'suicide':60.0,'overdose symptoms':67.0,'crisis hotline':0.0,
-    'teen suicide':0.0,'how to commit suicide':0.0,'fentanyl overdose':0.0,
-    'melatonin overdose':0.0,'Tylenol overdose':0.0,'MultiCare behavioral health':0.0,
+    'norovirus':48.0,
+    'child cough':4.0,
+    'Mary Bridge':46.0,
+    'kids sick':8.0,
+    'child fever':13.0,
+    'urgent care near me':16.0,
+    'croup':5.0,
+    'mass shooting':2.0,
+    'suicide':48.0,
+    'crisis hotline':1.0,
+    'overdose symptoms':9.0,
+    'anxiety attack':24.0,
+    'teen suicide':27.0,
+    'how to commit suicide':22.0,
+    'fentanyl overdose':31.0,
+    'melatonin overdose':17.0,
+    'Tylenol overdose':22.0,
+    'MultiCare behavioral health':2.0,
+    'youth crisis line':2.0,
   },
   sparklines: {
-    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
-    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 4.0],
-    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 51.0],
-    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 7.0],
-    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
-    'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
-    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
-    'mass shooting':      [4.0, 4.0, 2.0, 0.0, 3.0, 2.0, 3.0, 14.0, 4.0, 26.0, 3.0, 3.0],
-    'suicide':            [47.0, 51.0, 52.0, 51.0, 50.0, 53.0, 48.0, 52.0, 51.0, 52.0, 52.0, 60.0],
-    'overdose symptoms':  [86.0, 0.0, 83.0, 68.0, 65.0, 0.0, 0.0, 77.0, 0.0, 0.0, 0.0, 67.0],
-    'crisis hotline':     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 77.0, 0.0, 0.0, 78.0],
-    'teen suicide':       [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'how to commit suicide':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 89.0, 0.0],
-    'fentanyl overdose':  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'melatonin overdose': [0.0, 0.0, 0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'Tylenol overdose':   [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'MultiCare behavioral health':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'norovirus':          [32.0, 22.0, 46.0, 19.0, 54.0, 57.0, 33.0, 47.0, 42.0, 67.0, 62.0, 48.0],
+    'child cough':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 4.0],
+    'Mary Bridge':          [25.0, 35.0, 25.0, 33.0, 44.0, 28.0, 16.0, 34.0, 24.0, 54.0, 45.0, 46.0],
+    'kids sick':          [0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 8.0],
+    'child fever':          [0.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 10.0, 13.0],
+    'urgent care near me':          [14.0, 13.0, 14.0, 20.0, 13.0, 17.0, 20.0, 19.0, 13.0, 16.0, 16.0, 16.0],
+    'croup':          [3.0, 2.0, 2.0, 2.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 5.0, 5.0],
+    'mass shooting':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 9.0, 0.0, 2.0, 2.0],
+    'suicide':          [68.0, 50.0, 52.0, 55.0, 72.0, 70.0, 66.0, 76.0, 75.0, 63.0, 47.0, 48.0],
+    'crisis hotline':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+    'overdose symptoms':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 10.0, 9.0],
+    'anxiety attack':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 0.0, 0.0, 3.0, 25.0, 24.0],
+    'teen suicide':          [26.0, 30.0, 22.0, 31.0, 43.0, 50.0, 52.0, 46.0, 41.0, 43.0, 28.0, 27.0],
+    'how to commit suicide':          [21.0, 10.0, 13.0, 25.0, 26.0, 24.0, 19.0, 23.0, 25.0, 21.0, 23.0, 22.0],
+    'fentanyl overdose':          [50.0, 39.0, 48.0, 45.0, 47.0, 48.0, 56.0, 51.0, 59.0, 53.0, 32.0, 31.0],
+    'melatonin overdose':          [13.0, 20.0, 13.0, 15.0, 17.0, 8.0, 12.0, 17.0, 11.0, 16.0, 18.0, 17.0],
+    'Tylenol overdose':          [19.0, 24.0, 19.0, 25.0, 22.0, 22.0, 26.0, 18.0, 25.0, 23.0, 22.0, 22.0],
+    'MultiCare behavioral health':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 2.0],
+    'youth crisis line':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 2.0, 2.0],
   },
-  fetched: '2026-03-22',
+  fetched: '2026-03-24',
 };
 
 const TRENDS_META = {
@@ -4268,6 +4451,8 @@ const TRENDS_META = {
   'fentanyl overdose':   {icon:'🔴',  label:'Fentanyl OD',   lag:'0w',   r:0.25, group:'same', use:'Same-week MH surge corroborator — community opioid crisis activity'},
   'melatonin overdose':  {icon:'🔴',  label:'Melatonin OD',  lag:'0w',   r:0.18, group:'same', use:'Same-week signal — common pediatric intentional ingestion'},
   'MultiCare behavioral health':{icon:'🏥',label:'MultiCare BH',lag:'0w',r:0.25, group:'same', use:'Same-week MH demand — direct health system search intent'},
+  'anxiety attack':      {icon:'😰',label:'Anxiety Attack',lag:'+1w',r:0.27, group:'lead1', use:'MH surge lead 1 week — acute anxiety presentations. WA data.'},
+  'youth crisis line':   {icon:'📞',label:'Youth Crisis',  lag:'+2w',r:0.25, group:'lead', use:'MH surge lead 2 weeks — youth seeking crisis services before ED. National data.'},
 };
 
 function getTrendsData() {
@@ -4370,6 +4555,7 @@ updateGILoad();
 updateMHLoad();
 renderMpedocs();
 renderSurgeDashboard();
+updateEveBuildUI();
 setTimeout(function(){
   var _s=document.getElementById('sc-surge');if(_s)_s.scrollTop=0;
   renderCommunitySignal();
@@ -4489,7 +4675,7 @@ function renderMHTrends() {
 
   var groups = [
     { label: '2–4 Week Lead', color: '#a78bfa', keywords: ['suicide','teen suicide','crisis hotline','mass shooting'] },
-    { label: '1 Week Lead',   color: '#ffd166', keywords: ['overdose symptoms','Tylenol overdose'] },
+    { label: '1 Week Lead',   color: '#ffd166', keywords: ['overdose symptoms','Tylenol overdose','anxiety attack'] },
     { label: 'Same Week',     color: '#00e5c3', keywords: ['how to commit suicide','fentanyl overdose','melatonin overdose','MultiCare behavioral health'] },
   ];
 
