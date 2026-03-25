@@ -848,66 +848,6 @@ to { opacity:1; transform:translateY(0); }
     </div>
   </div>
 
-  <div class="tsec">Yesterday's Respiratory Load</div>
-  <div class="tp">
-    <div class="tph"><div class="tpt">Yesterday's Respiratory Diagnoses</div><div class="tbadge-g">EMPIRICAL · 3yr</div></div>
-    <div class="tpb">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;" id="d-resp-load" style="color:#39d98a;">0</div>
-        <div style="text-align:right;">
-          <div id="resp-load-badge" style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:4px 10px;border-radius:4px;border:1px solid #39d98a;color:#39d98a;">NORMAL</div>
-          <div id="resp-load-desc" style="font-size:9px;color:#8892b0;margin-top:3px;">Mean=28/day  Enter yesterdays count  Watch >=26  Watch >=31  Alert >=38  Elevated >=48  Critical >=57</div>
-        </div>
-      </div>
-      <input type="range" id="resp-load-slider" min="0" max="57" step="1" value="0"
-        style="width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#1a1e30;outline:none;cursor:pointer;margin-bottom:14px;"
-        oninput="onRespSlider(this.value)">
-      <div style="position:relative;height:18px;margin-top:-10px;margin-bottom:8px;">
-        <div style="position:absolute;left:26.7%;top:0;width:2px;height:8px;background:#ffd166;border-radius:1px;"></div>
-        <div style="position:absolute;left:26.7%;top:8px;font-size:7px;color:#ffd166;font-family:'Space Mono',monospace;transform:translateX(-50%);">12</div>
-        <div style="position:absolute;left:44.4%;top:0;width:2px;height:8px;background:#ff9a3c;border-radius:1px;"></div>
-        <div style="position:absolute;left:44.4%;top:8px;font-size:7px;color:#ff9a3c;font-family:'Space Mono',monospace;transform:translateX(-50%);">20</div>
-        <div style="position:absolute;left:66.7%;top:0;width:2px;height:8px;background:#ff4d6d;border-radius:1px;"></div>
-        <div style="position:absolute;left:66.7%;top:8px;font-size:7px;color:#ff4d6d;font-family:'Space Mono',monospace;transform:translateX(-50%);">30</div>
-        <div style="position:absolute;right:0;top:8px;font-size:7px;color:#8892b0;font-family:'Space Mono',monospace;">45</div>
-      </div>
-      <div id="resp-load-forecast" style="font-size:10px;color:#8892b0;line-height:1.6;"></div>
-      <div style="margin-top:6px;font-size:9px;color:#4a5568;line-height:1.5;">
-        Asthma · bronchiolitis · pneumonia · URI · croup · RSV · influenza · otitis ED Dx count from Epic yesterday.
-        Mean=28/day · Enter yesterday's count · Watch ≥18 · Alert ≥25 · Elevated ≥35 · Critical ≥45
-      </div>
-    </div>
-  </div>
-  <div class="tsec">Yesterday's GI Illness Load</div>
-  <div class="tp">
-    <div class="tph"><div class="tpt">Yesterday's GI Chief Complaints</div><div class="tbadge-g">EMPIRICAL · 3yr</div></div>
-    <div class="tpb">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div id="d-gi-load" style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:#39d98a;">0</div>
-        <div style="text-align:right;">
-          <div id="gi-load-badge" style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:4px 10px;border-radius:4px;border:1px solid #39d98a;color:#39d98a;">NORMAL</div>
-          <div id="gi-load-desc" style="font-size:9px;color:#8892b0;margin-top:3px;">Mean=14/day  Enter yesterdays count  Watch >=14  Watch >=16  Alert >=19  Elevated >=22  Critical >=25</div>
-        </div>
-      </div>
-      <input type="range" id="gi-load-slider" min="0" max="25" step="1" value="0"
-        style="width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#1a1e30;outline:none;cursor:pointer;margin-bottom:14px;"
-        oninput="onGISlider(this.value)">
-      <div style="position:relative;height:18px;margin-top:-10px;margin-bottom:8px;">
-        <div style="position:absolute;left:40%;top:0;width:2px;height:8px;background:#ffd166;border-radius:1px;"></div>
-        <div style="position:absolute;left:40%;top:8px;font-size:7px;color:#ffd166;font-family:'Space Mono',monospace;transform:translateX(-50%);">18</div>
-        <div style="position:absolute;left:55.6%;top:0;width:2px;height:8px;background:#ff9a3c;border-radius:1px;"></div>
-        <div style="position:absolute;left:55.6%;top:8px;font-size:7px;color:#ff9a3c;font-family:'Space Mono',monospace;transform:translateX(-50%);">25</div>
-        <div style="position:absolute;left:66.7%;top:0;width:2px;height:8px;background:#ff4d6d;border-radius:1px;"></div>
-        <div style="position:absolute;left:66.7%;top:8px;font-size:7px;color:#ff4d6d;font-family:'Space Mono',monospace;transform:translateX(-50%);">30</div>
-        <div style="position:absolute;right:0;top:8px;font-size:7px;color:#8892b0;font-family:'Space Mono',monospace;">45</div>
-      </div>
-      <div id="gi-load-forecast" style="font-size:10px;color:#8892b0;line-height:1.6;"></div>
-      <div style="margin-top:6px;font-size:9px;color:#4a5568;line-height:1.5;">
-        Gastroenteritis · vomiting · diarrhea · nausea ED Dx count from Epic yesterday.
-        Mean=14/day · Enter yesterday's count · Watch ≥10 · Alert ≥15 · Elevated ≥18 · Critical ≥20
-      </div>
-    </div>
-  </div>
 </div>
 
 
@@ -1169,14 +1109,20 @@ to { opacity:1; transform:translateY(0); }
   </div>
 
   <!-- Empirical Survival Model -->
-  <div class="sdiv">Surge Persistence · Empirical Survival</div>
+  <div class="sdiv">Surge Persistence · Volume-Stratified Survival</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
-      <div><span style="color:#c8cfe8;font-weight:600;">Activation:</span> When surge is confirmed (YES button), the forecast bars switch from the calendar model to empirical survival probabilities.</div>
-      <div><span style="color:#c8cfe8;font-weight:600;">Method:</span> For each confirmed surge hour H at threshold T, P(still surging at H+k) is computed directly from 3-year data (2023–2025, N=146,276 visits). Lookup keyed by confirmed start hour × offset (h+1 through h+8). Minimum n=5 events required per cell; cells below threshold default to 0.</div>
-      <div><span style="color:#c8cfe8;font-weight:600;">Current hour (h+0):</span> Forced to 100% on confirmation. All subsequent bars drawn from the empirical table.</div>
-      <div><span style="color:#c8cfe8;font-weight:600;">Key finding:</span> Surges confirmed at 17:00–19:00 persist 1–3h at 35–50% probability. Surges confirmed at 21:00+ have near-zero persistence — an amber warning fires automatically.</div>
-      <div><span style="color:#c8cfe8;font-weight:600;">Zero-event hours:</span> Some hour/threshold combinations have never occurred in the 3-year dataset (e.g. 02:00–07:00 at t≥10). Confirming a surge at these hours triggers a data-quality warning: <span style="color:#f5a623;">⚠ No prior events at this hour/threshold in 2023–2025 dataset — persistence model has insufficient empirical basis.</span></div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Activation:</span> When surge is confirmed (YES button), forecast bars switch from the calendar model to empirical survival probabilities for h+1 through h+6.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Volume stratification:</span> Survival tables are stratified by arrival volume at the confirmed surge hour relative to the active threshold (t). Staff enter the current hour's arrival count using the "Arrivals This Hour" stepper in Current Status.</div>
+      <div style="margin-top:6px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;margin-bottom:6px;">
+        <span style="color:#ffd166;">LOW</span><span>t to t+1/hr</span><span>Just-threshold surge — shortest persistence (e.g. 30% h+1 at t=10, 18:00 start)</span>
+        <span style="color:#ff9a3c;">MODERATE</span><span>t+2 to t+4/hr</span><span>Moderate surge — intermediate persistence (62% h+1)</span>
+        <span style="color:#ff4d6d;">HIGH</span><span>t+5+/hr</span><span>Strong surge — highest persistence (69% h+1)</span>
+      </div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Statistical basis:</span> ANOVA F=4.25, p=0.0007 across volume bands at onset. Point-biserial r=0.12 (p&lt;0.0001) for vol@onset vs h+1 survival. Analysis of 4,241 surge events (t=10), 2023–2025. Intra-episode ICC=-0.41, confirming independence assumption is conservative (effective n=5,709 &gt; nominal).</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Backtime stepper:</span> Adjust surge start hour back up to 6 hours if surge began earlier than the current hour. Shifting the start hour changes the survival lookup key — earlier starts use their own empirical persistence curves.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Horizon:</span> 6 hours (h+1 through h+6). Beyond h+6, persistence is near zero for all peak-hour starts — bars revert to the calendar model.</div>
+      <div style="margin-top:4px;font-size:9px;color:#4a5568;">Zero-event hours (e.g. 02:00–07:00 at t≥10) fall back to overall survival. Confirming a surge at these hours triggers a data-quality warning. Minimum n=5 events per cell required; cells below threshold default to 0.</div>
     </div>
   </div>
 
@@ -1196,28 +1142,6 @@ to { opacity:1; transform:translateY(0); }
     </div>
   </div>
 
-  <!-- Disease Load Modifiers -->
-  <div class="sdiv">Disease Load Modifiers (Yesterday's ED Dx)</div>
-  <div class="panel">
-    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
-      <div>Staff enter yesterday's ED Dx counts from Epic. Applied as multiplicative modifiers (combined cap ×2.5). Validated via Fisher's exact, lag+1, 3yr data.</div>
-      <div style="margin-top:6px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-family:'Space Mono',monospace;font-size:9px;">
-        <span style="color:#00e5c3;">Resp</span><span style="color:#c8cfe8;">Keywords (8):</span><span>asthma · bronchiolitis · pneumonia · URI · croup · RSV · influenza · otitis</span>
-        <span style="color:#00e5c3;">Resp</span><span style="color:#c8cfe8;">Mean=28/day</span><span>r=+0.39, p&lt;0.0001</span>
-        <span style="color:#00e5c3;">Resp</span><span style="color:#ffd166;">Watch ≥18</span><span>×1.19</span>
-        <span style="color:#00e5c3;">Resp</span><span style="color:#ff9a3c;">Alert ≥25</span><span>×1.35</span>
-        <span style="color:#00e5c3;">Resp</span><span style="color:#ff4d6d;">Elevated ≥35</span><span>×1.59</span>
-        <span style="color:#00e5c3;">Resp</span><span style="color:#ff4d6d;">Critical ≥45</span><span>×1.97</span>
-        <span style="color:#a78bfa;">GI</span><span style="color:#c8cfe8;">Keywords (4):</span><span>gastroenteritis · vomiting · diarrhea · nausea</span>
-        <span style="color:#a78bfa;">GI</span><span style="color:#c8cfe8;">Mean=14/day</span><span>r=+0.23, p&lt;0.0001</span>
-        <span style="color:#a78bfa;">GI</span><span style="color:#ffd166;">Watch ≥10</span><span>×1.17</span>
-        <span style="color:#a78bfa;">GI</span><span style="color:#ff9a3c;">Alert ≥15</span><span>×1.30</span>
-        <span style="color:#a78bfa;">GI</span><span style="color:#ff4d6d;">Elevated ≥18</span><span>×1.46</span>
-        <span style="color:#a78bfa;">GI</span><span style="color:#ff4d6d;">Critical ≥20</span><span>×1.54</span>
-      </div>
-      <div style="margin-top:6px;font-size:9px;color:#4a5568;">URI uses word-boundary match to exclude UTI, dysuria, urticaria. Gastro uses full word "gastroenteritis" to exclude GERD, gastrostomy tube.</div>
-    </div>
-  </div>
 
   <!-- Event Modifiers -->
   <div class="sdiv">Event Modifiers</div>
@@ -1302,25 +1226,46 @@ to { opacity:1; transform:translateY(0); }
   </div>
 
   <!-- Late Night Surge Risk -->
-  <div class="sdiv">Evening Build-up · Late Night Surge Risk</div>
+
+  <!-- Model Decisions -->
+  <!-- 24h Arrivals Forecast -->
+  <div class="sdiv">24-Hour Arrivals Forecast</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
-      <div style="margin-bottom:6px;">Empirical analysis of 22:00 surge events (t=10) across 2023–2025 identified cumulative total arrivals across the 18–21:00 window (all four hours combined, not per-hour) as the strongest actionable real-time predictor of late-night surge. Late-night surges are concentrated in the school year (May 31%, December 25%, April 19%) and essentially absent in summer (July/August 4–8%).</div>
-      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;margin-bottom:8px;">
-        <span style="color:#ffd166;">≥25 arrivals</span><span style="color:#ffd166;">WATCH</span><span>×1.45 modifier on 22:00–23:00 bars — RR=2.54 vs &lt;25 total (p=0.023)</span>
-        <span style="color:#ff9a3c;">≥30 arrivals</span><span style="color:#ff9a3c;">ELEVATED</span><span>×1.80 modifier — RR=2.46 vs &lt;30 total (p&lt;0.0001)</span>
-        <span style="color:#ff4d6d;">≥35 arrivals</span><span style="color:#ff4d6d;">HIGH</span><span>×2.05 modifier — RR=2.05 vs &lt;35 total (p&lt;0.0001)</span>
+      <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Estimates expected hourly arrivals for the next 24 hours, independent of the surge probability model. Bar colors use absolute volume thresholds (green &lt;6, watch 6–8, orange 9–11, red ≥12 arrivals/hr).</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Baseline:</span> DOW × hour empirical median, 2023–2025 (n=146,276 visits). Median preferred over mean — arrival distributions are right-skewed; mean overestimates typical hourly volume. Stratifying by DOW × hour absorbs most variance (ANOVA F=110, p&lt;0.0001 for month effect on residuals).</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Surge probability independence:</span> Tested surge probability as a volume predictor after DOW × hour stratification — r=0.053, ratio 0.96×–1.03× across full surge rate range. Adds no meaningful signal; not used.</div>
+      <div style="margin-top:8px;font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Validated modifiers (all tested against DOW×hour-adjusted arrival ratios)</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 12px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#39d98a;">ILI season</span><span style="color:#c8cfe8;">RR=1.35 peak vs summer</span><span>Live CDC ILI%. Full iliMod applied at full strength.</span>
+        <span style="color:#39d98a;">Summer break</span><span style="color:#c8cfe8;">RR=0.73  p&lt;0.001</span><span>Jun 20 – Sep 1. Strongest school signal.</span>
+        <span style="color:#39d98a;">Winter break</span><span style="color:#c8cfe8;">RR=1.08  p=0.022</span><span>Dec 23 – Jan 3. ILI season elevates, not reduces.</span>
+        <span style="color:#ffd166;">Spring break</span><span style="color:#c8cfe8;">RR=1.04  p=0.189</span><span>Not significant — not applied.</span>
+        <span style="color:#39d98a;">Post-break return</span><span style="color:#c8cfe8;">RR=1.08</span><span>First school day after break.</span>
+        <span style="color:#39d98a;">WA State Fair (same-day)</span><span style="color:#c8cfe8;">RR=0.781  p&lt;0.001</span><span>Crowd displacement. Consistent across both years.</span>
+        <span style="color:#39d98a;">WA State Fair lag +1-7d</span><span style="color:#c8cfe8;">RR=0.894  p=0.002</span><span>Post-fair protective — not a rebound.</span>
+        <span style="color:#39d98a;">Pierce County Fair (same-day)</span><span style="color:#c8cfe8;">RR=0.729  p&lt;0.001</span><span>Strong displacement effect.</span>
+        <span style="color:#39d98a;">Pierce County Fair lag +9-17d</span><span style="color:#c8cfe8;">RR=0.732  p&lt;0.001</span><span>Incubation-period lag still protective.</span>
+        <span style="color:#ffd166;">Spring Fair (Puyallup)</span><span style="color:#c8cfe8;">RR=0.994  p=0.860</span><span>Neutral for volume — not applied.</span>
+        <span style="color:#ffd166;">WIAA Playoffs</span><span style="color:#c8cfe8;">RR=0.96–1.00  p=0.24–0.98</span><span>No volume effect — not applied.</span>
+        <span style="color:#39d98a;">Thanksgiving lag +1-6d</span><span style="color:#c8cfe8;">RR=1.102  p=0.010</span><span>Post-holiday return surge.</span>
+        <span style="color:#39d98a;">New Year lag +1-3d</span><span style="color:#c8cfe8;">RR=1.168  p=0.004</span><span>Strong return effect.</span>
+        <span style="color:#39d98a;">July 4th lag +1-3d</span><span style="color:#c8cfe8;">RR=0.871  p=0.015</span><span>Post-holiday dip.</span>
+        <span style="color:#39d98a;">Labor Day lag +1-2d</span><span style="color:#c8cfe8;">RR=0.745  p=0.002</span><span>Strong post-holiday dip.</span>
+        <span style="color:#39d98a;">Zoolights (Dec)</span><span style="color:#c8cfe8;">RR=1.24  p&lt;0.001</span><span>Residual ×1.08 applied (ILI captures remainder).</span>
+        <span style="color:#39d98a;">Graduation Jun 1–7</span><span style="color:#c8cfe8;">RR=1.10  p=0.019</span><span>Jun 8–20 flat (p=0.21/0.94) — not applied.</span>
+        <span style="color:#4a5568;">Month seasonality</span><span style="color:#4a5568;">F=49  p&lt;0.001</span><span>Residual after ILI — largely double-counts ILI. Not applied.</span>
       </div>
-      <div>The modifier is applied only to the 22:00 and 23:00 forecast bars and only when no surge is already confirmed (survival model takes precedence when YES is active). The input panel is visible at all times but <strong style="color:#c8cfe8;">only activates between 18:00 and 23:00</strong> — outside that window the badge shows "inactive" and bar modifiers are suppressed. The warning card below the 24h forecast is shown only during the active window when a threshold is crossed. The build-up value <strong style="color:#c8cfe8;">auto-resets at midnight</strong> so stale data never carries into the following day. First stepper press jumps to 25 (minimum meaningful threshold); subsequent presses step by 5.</div>
-      <div style="margin-top:6px;font-size:9px;color:#4a5568;">t=15 and t=20 have insufficient late-night event counts (&lt;10 events over 3 years) to support a predictor at those thresholds. The modifier uses t=10 RR values as the empirical basis.</div>
+      <div style="margin-top:6px;font-size:9px;color:#4a5568;">All event RRs derived directly against DOW×hour-adjusted arrival ratios — not borrowed from the surge probability model. Spring Fair and WIAA Playoffs included in surge model but show no volume signal and are excluded here.</div>
     </div>
   </div>
 
-  <!-- Model Decisions -->
   <div class="sdiv">Model Decisions &amp; Exclusions</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
       <div style="display:flex;flex-direction:column;gap:4px;">
+        <div>❌ <span style="color:#c8cfe8;">Respiratory &amp; GI disease load (yesterday's ED Dx)</span> — Modifiers were derived against surge probability but found to be measuring volume autocorrelation (busy days follow busy days), not a disease-specific signal. ILI modifier already captures the respiratory illness signal from a cleaner source. Removed.</div>
+        <div>❌ <span style="color:#c8cfe8;">Evening build-up model (18–21:00 cumulative arrivals)</span> — Designed to warn about late-night surge before confirmation. Base late-night surge rates are too low (13% at 22:00) for the modifier to push bars above WATCH even at HIGH threshold. Staff already observe a busy department directly. Removed as dead weight.</div>
         <div>❌ <span style="color:#c8cfe8;">Weather (same-day)</span> — Multivariate analysis confirmed weather lag effects were confounded by seasonality. Cold/rainy weather co-occurs with respiratory season; once month and ILI are controlled, ΔR²&lt;0.001. The ILI modifier and empirical (hour × DOW × month) heatmap already capture the underlying seasonal signal. Intraday weather timing (e.g. afternoon rain → evening surge) also tested — not significant (RR=1.08, p=0.37).</div>
         <div>❌ <span style="color:#c8cfe8;">Barometric pressure lag</span> — Same confounding mechanism. Pressure changes correlate with storm systems that cluster in winter respiratory season. No independent predictive value after ILI and month controlled.</div>
         <div>❌ <span style="color:#c8cfe8;">Moon phase</span> — No significant effect detected (p=0.31).</div>
@@ -1396,292 +1341,825 @@ function $$(id){var el=document.getElementById(id);return el||_DUMMY_EL;}
 // Surge rate by hour (from 3-year dataset)
 const THRESH_OPTIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 let SURGE_THRESH = 10;  // default — adjustable via slider
-const SURGE_SURVIVAL = {
+var SURGE_VOL = 10;    // arrivals at surge confirmation — informs survival volume band
+const SURGE_SURVIVAL_LOW = {
   "6": {
-    0: {1:0.1194, 2:0.0249, 3:0.005, 4:0.0249, 5:0.01, 6:0.0249, 7:0.0498, 8:0.2239},
-    1: {1:0.0337, 2:0.0337, 3:0.0225, 4:0.0225, 5:0.0112, 6:0.0225, 7:0.2472, 8:0.5618},
-    2: {1:0.0, 2:0.05, 3:0.0, 4:0.05, 5:0.05, 6:0.25, 7:0.3, 8:0.7},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3333, 6:0.5, 7:0.7222, 8:0.7222},
-    4: {1:0.0, 2:0.0, 3:0.1818, 4:0.1818, 5:0.3636, 6:0.7273, 7:0.9091, 8:1.0},
-    5: {1:0.0, 2:0.1667, 3:0.5, 4:0.5, 5:0.6667, 6:0.8333, 7:0.8333, 8:1.0},
-    6: {1:0.0, 2:0.2857, 3:0.4286, 4:0.8571, 5:0.8571, 6:1.0, 7:0.7857, 8:0.7143},
-    7: {1:0.2727, 2:0.6591, 3:0.7273, 4:0.8864, 5:0.8864, 6:0.8409, 7:0.8182, 8:0.75},
-    8: {1:0.6294, 2:0.7513, 3:0.8274, 4:0.802, 5:0.802, 6:0.7868, 7:0.7665, 8:0.8223},
-    9: {1:0.7362, 2:0.8083, 3:0.7761, 4:0.7647, 5:0.7362, 6:0.7704, 7:0.8292, 8:0.8444},
-    10: {1:0.7832, 2:0.7581, 3:0.7448, 4:0.7566, 5:0.7493, 6:0.8142, 7:0.8496, 8:0.8879},
-    11: {1:0.7591, 2:0.7591, 3:0.7201, 4:0.7541, 5:0.7932, 6:0.826, 7:0.8726, 8:0.889},
-    12: {1:0.7324, 2:0.7183, 3:0.7324, 4:0.781, 5:0.8143, 6:0.8656, 7:0.8963, 8:0.8617},
-    13: {1:0.7276, 2:0.725, 3:0.7912, 4:0.8262, 5:0.869, 6:0.8949, 7:0.8781, 8:0.8067},
-    14: {1:0.7481, 2:0.7974, 3:0.8273, 4:0.8766, 5:0.8961, 6:0.8701, 7:0.8065, 8:0.6117},
-    15: {1:0.8, 2:0.8181, 3:0.8645, 4:0.8968, 5:0.8658, 6:0.8065, 7:0.6361, 8:0.3935},
-    16: {1:0.824, 2:0.8743, 3:0.8958, 4:0.8707, 5:0.8132, 6:0.6251, 7:0.3856, 8:0.1894},
-    17: {1:0.8638, 2:0.9016, 3:0.8684, 4:0.8066, 5:0.627, 6:0.3947, 7:0.1888, 8:0.0904},
-    18: {1:0.8982, 2:0.8678, 3:0.8017, 4:0.6121, 5:0.3814, 6:0.18, 7:0.0759, 8:0.0184},
-    19: {1:0.8627, 2:0.7977, 3:0.6226, 4:0.3836, 5:0.1855, 6:0.0786, 7:0.0178, 8:0.0168},
-    20: {1:0.8084, 2:0.6146, 3:0.3854, 4:0.1874, 5:0.0889, 6:0.0203, 7:0.0171, 8:0.0118},
-    21: {1:0.6293, 2:0.388, 3:0.1861, 4:0.0855, 5:0.0208, 6:0.0162, 7:0.0104, 8:0.0058},
-    22: {1:0.4003, 2:0.1934, 3:0.0765, 4:0.018, 5:0.0165, 6:0.009, 7:0.0075, 8:0.0135},
-    23: {1:0.212, 2:0.0916, 3:0.0265, 4:0.0145, 5:0.0096, 6:0.0072, 7:0.0096, 8:0.0458},
+    0: {1:0.1259, 2:0.028, 3:0.007, 4:0.014, 5:0.007, 6:0.028},
+    1: {1:0.0411, 2:0.0274, 3:0.0274, 4:0.0137, 5:0.0137, 6:0.0274},
+    2: {1:0.0, 2:0.05, 3:0.0, 4:0.05, 5:0.05, 6:0.25},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3529, 6:0.4706},
+    4: {1:0.0, 2:0.0, 3:0.1818, 4:0.1818, 5:0.3636, 6:0.7273},
+    5: {1:0.0, 2:0.1667, 3:0.5, 4:0.5, 5:0.6667, 6:0.8333},
+    6: {1:0.0, 2:0.2, 3:0.3, 4:0.8, 5:0.9, 6:1.0},
+    7: {1:0.275, 2:0.675, 3:0.725, 4:0.875, 5:0.875, 6:0.825},
+    8: {1:0.5855, 2:0.7632, 3:0.7961, 4:0.7895, 5:0.7763, 6:0.7829},
+    9: {1:0.6534, 2:0.7653, 3:0.7292, 4:0.7148, 5:0.6643, 6:0.7148},
+    10: {1:0.7222, 2:0.7103, 3:0.6706, 4:0.7302, 5:0.7143, 6:0.7897},
+    11: {1:0.7138, 2:0.7071, 3:0.6902, 4:0.6936, 5:0.7542, 6:0.7778},
+    12: {1:0.6884, 2:0.6703, 3:0.663, 4:0.75, 5:0.8116, 6:0.8659},
+    13: {1:0.6752, 2:0.7044, 3:0.7226, 4:0.7847, 5:0.8504, 6:0.8759},
+    14: {1:0.7482, 2:0.7837, 3:0.8156, 4:0.8369, 5:0.8723, 6:0.8333},
+    15: {1:0.7684, 2:0.7579, 3:0.8175, 4:0.8912, 5:0.8281, 6:0.8105},
+    16: {1:0.7985, 2:0.8555, 3:0.8631, 4:0.8517, 5:0.7909, 6:0.6654},
+    17: {1:0.7959, 2:0.8776, 3:0.8327, 4:0.7796, 5:0.5714, 6:0.4163},
+    18: {1:0.8584, 2:0.8026, 3:0.7468, 4:0.588, 5:0.3648, 6:0.1631},
+    19: {1:0.8051, 2:0.7436, 3:0.5795, 4:0.3538, 5:0.1795, 6:0.0718},
+    20: {1:0.7636, 2:0.5636, 3:0.3773, 4:0.1591, 5:0.1045, 6:0.0182},
+    21: {1:0.6029, 2:0.3529, 3:0.1544, 4:0.0699, 5:0.0221, 6:0.0184},
+    22: {1:0.3519, 2:0.1975, 3:0.0802, 4:0.0185, 5:0.0123, 6:0.0093},
+    23: {1:0.1882, 2:0.0784, 3:0.0353, 4:0.0118, 5:0.0078, 6:0.0039},
   },
   "7": {
-    0: {1:0.0476, 2:0.0095, 3:0.0, 4:0.0, 5:0.0095, 6:0.019, 7:0.0381, 8:0.0857},
-    1: {1:0.025, 2:0.025, 3:0.0, 4:0.025, 5:0.0, 6:0.025, 7:0.175, 8:0.525},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.1429, 5:0.0, 6:0.0, 7:0.1429, 8:0.7143},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3333, 6:0.5556, 7:0.5556, 8:0.6667},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.2857, 3:0.7143, 4:1.0, 5:0.8571, 6:0.5714, 7:0.7143, 8:0.7143},
-    7: {1:0.4118, 2:0.5882, 3:0.6471, 4:0.9412, 5:0.9412, 6:0.5882, 7:0.7647, 8:0.7647},
-    8: {1:0.5094, 2:0.6226, 3:0.7075, 4:0.6887, 5:0.7264, 6:0.6604, 7:0.5943, 8:0.6981},
-    9: {1:0.6763, 2:0.7079, 3:0.6711, 4:0.6737, 5:0.6447, 6:0.6763, 7:0.7342, 8:0.7763},
-    10: {1:0.6477, 2:0.6679, 3:0.6532, 4:0.6477, 5:0.6422, 6:0.7266, 7:0.7761, 8:0.8202},
-    11: {1:0.6477, 2:0.6445, 3:0.6288, 4:0.643, 5:0.7093, 6:0.7551, 7:0.8073, 8:0.8199},
-    12: {1:0.632, 2:0.6242, 3:0.6165, 4:0.6941, 5:0.7329, 6:0.7748, 7:0.8214, 8:0.795},
-    13: {1:0.6313, 2:0.6013, 3:0.7009, 4:0.7547, 5:0.7911, 6:0.8259, 7:0.8149, 8:0.7152},
-    14: {1:0.6244, 2:0.7089, 3:0.7371, 4:0.7793, 5:0.8247, 6:0.8044, 7:0.7136, 8:0.4538},
-    15: {1:0.7168, 2:0.7484, 3:0.8022, 4:0.8196, 5:0.7943, 6:0.7057, 7:0.4731, 8:0.2706},
-    16: {1:0.7344, 2:0.787, 3:0.8133, 4:0.7953, 5:0.7192, 6:0.4495, 7:0.2545, 8:0.1011},
-    17: {1:0.8005, 2:0.8279, 3:0.807, 4:0.6975, 5:0.4628, 6:0.2555, 7:0.1056, 8:0.0469},
-    18: {1:0.8207, 2:0.8024, 3:0.6988, 4:0.4451, 5:0.2512, 6:0.0989, 7:0.033, 8:0.0049},
-    19: {1:0.79, 2:0.6931, 3:0.4562, 4:0.2509, 5:0.098, 6:0.0385, 7:0.0047, 8:0.0082},
-    20: {1:0.7078, 2:0.4572, 3:0.2482, 4:0.101, 5:0.0416, 6:0.0059, 7:0.0107, 8:0.0024},
-    21: {1:0.4579, 2:0.2603, 3:0.1003, 4:0.0414, 5:0.008, 6:0.0094, 7:0.0027, 8:0.0027},
-    22: {1:0.2714, 2:0.1023, 3:0.0376, 4:0.0042, 5:0.0104, 6:0.0042, 7:0.0063, 8:0.0042},
-    23: {1:0.1221, 2:0.0229, 3:0.0115, 4:0.0076, 5:0.0, 6:0.0, 7:0.0076, 8:0.0305},
+    0: {1:0.0253, 2:0.0, 3:0.0, 4:0.0, 5:0.0127, 6:0.0253},
+    1: {1:0.0286, 2:0.0286, 3:0.0, 4:0.0286, 5:0.0, 6:0.0286},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.1429, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.375, 6:0.5},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.4, 3:0.8, 4:1.0, 5:1.0, 6:0.8},
+    7: {1:0.4, 2:0.5333, 3:0.6667, 4:1.0, 5:0.9333, 6:0.6667},
+    8: {1:0.4588, 2:0.6471, 3:0.6941, 4:0.6588, 5:0.7059, 6:0.6824},
+    9: {1:0.5775, 2:0.6526, 3:0.6103, 4:0.615, 5:0.6056, 6:0.6479},
+    10: {1:0.5533, 2:0.5984, 3:0.582, 4:0.5984, 5:0.582, 6:0.7008},
+    11: {1:0.5615, 2:0.5423, 3:0.5962, 4:0.5885, 5:0.65, 6:0.6769},
+    12: {1:0.5876, 2:0.573, 3:0.5985, 4:0.6496, 5:0.6934, 6:0.7299},
+    13: {1:0.5637, 2:0.5598, 3:0.6795, 4:0.7181, 5:0.7529, 6:0.7992},
+    14: {1:0.6066, 2:0.6434, 3:0.6838, 4:0.7206, 5:0.8162, 6:0.7904},
+    15: {1:0.6958, 2:0.7413, 3:0.8007, 4:0.7937, 5:0.7762, 6:0.6923},
+    16: {1:0.7049, 2:0.7465, 3:0.7986, 4:0.7986, 5:0.7292, 6:0.4583},
+    17: {1:0.75, 2:0.8116, 3:0.808, 4:0.6848, 5:0.4457, 6:0.2464},
+    18: {1:0.7918, 2:0.7592, 3:0.6122, 4:0.449, 5:0.2571, 6:0.0939},
+    19: {1:0.7097, 2:0.659, 3:0.4147, 4:0.2627, 5:0.1198, 6:0.0415},
+    20: {1:0.708, 2:0.4088, 3:0.2226, 4:0.0839, 5:0.0438, 6:0.0},
+    21: {1:0.4385, 2:0.2757, 3:0.0767, 4:0.04, 5:0.01, 6:0.01},
+    22: {1:0.2823, 2:0.0887, 3:0.0323, 4:0.0, 5:0.0081, 6:0.0081},
+    23: {1:0.0809, 2:0.0173, 3:0.0116, 4:0.0058, 5:0.0, 6:0.0},
   },
   "8": {
-    0: {1:0.0175, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0175},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.125, 8:0.3125},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.4444, 2:0.5333, 3:0.6444, 4:0.5556, 5:0.6444, 6:0.5556, 7:0.4667, 8:0.6222},
-    9: {1:0.632, 2:0.608, 3:0.592, 4:0.628, 5:0.556, 6:0.608, 7:0.64, 8:0.736},
-    10: {1:0.5657, 2:0.5728, 3:0.5469, 4:0.5399, 5:0.5423, 6:0.5775, 7:0.6808, 8:0.7347},
-    11: {1:0.5625, 2:0.5504, 3:0.506, 4:0.5403, 5:0.6109, 6:0.6714, 7:0.7137, 8:0.75},
-    12: {1:0.5386, 2:0.4871, 3:0.5188, 4:0.5624, 5:0.6218, 6:0.6752, 7:0.7465, 8:0.699},
-    13: {1:0.5151, 2:0.4829, 3:0.5634, 4:0.6499, 5:0.6881, 6:0.7485, 7:0.7344, 8:0.5996},
-    14: {1:0.4959, 2:0.5615, 3:0.6414, 4:0.6885, 5:0.7459, 6:0.7029, 7:0.5758, 8:0.3361},
-    15: {1:0.598, 2:0.6429, 3:0.6959, 4:0.7327, 5:0.7061, 6:0.5857, 7:0.3429, 8:0.1776},
-    16: {1:0.6294, 2:0.6836, 3:0.7517, 4:0.7203, 5:0.5769, 6:0.3147, 7:0.1608, 8:0.0594},
-    17: {1:0.7059, 2:0.744, 3:0.6932, 4:0.5755, 5:0.3307, 6:0.1526, 7:0.0604, 8:0.0223},
-    18: {1:0.7522, 2:0.7, 3:0.5681, 4:0.3159, 5:0.1478, 6:0.0566, 7:0.016, 8:0.0},
-    19: {1:0.6904, 2:0.5652, 3:0.3347, 4:0.1647, 5:0.0553, 6:0.0171, 7:0.0, 8:0.0013},
-    20: {1:0.5714, 2:0.3431, 3:0.1527, 4:0.0644, 5:0.0182, 6:0.0, 7:0.0014, 8:0.0},
-    21: {1:0.3485, 2:0.1566, 3:0.0624, 4:0.0185, 5:0.0, 6:0.0017, 7:0.0, 8:0.0},
-    22: {1:0.1778, 2:0.0554, 3:0.0117, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0058},
-    23: {1:0.1062, 2:0.0125, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0063, 8:0.0125},
+    0: {1:0.0217, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.4054, 2:0.5405, 3:0.6486, 4:0.5135, 5:0.6486, 6:0.5676},
+    9: {1:0.5481, 2:0.5481, 3:0.5704, 4:0.6074, 5:0.5556, 6:0.5481},
+    10: {1:0.4846, 2:0.533, 3:0.4626, 4:0.4934, 5:0.4758, 6:0.4802},
+    11: {1:0.4889, 2:0.4844, 3:0.4844, 4:0.4844, 5:0.5911, 6:0.6},
+    12: {1:0.4936, 2:0.4809, 3:0.4723, 4:0.5064, 5:0.5532, 6:0.6553},
+    13: {1:0.444, 2:0.4224, 3:0.5431, 4:0.6121, 5:0.6293, 6:0.7155},
+    14: {1:0.4391, 2:0.4957, 3:0.5739, 4:0.6348, 5:0.713, 6:0.6696},
+    15: {1:0.5622, 2:0.5944, 3:0.6667, 4:0.7108, 5:0.6827, 6:0.5823},
+    16: {1:0.5885, 2:0.6346, 3:0.7308, 4:0.7115, 5:0.5269, 6:0.3038},
+    17: {1:0.6732, 2:0.7165, 3:0.7008, 4:0.5512, 5:0.311, 6:0.1102},
+    18: {1:0.7004, 2:0.664, 3:0.5385, 4:0.332, 5:0.1579, 6:0.0648},
+    19: {1:0.6074, 2:0.5124, 3:0.3554, 4:0.157, 5:0.0496, 6:0.0289},
+    20: {1:0.5506, 2:0.3221, 3:0.1124, 4:0.0712, 5:0.0187, 6:0.0},
+    21: {1:0.3272, 2:0.1324, 3:0.048, 4:0.0148, 5:0.0, 6:0.0},
+    22: {1:0.199, 2:0.0547, 3:0.005, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0603, 2:0.0086, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "9": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.4286, 2:0.4286, 3:0.5714, 4:0.5238, 5:0.5238, 6:0.2857, 7:0.4286, 8:0.5714},
-    9: {1:0.5269, 2:0.5389, 3:0.4671, 4:0.5269, 5:0.4611, 6:0.4671, 7:0.485, 8:0.6347},
-    10: {1:0.505, 2:0.4751, 3:0.4651, 4:0.4419, 5:0.4086, 6:0.5083, 7:0.5681, 8:0.6678},
-    11: {1:0.4638, 2:0.4638, 3:0.4129, 4:0.4209, 5:0.4745, 6:0.5791, 7:0.6327, 8:0.6622},
-    12: {1:0.4243, 2:0.4054, 3:0.3892, 4:0.4703, 5:0.5297, 6:0.5919, 7:0.6486, 8:0.5757},
-    13: {1:0.4155, 2:0.3592, 3:0.4316, 4:0.5389, 5:0.6032, 6:0.6622, 7:0.6032, 8:0.4826},
-    14: {1:0.3706, 2:0.4741, 3:0.5586, 4:0.6349, 5:0.6512, 6:0.5886, 7:0.4578, 8:0.2452},
-    15: {1:0.4942, 2:0.5231, 3:0.6185, 4:0.6647, 5:0.604, 6:0.4277, 7:0.2254, 8:0.1243},
-    16: {1:0.5057, 2:0.5954, 3:0.6529, 4:0.5862, 5:0.4506, 6:0.2046, 7:0.0989, 8:0.0276},
-    17: {1:0.6069, 2:0.6517, 3:0.5499, 4:0.4318, 5:0.2301, 6:0.11, 7:0.0265, 8:0.0081},
-    18: {1:0.6609, 2:0.5774, 3:0.4417, 4:0.2209, 5:0.0748, 6:0.0261, 7:0.0052, 8:0.0},
-    19: {1:0.5719, 2:0.4359, 3:0.2281, 4:0.0828, 5:0.0219, 6:0.0047, 7:0.0, 8:0.0016},
-    20: {1:0.4225, 2:0.2324, 3:0.088, 4:0.0282, 5:0.0035, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.2411, 2:0.0804, 3:0.029, 4:0.0067, 5:0.0, 6:0.0022, 7:0.0, 8:0.0},
-    22: {1:0.0952, 2:0.0303, 3:0.0087, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0043},
-    23: {1:0.0562, 2:0.0112, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0112, 8:0.0112},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.4118, 2:0.4118, 3:0.5882, 4:0.4706, 5:0.5882, 6:0.2941},
+    9: {1:0.5269, 2:0.5054, 3:0.4731, 4:0.5699, 5:0.4731, 6:0.4194},
+    10: {1:0.4182, 2:0.4061, 3:0.4424, 4:0.4303, 5:0.303, 6:0.4485},
+    11: {1:0.4012, 2:0.4244, 3:0.3895, 4:0.4244, 5:0.4012, 6:0.5291},
+    12: {1:0.3598, 2:0.3704, 3:0.3704, 4:0.4286, 5:0.4921, 6:0.5238},
+    13: {1:0.342, 2:0.3057, 3:0.4145, 4:0.4611, 5:0.5285, 6:0.6477},
+    14: {1:0.3093, 2:0.4433, 3:0.5103, 4:0.6289, 5:0.6082, 6:0.5258},
+    15: {1:0.4624, 2:0.5108, 3:0.5806, 4:0.6344, 5:0.5591, 6:0.4194},
+    16: {1:0.4464, 2:0.5923, 3:0.6524, 4:0.5622, 5:0.4292, 6:0.1845},
+    17: {1:0.5658, 2:0.6053, 3:0.5044, 4:0.4167, 5:0.2588, 6:0.1009},
+    18: {1:0.5991, 2:0.5639, 3:0.4361, 4:0.2203, 5:0.0749, 6:0.0265},
+    19: {1:0.5267, 2:0.3745, 3:0.2263, 4:0.07, 5:0.0288, 6:0.0082},
+    20: {1:0.3766, 2:0.2294, 3:0.0606, 4:0.0087, 5:0.0043, 6:0.0},
+    21: {1:0.2155, 2:0.0647, 3:0.0216, 4:0.0043, 5:0.0, 6:0.0},
+    22: {1:0.0927, 2:0.0397, 3:0.0066, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0441, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "10": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.25, 2:0.375, 3:0.375, 4:0.75, 5:0.375, 6:0.375, 7:0.5, 8:0.625},
-    9: {1:0.3652, 2:0.487, 3:0.3652, 4:0.3652, 5:0.3565, 6:0.3826, 7:0.4348, 8:0.487},
-    10: {1:0.4271, 2:0.4121, 3:0.407, 4:0.3869, 5:0.3618, 6:0.4422, 7:0.5126, 8:0.5578},
-    11: {1:0.3875, 2:0.3506, 3:0.3358, 4:0.2989, 5:0.3875, 6:0.4539, 7:0.5166, 8:0.5978},
-    12: {1:0.3556, 2:0.3259, 3:0.3111, 4:0.3667, 5:0.4296, 6:0.4963, 7:0.5556, 8:0.4407},
-    13: {1:0.3509, 2:0.283, 3:0.3774, 4:0.4491, 5:0.5208, 6:0.6113, 7:0.4906, 8:0.3811},
-    14: {1:0.3023, 2:0.4031, 3:0.438, 4:0.4922, 5:0.5814, 6:0.531, 7:0.345, 8:0.1395},
-    15: {1:0.3817, 2:0.4108, 3:0.4855, 4:0.5726, 5:0.4979, 6:0.3112, 7:0.1535, 8:0.0747},
-    16: {1:0.4327, 2:0.4872, 3:0.5737, 4:0.4936, 5:0.3622, 6:0.1186, 7:0.0577, 8:0.0096},
-    17: {1:0.496, 2:0.5707, 3:0.4453, 4:0.3307, 5:0.136, 6:0.0533, 7:0.0107, 8:0.0027},
-    18: {1:0.5801, 2:0.4673, 3:0.3138, 4:0.14, 5:0.0339, 6:0.0113, 7:0.0023, 8:0.0},
-    19: {1:0.4874, 2:0.3366, 3:0.1644, 4:0.0503, 5:0.0116, 6:0.0, 7:0.0, 8:0.0},
-    20: {1:0.3244, 2:0.1544, 3:0.0515, 4:0.0157, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.1646, 2:0.0497, 3:0.0124, 4:0.0031, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    22: {1:0.0423, 2:0.0141, 3:0.007, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    23: {1:0.0227, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.1667, 2:0.5, 3:0.5, 4:0.8333, 5:0.5, 6:0.3333},
+    9: {1:0.3582, 2:0.4776, 3:0.403, 4:0.4328, 5:0.3134, 6:0.3731},
+    10: {1:0.3879, 2:0.3448, 3:0.4138, 4:0.3276, 5:0.3707, 6:0.431},
+    11: {1:0.2971, 2:0.3261, 3:0.2971, 4:0.2826, 5:0.3116, 6:0.3986},
+    12: {1:0.3203, 2:0.3137, 3:0.2876, 4:0.3072, 5:0.3791, 6:0.5033},
+    13: {1:0.2792, 2:0.2597, 3:0.3636, 4:0.3896, 5:0.4805, 6:0.6039},
+    14: {1:0.2847, 2:0.3681, 3:0.3958, 4:0.5208, 5:0.5556, 6:0.4931},
+    15: {1:0.3264, 2:0.4236, 3:0.5, 4:0.5972, 5:0.4444, 6:0.2847},
+    16: {1:0.3989, 2:0.4973, 3:0.5738, 4:0.4645, 5:0.3388, 6:0.1311},
+    17: {1:0.4474, 2:0.5263, 3:0.4316, 4:0.3158, 5:0.1474, 6:0.0474},
+    18: {1:0.5075, 2:0.4422, 3:0.3166, 4:0.1307, 5:0.0352, 6:0.0101},
+    19: {1:0.4667, 2:0.2844, 3:0.1644, 4:0.0356, 5:0.0178, 6:0.0},
+    20: {1:0.303, 2:0.1414, 3:0.0505, 4:0.0051, 5:0.0, 6:0.0},
+    21: {1:0.1582, 2:0.0408, 3:0.0051, 4:0.0051, 5:0.0, 6:0.0},
+    22: {1:0.0485, 2:0.0194, 3:0.0097, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "11": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    9: {1:0.3108, 2:0.3919, 3:0.2973, 4:0.2703, 5:0.2568, 6:0.2432, 7:0.2973, 8:0.473},
-    10: {1:0.3603, 2:0.3235, 3:0.3015, 4:0.3015, 5:0.3162, 6:0.3456, 7:0.4559, 8:0.4779},
-    11: {1:0.3085, 2:0.2637, 3:0.2438, 4:0.1891, 5:0.2687, 6:0.3483, 7:0.4527, 8:0.5075},
-    12: {1:0.2597, 2:0.2541, 3:0.1768, 4:0.2818, 5:0.3591, 6:0.4807, 7:0.4862, 8:0.3591},
-    13: {1:0.2833, 2:0.2111, 3:0.2556, 4:0.4056, 5:0.4222, 6:0.5389, 7:0.4056, 8:0.2778},
-    14: {1:0.2197, 2:0.3064, 3:0.3757, 4:0.3584, 5:0.4798, 6:0.422, 7:0.2486, 8:0.0983},
-    15: {1:0.2562, 2:0.35, 3:0.3937, 4:0.525, 5:0.4062, 6:0.25, 7:0.0813, 8:0.0187},
-    16: {1:0.3465, 2:0.4059, 3:0.4406, 4:0.3614, 5:0.2475, 6:0.0743, 7:0.0347, 8:0.0099},
-    17: {1:0.4106, 2:0.4867, 3:0.3802, 4:0.2243, 5:0.0608, 6:0.0342, 7:0.0038, 8:0.0},
-    18: {1:0.4828, 2:0.3563, 3:0.2184, 4:0.0776, 5:0.0115, 6:0.0, 7:0.0029, 8:0.0},
-    19: {1:0.3678, 2:0.2519, 3:0.0882, 4:0.0252, 5:0.005, 6:0.0, 7:0.0, 8:0.0},
-    20: {1:0.2226, 2:0.089, 3:0.0297, 4:0.0059, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.1157, 2:0.0278, 3:0.0, 4:0.0046, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    22: {1:0.0375, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    23: {1:0.0476, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.3095, 2:0.4762, 3:0.3571, 4:0.3333, 5:0.2619, 6:0.2619},
+    10: {1:0.439, 2:0.2927, 3:0.3049, 4:0.2561, 5:0.3902, 6:0.3537},
+    11: {1:0.24, 2:0.232, 3:0.184, 4:0.168, 5:0.224, 6:0.296},
+    12: {1:0.2477, 2:0.211, 3:0.1651, 4:0.2844, 5:0.3119, 6:0.5138},
+    13: {1:0.2241, 2:0.1897, 3:0.2414, 4:0.4052, 5:0.4052, 6:0.5345},
+    14: {1:0.2054, 2:0.2679, 3:0.3661, 4:0.3571, 5:0.4554, 6:0.4107},
+    15: {1:0.2255, 2:0.3627, 3:0.4118, 4:0.5098, 5:0.402, 6:0.2353},
+    16: {1:0.2952, 2:0.4, 3:0.4571, 4:0.3429, 5:0.2476, 6:0.0857},
+    17: {1:0.3333, 2:0.4524, 3:0.373, 4:0.2302, 5:0.0873, 6:0.0317},
+    18: {1:0.452, 2:0.3107, 3:0.209, 4:0.0791, 5:0.0056, 6:0.0},
+    19: {1:0.3371, 2:0.2022, 3:0.0955, 4:0.0112, 5:0.0056, 6:0.0},
+    20: {1:0.2, 2:0.0889, 3:0.0278, 4:0.0056, 5:0.0, 6:0.0},
+    21: {1:0.125, 2:0.0294, 3:0.0, 4:0.0074, 5:0.0, 6:0.0},
+    22: {1:0.05, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "12": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    9: {1:0.1875, 2:0.2708, 3:0.1042, 4:0.125, 5:0.2083, 6:0.125, 7:0.25, 8:0.375},
-    10: {1:0.2771, 2:0.2771, 3:0.2169, 4:0.241, 5:0.1205, 6:0.3012, 7:0.3614, 8:0.3735},
-    11: {1:0.2707, 2:0.1805, 3:0.1955, 4:0.1353, 5:0.2105, 6:0.3008, 7:0.3459, 8:0.4962},
-    12: {1:0.2137, 2:0.2051, 3:0.1538, 4:0.2137, 5:0.2821, 6:0.3504, 7:0.3675, 8:0.2479},
-    13: {1:0.2162, 2:0.1441, 3:0.2252, 4:0.3153, 5:0.3514, 6:0.4775, 7:0.2883, 8:0.1802},
-    14: {1:0.1316, 2:0.193, 3:0.2368, 4:0.2982, 5:0.4386, 6:0.3158, 7:0.1053, 8:0.0526},
-    15: {1:0.2062, 2:0.2165, 3:0.2268, 4:0.3918, 5:0.2784, 6:0.1649, 7:0.0412, 8:0.0206},
-    16: {1:0.3178, 2:0.2946, 3:0.3411, 4:0.2791, 5:0.155, 6:0.031, 7:0.031, 8:0.0},
-    17: {1:0.3622, 2:0.3838, 3:0.2919, 4:0.1459, 5:0.0162, 6:0.027, 7:0.0, 8:0.0},
-    18: {1:0.4139, 2:0.3033, 3:0.1189, 4:0.0369, 5:0.0041, 6:0.0, 7:0.0, 8:0.0},
-    19: {1:0.2808, 2:0.1678, 3:0.0582, 4:0.0205, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    20: {1:0.1566, 2:0.0482, 3:0.0201, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.0794, 2:0.0159, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.1515, 2:0.3333, 3:0.0606, 4:0.1515, 5:0.1212, 6:0.1515},
+    10: {1:0.3019, 2:0.283, 3:0.2264, 4:0.2075, 5:0.1698, 6:0.3208},
+    11: {1:0.2152, 2:0.1392, 3:0.1772, 4:0.1266, 5:0.1899, 6:0.2278},
+    12: {1:0.1884, 2:0.1739, 3:0.1304, 4:0.2029, 5:0.2319, 6:0.3043},
+    13: {1:0.1831, 2:0.1127, 3:0.1972, 4:0.338, 5:0.3662, 6:0.4648},
+    14: {1:0.1519, 2:0.1646, 3:0.2658, 4:0.2532, 5:0.4177, 6:0.3165},
+    15: {1:0.2131, 2:0.1803, 3:0.1967, 4:0.3443, 5:0.2131, 6:0.1475},
+    16: {1:0.2027, 2:0.3649, 3:0.3243, 4:0.3108, 5:0.1486, 6:0.0135},
+    17: {1:0.3113, 2:0.4057, 3:0.2642, 4:0.1415, 5:0.0094, 6:0.0094},
+    18: {1:0.378, 2:0.2677, 3:0.1181, 4:0.0315, 5:0.0079, 6:0.0},
+    19: {1:0.3043, 2:0.1522, 3:0.0435, 4:0.0217, 5:0.0, 6:0.0},
+    20: {1:0.1513, 2:0.0526, 3:0.0263, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.1013, 2:0.0127, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "13": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    9: {1:0.0938, 2:0.1562, 3:0.125, 4:0.0312, 5:0.0938, 6:0.0312, 7:0.1875, 8:0.3125},
-    10: {1:0.1296, 2:0.1481, 3:0.1111, 4:0.1111, 5:0.037, 6:0.1852, 7:0.2407, 8:0.2407},
-    11: {1:0.1974, 2:0.1053, 3:0.1053, 4:0.1184, 5:0.2237, 6:0.2632, 7:0.25, 8:0.4474},
-    12: {1:0.1111, 2:0.1667, 3:0.1111, 4:0.1389, 5:0.2361, 6:0.25, 7:0.3472, 8:0.1667},
-    13: {1:0.1562, 2:0.0938, 3:0.1875, 4:0.1562, 5:0.2656, 6:0.4062, 7:0.2344, 8:0.1562},
-    14: {1:0.0656, 2:0.1639, 3:0.1639, 4:0.2623, 5:0.377, 6:0.2459, 7:0.0984, 8:0.0328},
-    15: {1:0.1552, 2:0.1897, 3:0.2069, 4:0.3621, 5:0.1552, 6:0.1034, 7:0.0, 8:0.0172},
-    16: {1:0.2784, 2:0.2062, 3:0.2577, 4:0.1753, 5:0.0825, 6:0.0, 7:0.0206, 8:0.0},
-    17: {1:0.2993, 2:0.3066, 3:0.1971, 4:0.0949, 5:0.0, 6:0.0219, 7:0.0, 8:0.0},
-    18: {1:0.3041, 2:0.2339, 3:0.0877, 4:0.0292, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    19: {1:0.1872, 2:0.1142, 3:0.0411, 4:0.0228, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    20: {1:0.1083, 2:0.0318, 3:0.0255, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.05, 2:0.0125, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.0455, 2:0.1364, 3:0.0909, 4:0.0455, 5:0.0455, 6:0.0455},
+    10: {1:0.1176, 2:0.1176, 3:0.1176, 4:0.1176, 5:0.0294, 6:0.1176},
+    11: {1:0.1707, 2:0.0244, 3:0.0732, 4:0.0976, 5:0.2195, 6:0.2195},
+    12: {1:0.0833, 2:0.1389, 3:0.0556, 4:0.1389, 5:0.1944, 6:0.2222},
+    13: {1:0.1842, 2:0.0263, 3:0.2105, 4:0.1842, 5:0.2368, 6:0.4211},
+    14: {1:0.0789, 2:0.1842, 3:0.2105, 4:0.2105, 5:0.3684, 6:0.2632},
+    15: {1:0.1463, 2:0.1951, 3:0.2195, 4:0.2927, 5:0.1463, 6:0.0976},
+    16: {1:0.1639, 2:0.2951, 3:0.2131, 4:0.1803, 5:0.0656, 6:0.0},
+    17: {1:0.1923, 2:0.3462, 3:0.1538, 4:0.0897, 5:0.0, 6:0.0},
+    18: {1:0.2828, 2:0.2323, 3:0.0808, 4:0.0505, 5:0.0, 6:0.0},
+    19: {1:0.1783, 2:0.0853, 3:0.031, 4:0.0233, 5:0.0, 6:0.0},
+    20: {1:0.1122, 2:0.0408, 3:0.0408, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0702, 2:0.0175, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "14": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    9: {1:0.0667, 2:0.1333, 3:0.1333, 4:0.0, 5:0.0667, 6:0.0, 7:0.0667, 8:0.4},
-    10: {1:0.1, 2:0.1333, 3:0.0333, 4:0.0667, 5:0.0, 6:0.1667, 7:0.1333, 8:0.1667},
-    11: {1:0.1296, 2:0.0741, 3:0.037, 4:0.0556, 5:0.1481, 6:0.2222, 7:0.2037, 8:0.2778},
-    12: {1:0.0625, 2:0.0417, 3:0.1458, 4:0.0625, 5:0.2708, 6:0.2917, 7:0.2917, 8:0.1042},
-    13: {1:0.1, 2:0.075, 3:0.15, 4:0.125, 5:0.175, 6:0.325, 7:0.15, 8:0.125},
-    14: {1:0.0286, 2:0.1429, 3:0.0857, 4:0.1714, 5:0.2286, 6:0.1429, 7:0.0857, 8:0.0},
-    15: {1:0.1111, 2:0.1111, 3:0.1944, 4:0.3333, 5:0.1389, 6:0.0556, 7:0.0, 8:0.0},
-    16: {1:0.2364, 2:0.1091, 3:0.2727, 4:0.0727, 5:0.0545, 6:0.0, 7:0.0364, 8:0.0},
-    17: {1:0.2911, 2:0.2152, 3:0.1266, 4:0.0633, 5:0.0, 6:0.038, 7:0.0, 8:0.0},
-    18: {1:0.2308, 2:0.1453, 3:0.0598, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    19: {1:0.0844, 2:0.0844, 3:0.013, 4:0.013, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    20: {1:0.0825, 2:0.0103, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.0213, 2:0.0213, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.1111, 2:0.1111, 3:0.2222, 4:0.0, 5:0.1111, 6:0.0},
+    10: {1:0.1333, 2:0.0667, 3:0.0, 4:0.0667, 5:0.0, 6:0.1333},
+    11: {1:0.1333, 2:0.0667, 3:0.0333, 4:0.0333, 5:0.1667, 6:0.2333},
+    12: {1:0.0, 2:0.0435, 3:0.087, 4:0.0435, 5:0.2609, 6:0.3478},
+    13: {1:0.1379, 2:0.069, 3:0.1379, 4:0.1379, 5:0.1724, 6:0.2759},
+    14: {1:0.0435, 2:0.1739, 3:0.0435, 4:0.1739, 5:0.2609, 6:0.087},
+    15: {1:0.12, 2:0.16, 3:0.24, 4:0.24, 5:0.12, 6:0.0},
+    16: {1:0.2286, 2:0.1714, 3:0.2571, 4:0.0571, 5:0.0857, 6:0.0},
+    17: {1:0.2162, 2:0.2703, 3:0.1351, 4:0.027, 5:0.0, 6:0.027},
+    18: {1:0.2267, 2:0.1067, 3:0.0533, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.0606, 2:0.0707, 3:0.0101, 4:0.0, 5:0.0, 6:0.0},
+    20: {1:0.1045, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0294, 2:0.0294, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
   "15": {
-    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    9: {1:0.1, 2:0.1, 3:0.1, 4:0.0, 5:0.1, 6:0.0, 7:0.0, 8:0.2},
-    10: {1:0.1, 2:0.2, 3:0.05, 4:0.0, 5:0.0, 6:0.2, 7:0.15, 8:0.1},
-    11: {1:0.1429, 2:0.0857, 3:0.0286, 4:0.0571, 5:0.1143, 6:0.2286, 7:0.1429, 8:0.2857},
-    12: {1:0.0833, 2:0.0278, 3:0.0278, 4:0.0556, 5:0.25, 6:0.1667, 7:0.1944, 8:0.1111},
-    13: {1:0.0385, 2:0.1154, 3:0.0769, 4:0.0769, 5:0.1154, 6:0.2308, 7:0.1154, 8:0.0385},
-    14: {1:0.0, 2:0.0435, 3:0.0435, 4:0.1739, 5:0.2174, 6:0.087, 7:0.1304, 8:0.0},
-    15: {1:0.0, 2:0.0, 3:0.0588, 4:0.2941, 5:0.0, 6:0.1176, 7:0.0, 8:0.0},
-    16: {1:0.2222, 2:0.0, 3:0.2222, 4:0.0, 5:0.0556, 6:0.0, 7:0.0, 8:0.0},
-    17: {1:0.1864, 2:0.0847, 3:0.0847, 4:0.0339, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    18: {1:0.0972, 2:0.0972, 3:0.0417, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    19: {1:0.0667, 2:0.0556, 3:0.0111, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    20: {1:0.0, 2:0.0169, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
-    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0, 7:0.0, 8:0.0},
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.1429, 2:0.1429, 3:0.1429, 4:0.0, 5:0.1429, 6:0.0},
+    10: {1:0.1667, 2:0.25, 3:0.0, 4:0.0, 5:0.0, 6:0.25},
+    11: {1:0.1364, 2:0.0455, 3:0.0455, 4:0.0, 5:0.1818, 6:0.1818},
+    12: {1:0.087, 2:0.0435, 3:0.0435, 4:0.0435, 5:0.2174, 6:0.2609},
+    13: {1:0.0526, 2:0.1053, 3:0.0526, 4:0.1053, 5:0.1053, 6:0.2105},
+    14: {1:0.0, 2:0.0556, 3:0.0, 4:0.2222, 5:0.2778, 6:0.0556},
+    15: {1:0.0, 2:0.0, 3:0.0, 4:0.3333, 5:0.0, 6:0.1333},
+    16: {1:0.2593, 2:0.0, 3:0.2593, 4:0.0, 5:0.0741, 6:0.0},
+    17: {1:0.1176, 2:0.0294, 3:0.0882, 4:0.0588, 5:0.0, 6:0.0},
+    18: {1:0.1224, 2:0.0816, 3:0.0408, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.0536, 2:0.0179, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    20: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
   },
 };
-// Hours with zero confirmed surge events in 3yr dataset (2023-2025) by threshold
-// Persistence model has no empirical basis for these hour/threshold combinations
+
+const SURGE_SURVIVAL_MID = {
+  "6": {
+    0: {1:0.0926, 2:0.0185, 3:0.0, 4:0.0556, 5:0.0, 6:0.0185},
+    1: {1:0.0, 2:0.0667, 3:0.0, 4:0.0667, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.05, 3:0.0, 4:0.05, 5:0.05, 6:0.25},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3333, 6:0.5},
+    4: {1:0.0, 2:0.0, 3:0.1818, 4:0.1818, 5:0.3636, 6:0.7273},
+    5: {1:0.0, 2:0.1667, 3:0.5, 4:0.5, 5:0.6667, 6:0.8333},
+    6: {1:0.0, 2:0.2857, 3:0.4286, 4:0.8571, 5:0.8571, 6:1.0},
+    7: {1:0.2727, 2:0.6591, 3:0.7273, 4:0.8864, 5:0.8864, 6:0.8409},
+    8: {1:0.7805, 2:0.7317, 3:0.9512, 4:0.8537, 5:0.9024, 6:0.7805},
+    9: {1:0.7898, 2:0.8352, 3:0.8409, 4:0.8125, 5:0.8352, 6:0.8466},
+    10: {1:0.7793, 2:0.7828, 3:0.7483, 4:0.7724, 5:0.7379, 6:0.8},
+    11: {1:0.7458, 2:0.7559, 3:0.7051, 4:0.7525, 5:0.7763, 6:0.8305},
+    12: {1:0.713, 2:0.7346, 3:0.7562, 4:0.7562, 5:0.7809, 6:0.8333},
+    13: {1:0.7129, 2:0.694, 3:0.8139, 4:0.8297, 5:0.8675, 6:0.9022},
+    14: {1:0.7143, 2:0.7778, 3:0.7905, 4:0.8889, 5:0.9016, 6:0.8952},
+    15: {1:0.8091, 2:0.8455, 3:0.897, 4:0.8848, 5:0.8758, 6:0.803},
+    16: {1:0.8, 2:0.8757, 3:0.9081, 4:0.8622, 5:0.7919, 6:0.6054},
+    17: {1:0.8579, 2:0.9071, 3:0.8743, 4:0.8169, 5:0.6475, 6:0.3579},
+    18: {1:0.883, 2:0.8772, 3:0.8129, 4:0.6111, 5:0.3567, 6:0.1965},
+    19: {1:0.8481, 2:0.7707, 3:0.6492, 4:0.395, 5:0.2017, 6:0.0801},
+    20: {1:0.7984, 2:0.6366, 3:0.3475, 4:0.1804, 5:0.0875, 6:0.0106},
+    21: {1:0.6349, 2:0.4101, 3:0.1989, 4:0.1008, 5:0.0159, 6:0.0186},
+    22: {1:0.4525, 2:0.2129, 3:0.076, 4:0.0228, 5:0.019, 6:0.0114},
+    23: {1:0.2374, 2:0.0935, 3:0.0072, 4:0.0216, 5:0.0144, 6:0.0072},
+  },
+  "7": {
+    0: {1:0.1154, 2:0.0385, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.1429, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3333, 6:0.5556},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.2857, 3:0.7143, 4:1.0, 5:0.8571, 6:0.5714},
+    7: {1:0.4118, 2:0.5882, 3:0.6471, 4:0.9412, 5:0.9412, 6:0.5882},
+    8: {1:0.7368, 2:0.5263, 3:0.7895, 4:0.8421, 5:0.8947, 6:0.5263},
+    9: {1:0.7899, 2:0.7647, 3:0.7647, 4:0.7731, 5:0.7227, 6:0.7227},
+    10: {1:0.7064, 2:0.6972, 3:0.6835, 4:0.6835, 5:0.656, 6:0.7248},
+    11: {1:0.6458, 2:0.6792, 3:0.6125, 4:0.65, 5:0.7083, 6:0.7875},
+    12: {1:0.6482, 2:0.6798, 3:0.6206, 4:0.6996, 5:0.7352, 6:0.7787},
+    13: {1:0.645, 2:0.5916, 3:0.6947, 4:0.7519, 5:0.7939, 6:0.8282},
+    14: {1:0.6008, 2:0.747, 3:0.751, 4:0.8103, 5:0.8379, 6:0.8103},
+    15: {1:0.7108, 2:0.755, 3:0.7992, 4:0.8394, 5:0.7992, 6:0.7149},
+    16: {1:0.7222, 2:0.7941, 3:0.8203, 4:0.768, 5:0.683, 6:0.4379},
+    17: {1:0.7908, 2:0.8203, 3:0.7974, 4:0.6961, 5:0.4575, 6:0.2451},
+    18: {1:0.7946, 2:0.8187, 3:0.7281, 4:0.4169, 5:0.2296, 6:0.1182},
+    19: {1:0.7989, 2:0.6523, 3:0.4713, 4:0.2328, 5:0.0948, 6:0.0431},
+    20: {1:0.6552, 2:0.4765, 3:0.2288, 4:0.0909, 5:0.0439, 6:0.0},
+    21: {1:0.4907, 2:0.2453, 3:0.118, 4:0.0373, 5:0.0062, 6:0.0093},
+    22: {1:0.2552, 2:0.1198, 3:0.0417, 4:0.0104, 5:0.0156, 6:0.0},
+    23: {1:0.1818, 2:0.026, 3:0.013, 4:0.013, 5:0.0, 6:0.0},
+  },
+  "8": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.6667, 2:0.5, 3:0.6667, 4:0.8333, 5:0.8333, 6:0.3333},
+    9: {1:0.6988, 2:0.6627, 3:0.6506, 4:0.6747, 5:0.5904, 6:0.6627},
+    10: {1:0.669, 2:0.5862, 3:0.6345, 4:0.5862, 5:0.6069, 6:0.7103},
+    11: {1:0.5846, 2:0.5795, 3:0.4821, 4:0.559, 5:0.5795, 6:0.7231},
+    12: {1:0.5556, 2:0.4747, 3:0.5404, 4:0.6212, 5:0.6667, 6:0.6869},
+    13: {1:0.5522, 2:0.5224, 3:0.5522, 4:0.6517, 5:0.7164, 6:0.7662},
+    14: {1:0.5127, 2:0.5888, 3:0.6599, 4:0.7208, 5:0.7513, 6:0.7462},
+    15: {1:0.6175, 2:0.6831, 3:0.7268, 4:0.7432, 5:0.7049, 6:0.5847},
+    16: {1:0.6465, 2:0.7209, 3:0.7674, 4:0.7209, 5:0.6047, 6:0.3209},
+    17: {1:0.7059, 2:0.7353, 3:0.6765, 4:0.6008, 5:0.3571, 6:0.1807},
+    18: {1:0.7316, 2:0.6949, 3:0.5809, 4:0.2868, 5:0.136, 6:0.0517},
+    19: {1:0.7148, 2:0.5503, 3:0.3255, 4:0.151, 5:0.0671, 6:0.0168},
+    20: {1:0.5414, 2:0.3414, 3:0.1517, 4:0.0414, 5:0.0207, 6:0.0},
+    21: {1:0.3802, 2:0.1777, 3:0.0785, 4:0.0207, 5:0.0, 6:0.0},
+    22: {1:0.1311, 2:0.0492, 3:0.0164, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.25, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "9": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.4286, 2:0.4286, 3:0.5714, 4:0.5238, 5:0.5238, 6:0.2857},
+    9: {1:0.4746, 2:0.5593, 3:0.4576, 4:0.4576, 5:0.4407, 6:0.5763},
+    10: {1:0.6415, 2:0.5472, 3:0.5, 4:0.4151, 5:0.5755, 6:0.6038},
+    11: {1:0.4762, 2:0.4898, 3:0.3946, 4:0.3605, 5:0.4966, 6:0.6054},
+    12: {1:0.4586, 2:0.4135, 3:0.3759, 4:0.4812, 5:0.5338, 6:0.6617},
+    13: {1:0.4714, 2:0.4071, 3:0.4214, 4:0.6214, 5:0.6786, 6:0.6643},
+    14: {1:0.4565, 2:0.471, 3:0.6014, 4:0.6377, 5:0.6812, 6:0.6667},
+    15: {1:0.4919, 2:0.5, 3:0.6613, 4:0.7016, 5:0.629, 6:0.4355},
+    16: {1:0.5102, 2:0.6259, 3:0.6395, 4:0.6122, 5:0.483, 6:0.2041},
+    17: {1:0.6033, 2:0.6848, 3:0.5924, 4:0.4348, 5:0.2011, 6:0.1141},
+    18: {1:0.6537, 2:0.5455, 3:0.4286, 4:0.1948, 5:0.0779, 6:0.0303},
+    19: {1:0.6049, 2:0.4527, 3:0.2058, 4:0.0947, 5:0.0206, 6:0.0041},
+    20: {1:0.425, 2:0.2417, 3:0.1083, 4:0.0417, 5:0.0042, 6:0.0},
+    21: {1:0.2663, 2:0.0947, 3:0.0473, 4:0.0059, 5:0.0, 6:0.0},
+    22: {1:0.0857, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0625, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "10": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.25, 2:0.375, 3:0.375, 4:0.75, 5:0.375, 6:0.375},
+    9: {1:0.2895, 2:0.4737, 3:0.3158, 4:0.2632, 5:0.3684, 6:0.4474},
+    10: {1:0.4921, 2:0.4921, 3:0.381, 4:0.4127, 5:0.3651, 6:0.4286},
+    11: {1:0.4592, 2:0.3469, 3:0.3776, 4:0.2857, 5:0.449, 6:0.4694},
+    12: {1:0.321, 2:0.284, 3:0.3333, 4:0.4321, 5:0.4321, 6:0.4568},
+    13: {1:0.4235, 2:0.2824, 3:0.3882, 4:0.5412, 5:0.5647, 6:0.6353},
+    14: {1:0.3297, 2:0.4396, 3:0.4725, 4:0.4286, 5:0.6044, 6:0.5824},
+    15: {1:0.45, 2:0.3375, 3:0.4625, 4:0.5125, 5:0.5625, 6:0.3125},
+    16: {1:0.4301, 2:0.5269, 3:0.5806, 4:0.5376, 5:0.4086, 6:0.0968},
+    17: {1:0.4921, 2:0.619, 3:0.4524, 4:0.3413, 5:0.1111, 6:0.0397},
+    18: {1:0.6163, 2:0.4593, 3:0.3023, 4:0.1279, 5:0.0349, 6:0.0174},
+    19: {1:0.5099, 2:0.3663, 3:0.1337, 4:0.0594, 5:0.0, 6:0.0},
+    20: {1:0.3632, 2:0.1789, 3:0.0579, 4:0.0316, 5:0.0, 6:0.0},
+    21: {1:0.1845, 2:0.0583, 3:0.0291, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0323, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0909, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "11": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.3077, 2:0.3077, 3:0.2308, 4:0.1923, 5:0.1538, 6:0.2692},
+    10: {1:0.1795, 2:0.3077, 3:0.2821, 4:0.2821, 5:0.2308, 6:0.2821},
+    11: {1:0.4038, 2:0.25, 3:0.3269, 4:0.2115, 5:0.3462, 6:0.3846},
+    12: {1:0.1489, 2:0.2766, 3:0.1915, 4:0.2979, 5:0.4043, 6:0.4043},
+    13: {1:0.4151, 2:0.2075, 3:0.2453, 4:0.3962, 5:0.434, 6:0.5094},
+    14: {1:0.3061, 2:0.3469, 3:0.3469, 4:0.3673, 5:0.5306, 6:0.449},
+    15: {1:0.3404, 2:0.3191, 3:0.3404, 4:0.5106, 5:0.383, 6:0.2553},
+    16: {1:0.3506, 2:0.4805, 3:0.4416, 4:0.3506, 5:0.2727, 6:0.0779},
+    17: {1:0.4211, 2:0.5684, 3:0.3789, 4:0.1895, 5:0.0105, 6:0.0316},
+    18: {1:0.4729, 2:0.3721, 3:0.2093, 4:0.062, 5:0.0233, 6:0.0},
+    19: {1:0.378, 2:0.2805, 3:0.0732, 4:0.0244, 5:0.0, 6:0.0},
+    20: {1:0.2598, 2:0.0866, 3:0.0394, 4:0.0079, 5:0.0, 6:0.0},
+    21: {1:0.1045, 2:0.0149, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.1429, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "12": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.25, 2:0.0833, 3:0.25, 4:0.0833, 5:0.3333, 6:0.0833},
+    10: {1:0.2273, 2:0.3182, 3:0.1818, 4:0.4091, 5:0.0, 6:0.2273},
+    11: {1:0.3415, 2:0.1951, 3:0.2439, 4:0.0976, 5:0.2195, 6:0.3415},
+    12: {1:0.1714, 2:0.2571, 3:0.2, 4:0.2857, 5:0.3429, 6:0.4286},
+    13: {1:0.303, 2:0.1515, 3:0.2121, 4:0.303, 5:0.3636, 6:0.4848},
+    14: {1:0.1, 2:0.2667, 3:0.1667, 4:0.4333, 5:0.5, 6:0.3},
+    15: {1:0.2059, 2:0.2941, 3:0.2647, 4:0.4706, 5:0.3824, 6:0.2059},
+    16: {1:0.4348, 2:0.2391, 3:0.413, 4:0.2609, 5:0.1522, 6:0.0652},
+    17: {1:0.3333, 2:0.3704, 3:0.3148, 4:0.0741, 5:0.0185, 6:0.0556},
+    18: {1:0.4149, 2:0.3085, 3:0.117, 4:0.0532, 5:0.0, 6:0.0},
+    19: {1:0.2333, 2:0.15, 3:0.0833, 4:0.0083, 5:0.0, 6:0.0},
+    20: {1:0.1829, 2:0.0244, 3:0.0122, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0526, 2:0.0263, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "13": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.2222, 2:0.2222, 3:0.2222, 4:0.0, 5:0.2222, 6:0.0},
+    10: {1:0.2, 2:0.2667, 3:0.1333, 4:0.1333, 5:0.0, 6:0.2667},
+    11: {1:0.2667, 2:0.1667, 3:0.1333, 4:0.1, 5:0.2667, 6:0.3667},
+    12: {1:0.1333, 2:0.2, 3:0.1667, 4:0.1667, 5:0.2667, 6:0.3},
+    13: {1:0.1364, 2:0.1364, 3:0.0455, 4:0.1364, 5:0.3636, 6:0.3182},
+    14: {1:0.0476, 2:0.1429, 3:0.0952, 4:0.381, 5:0.4286, 6:0.1905},
+    15: {1:0.1875, 2:0.1875, 3:0.125, 4:0.5, 5:0.1875, 6:0.125},
+    16: {1:0.5, 2:0.0667, 3:0.4, 4:0.1667, 5:0.1333, 6:0.0},
+    17: {1:0.3636, 2:0.2045, 3:0.2045, 4:0.1136, 5:0.0, 6:0.0455},
+    18: {1:0.2909, 2:0.2182, 3:0.0727, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.2059, 2:0.1471, 3:0.0588, 4:0.0147, 5:0.0, 6:0.0},
+    20: {1:0.1091, 2:0.0182, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "14": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.0, 2:0.1667, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    10: {1:0.0714, 2:0.2143, 3:0.0714, 4:0.0714, 5:0.0, 6:0.2143},
+    11: {1:0.1304, 2:0.087, 3:0.0435, 4:0.087, 5:0.1304, 6:0.2174},
+    12: {1:0.125, 2:0.0417, 3:0.2083, 4:0.0833, 5:0.2917, 6:0.25},
+    13: {1:0.0, 2:0.1111, 3:0.1111, 4:0.1111, 5:0.2222, 6:0.3333},
+    14: {1:0.0, 2:0.0909, 3:0.1818, 4:0.1818, 5:0.1818, 6:0.1818},
+    15: {1:0.0909, 2:0.0, 3:0.0909, 4:0.5455, 5:0.1818, 6:0.1818},
+    16: {1:0.25, 2:0.0, 3:0.375, 4:0.125, 5:0.0, 6:0.0},
+    17: {1:0.2941, 2:0.0882, 3:0.1176, 4:0.0882, 5:0.0, 6:0.0294},
+    18: {1:0.2286, 2:0.2, 3:0.0857, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.1304, 2:0.1087, 3:0.0, 4:0.0217, 5:0.0, 6:0.0},
+    20: {1:0.037, 2:0.037, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "15": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.1, 2:0.1, 3:0.1, 4:0.0, 5:0.1, 6:0.0},
+    10: {1:0.0, 2:0.1429, 3:0.1429, 4:0.0, 5:0.0, 6:0.1429},
+    11: {1:0.1538, 2:0.1538, 3:0.0, 4:0.1538, 5:0.0, 6:0.3077},
+    12: {1:0.0769, 2:0.0, 3:0.0, 4:0.0769, 5:0.3077, 6:0.0},
+    13: {1:0.0, 2:0.1429, 3:0.1429, 4:0.0, 5:0.1429, 6:0.2857},
+    14: {1:0.0, 2:0.0, 3:0.2, 4:0.0, 5:0.0, 6:0.2},
+    15: {1:0.0, 2:0.0, 3:0.0588, 4:0.2941, 5:0.0, 6:0.1176},
+    16: {1:0.0, 2:0.0, 3:0.125, 4:0.0, 5:0.0, 6:0.0},
+    17: {1:0.2857, 2:0.1905, 3:0.0476, 4:0.0, 5:0.0, 6:0.0},
+    18: {1:0.0526, 2:0.1053, 3:0.0526, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.1034, 2:0.1379, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    20: {1:0.0, 2:0.0769, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+};
+
+const SURGE_SURVIVAL_HIGH = {
+  "6": {
+    0: {1:0.1194, 2:0.0249, 3:0.005, 4:0.0249, 5:0.01, 6:0.0249},
+    1: {1:0.0337, 2:0.0337, 3:0.0225, 4:0.0225, 5:0.0112, 6:0.0225},
+    2: {1:0.0, 2:0.05, 3:0.0, 4:0.05, 5:0.05, 6:0.25},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3333, 6:0.5},
+    4: {1:0.0, 2:0.0, 3:0.1818, 4:0.1818, 5:0.3636, 6:0.7273},
+    5: {1:0.0, 2:0.1667, 3:0.5, 4:0.5, 5:0.6667, 6:0.8333},
+    6: {1:0.0, 2:0.2857, 3:0.4286, 4:0.8571, 5:0.8571, 6:1.0},
+    7: {1:0.2727, 2:0.6591, 3:0.7273, 4:0.8864, 5:0.8864, 6:0.8409},
+    8: {1:0.6294, 2:0.7513, 3:0.8274, 4:0.802, 5:0.802, 6:0.7868},
+    9: {1:0.9189, 2:0.9054, 3:0.7973, 4:0.8378, 5:0.7703, 6:0.7973},
+    10: {1:0.9044, 2:0.7941, 3:0.875, 4:0.7721, 5:0.8382, 6:0.8897},
+    11: {1:0.8458, 2:0.8408, 3:0.7861, 4:0.8458, 5:0.8756, 6:0.8905},
+    12: {1:0.8343, 2:0.7624, 3:0.7956, 4:0.8729, 5:0.8785, 6:0.9227},
+    13: {1:0.8333, 2:0.8111, 3:0.8556, 4:0.8833, 5:0.9, 6:0.9111},
+    14: {1:0.8092, 2:0.8555, 3:0.9133, 4:0.9191, 5:0.9249, 6:0.8844},
+    15: {1:0.8375, 2:0.8688, 3:0.8812, 4:0.9313, 5:0.9125, 6:0.8063},
+    16: {1:0.901, 2:0.896, 3:0.9158, 4:0.9109, 5:0.8812, 6:0.6089},
+    17: {1:0.9354, 2:0.9163, 3:0.8935, 4:0.8175, 5:0.6502, 6:0.4259},
+    18: {1:0.9397, 2:0.9023, 3:0.8276, 4:0.6293, 5:0.4167, 6:0.1753},
+    19: {1:0.9043, 2:0.8489, 3:0.6196, 4:0.3879, 5:0.1738, 6:0.0806},
+    20: {1:0.8487, 2:0.6231, 3:0.4332, 4:0.2136, 5:0.0801, 6:0.0326},
+    21: {1:0.6528, 2:0.3935, 3:0.2037, 4:0.0787, 5:0.0278, 6:0.0093},
+    22: {1:0.425, 2:0.1125, 3:0.0625, 4:0.0, 5:0.025, 6:0.0},
+    23: {1:0.3333, 2:0.2381, 3:0.0476, 4:0.0, 5:0.0, 6:0.0476},
+  },
+  "7": {
+    0: {1:0.0476, 2:0.0095, 3:0.0, 4:0.0, 5:0.0095, 6:0.019},
+    1: {1:0.025, 2:0.025, 3:0.0, 4:0.025, 5:0.0, 6:0.025},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.1429, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.3333, 6:0.5556},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.2857, 3:0.7143, 4:1.0, 5:0.8571, 6:0.5714},
+    7: {1:0.4118, 2:0.5882, 3:0.6471, 4:0.9412, 5:0.9412, 6:0.5882},
+    8: {1:0.5094, 2:0.6226, 3:0.7075, 4:0.6887, 5:0.7264, 6:0.6604},
+    9: {1:0.8333, 2:0.8125, 3:0.7083, 4:0.6875, 5:0.625, 6:0.6875},
+    10: {1:0.7711, 2:0.7952, 3:0.7831, 4:0.6988, 5:0.7831, 6:0.8072},
+    11: {1:0.8195, 2:0.782, 3:0.7218, 4:0.7368, 5:0.8271, 6:0.8496},
+    12: {1:0.7009, 2:0.6239, 3:0.6496, 4:0.7863, 5:0.8205, 6:0.8718},
+    13: {1:0.7568, 2:0.7207, 3:0.7658, 4:0.8468, 5:0.8739, 6:0.8829},
+    14: {1:0.7193, 2:0.7807, 3:0.8333, 4:0.8509, 5:0.8158, 6:0.8246},
+    15: {1:0.7938, 2:0.7526, 3:0.8144, 4:0.8454, 5:0.8351, 6:0.7216},
+    16: {1:0.8295, 2:0.8605, 3:0.8295, 4:0.8527, 5:0.7829, 6:0.4574},
+    17: {1:0.8919, 2:0.8649, 3:0.8216, 4:0.7189, 5:0.4973, 6:0.2865},
+    18: {1:0.8852, 2:0.8238, 3:0.7459, 4:0.4795, 5:0.2746, 6:0.0779},
+    19: {1:0.839, 2:0.7671, 3:0.4692, 4:0.2637, 5:0.0856, 6:0.0308},
+    20: {1:0.7751, 2:0.4859, 3:0.3012, 4:0.1325, 5:0.0361, 6:0.0201},
+    21: {1:0.4206, 2:0.2619, 3:0.1111, 4:0.0556, 5:0.0079, 6:0.0079},
+    22: {1:0.2821, 2:0.1026, 3:0.0513, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.3333, 2:0.0833, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "8": {
+    0: {1:0.0175, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.4444, 2:0.5333, 3:0.6444, 4:0.5556, 5:0.6444, 6:0.5556},
+    9: {1:0.8125, 2:0.7188, 3:0.5312, 4:0.5938, 5:0.4688, 6:0.7188},
+    10: {1:0.6296, 2:0.7037, 3:0.6667, 4:0.6111, 5:0.6481, 6:0.6296},
+    11: {1:0.7237, 2:0.6711, 3:0.6316, 4:0.6579, 5:0.75, 6:0.75},
+    12: {1:0.6389, 2:0.5417, 3:0.6111, 4:0.5833, 5:0.7222, 6:0.7083},
+    13: {1:0.6562, 2:0.5781, 3:0.6719, 4:0.7812, 5:0.8125, 6:0.8125},
+    14: {1:0.6557, 2:0.7213, 3:0.8361, 4:0.7869, 5:0.8525, 6:0.6885},
+    15: {1:0.6897, 2:0.7241, 3:0.7241, 4:0.7931, 5:0.8103, 6:0.6034},
+    16: {1:0.701, 2:0.732, 3:0.7732, 4:0.7423, 5:0.6495, 6:0.3299},
+    17: {1:0.7664, 2:0.8102, 3:0.708, 4:0.5766, 5:0.3212, 6:0.1825},
+    18: {1:0.8596, 2:0.7602, 3:0.5906, 4:0.3392, 5:0.152, 6:0.0526},
+    19: {1:0.7489, 2:0.6438, 3:0.3242, 4:0.1918, 5:0.0457, 6:0.0046},
+    20: {1:0.6624, 2:0.3822, 3:0.2229, 4:0.0955, 5:0.0127, 6:0.0},
+    21: {1:0.325, 2:0.175, 3:0.0625, 4:0.025, 5:0.0, 6:0.0125},
+    22: {1:0.25, 2:0.1, 3:0.05, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.125, 2:0.125, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "9": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.4286, 2:0.4286, 3:0.5714, 4:0.5238, 5:0.5238, 6:0.2857},
+    9: {1:0.7333, 2:0.6667, 3:0.4667, 4:0.5333, 5:0.4667, 6:0.3333},
+    10: {1:0.5, 2:0.6, 3:0.4667, 4:0.6, 5:0.4, 6:0.5},
+    11: {1:0.6296, 2:0.5185, 3:0.537, 4:0.5741, 5:0.6481, 6:0.6667},
+    12: {1:0.5833, 2:0.5208, 3:0.5, 4:0.6042, 5:0.6667, 6:0.6667},
+    13: {1:0.575, 2:0.45, 3:0.55, 4:0.625, 5:0.7, 6:0.725},
+    14: {1:0.3714, 2:0.6571, 3:0.6571, 4:0.6571, 5:0.7714, 6:0.6286},
+    15: {1:0.6667, 2:0.6667, 3:0.6667, 4:0.6944, 5:0.75, 6:0.4444},
+    16: {1:0.7455, 2:0.5273, 3:0.6909, 4:0.6182, 5:0.4545, 6:0.2909},
+    17: {1:0.7342, 2:0.7089, 3:0.5823, 4:0.4684, 5:0.2152, 6:0.1266},
+    18: {1:0.7949, 2:0.6667, 3:0.4786, 4:0.2735, 5:0.0684, 6:0.0171},
+    19: {1:0.5909, 2:0.5065, 3:0.2662, 4:0.0844, 5:0.013, 6:0.0},
+    20: {1:0.5258, 2:0.2165, 3:0.1031, 4:0.0412, 5:0.0, 6:0.0},
+    21: {1:0.2766, 2:0.1064, 3:0.0, 4:0.0213, 5:0.0, 6:0.0213},
+    22: {1:0.2, 2:0.1, 3:0.1, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.2, 2:0.2, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "10": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.25, 2:0.375, 3:0.375, 4:0.75, 5:0.375, 6:0.375},
+    9: {1:0.7, 2:0.6, 3:0.3, 4:0.3, 5:0.6, 6:0.2},
+    10: {1:0.45, 2:0.55, 3:0.45, 4:0.65, 5:0.3, 6:0.55},
+    11: {1:0.5429, 2:0.4571, 3:0.3714, 4:0.4, 5:0.5143, 6:0.6286},
+    12: {1:0.5833, 2:0.4722, 3:0.3611, 4:0.4722, 5:0.6389, 6:0.5556},
+    13: {1:0.5385, 2:0.4231, 3:0.4231, 4:0.5, 5:0.6154, 6:0.5769},
+    14: {1:0.3043, 2:0.4783, 3:0.5652, 4:0.5652, 5:0.6522, 6:0.5652},
+    15: {1:0.5294, 2:0.6471, 3:0.4706, 4:0.6471, 5:0.6471, 6:0.5294},
+    16: {1:0.6111, 2:0.3333, 3:0.5556, 4:0.5278, 5:0.3611, 6:0.1111},
+    17: {1:0.661, 2:0.6102, 3:0.4746, 4:0.3559, 5:0.1525, 6:0.1017},
+    18: {1:0.6944, 2:0.5556, 3:0.3333, 4:0.1944, 5:0.0278, 6:0.0},
+    19: {1:0.4889, 2:0.4, 3:0.2333, 4:0.0667, 5:0.0222, 6:0.0},
+    20: {1:0.2712, 2:0.1186, 3:0.0339, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.1304, 2:0.087, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0227, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "11": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.3333, 2:0.1667, 3:0.1667, 4:0.1667, 5:0.6667, 6:0.0},
+    10: {1:0.4, 2:0.5333, 3:0.3333, 4:0.6, 5:0.1333, 6:0.4667},
+    11: {1:0.4583, 2:0.4583, 3:0.375, 4:0.25, 5:0.3333, 6:0.5417},
+    12: {1:0.52, 2:0.4, 3:0.2, 4:0.24, 5:0.48, 6:0.48},
+    13: {1:0.2727, 2:0.4545, 3:0.4545, 4:0.4545, 5:0.5455, 6:0.7273},
+    14: {1:0.0, 2:0.5, 3:0.5833, 4:0.3333, 5:0.5, 6:0.4167},
+    15: {1:0.1818, 2:0.3636, 3:0.4545, 4:0.7273, 5:0.5455, 6:0.3636},
+    16: {1:0.6, 2:0.15, 3:0.35, 4:0.5, 5:0.15, 6:0.0},
+    17: {1:0.619, 2:0.4048, 3:0.4048, 4:0.2857, 5:0.0952, 6:0.0476},
+    18: {1:0.6429, 2:0.5, 3:0.2857, 4:0.119, 5:0.0, 6:0.0},
+    19: {1:0.4364, 2:0.3273, 3:0.1091, 4:0.0727, 5:0.0182, 6:0.0},
+    20: {1:0.2, 2:0.1, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0769, 2:0.0769, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0476, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "12": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.1875, 2:0.2708, 3:0.1042, 4:0.125, 5:0.2083, 6:0.125},
+    10: {1:0.25, 2:0.125, 3:0.25, 4:0.0, 5:0.125, 6:0.375},
+    11: {1:0.3846, 2:0.3846, 3:0.1538, 4:0.3077, 5:0.3077, 6:0.6154},
+    12: {1:0.4615, 2:0.2308, 3:0.1538, 4:0.0769, 5:0.3846, 6:0.3846},
+    13: {1:0.1429, 2:0.4286, 3:0.5714, 4:0.1429, 5:0.1429, 6:0.5714},
+    14: {1:0.0, 2:0.2, 3:0.2, 4:0.2, 5:0.4, 6:0.4},
+    15: {1:0.2062, 2:0.2165, 3:0.2268, 4:0.3918, 5:0.2784, 6:0.1649},
+    16: {1:0.6667, 2:0.0, 3:0.1111, 4:0.1111, 5:0.2222, 6:0.0},
+    17: {1:0.64, 2:0.32, 3:0.36, 4:0.32, 5:0.04, 6:0.04},
+    18: {1:0.6087, 2:0.4783, 3:0.1304, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.3529, 2:0.2941, 3:0.0294, 4:0.0588, 5:0.0, 6:0.0},
+    20: {1:0.0667, 2:0.1333, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "13": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.0938, 2:0.1562, 3:0.125, 4:0.0312, 5:0.0938, 6:0.0312},
+    10: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.2, 6:0.4},
+    11: {1:0.0, 2:0.4, 3:0.2, 4:0.4, 5:0.0, 6:0.0},
+    12: {1:0.1667, 2:0.1667, 3:0.1667, 4:0.0, 5:0.3333, 6:0.1667},
+    13: {1:0.1562, 2:0.0938, 3:0.1875, 4:0.1562, 5:0.2656, 6:0.4062},
+    14: {1:0.0656, 2:0.1639, 3:0.1639, 4:0.2623, 5:0.377, 6:0.2459},
+    15: {1:0.1552, 2:0.1897, 3:0.2069, 4:0.3621, 5:0.1552, 6:0.1034},
+    16: {1:0.3333, 2:0.0, 3:0.0, 4:0.1667, 5:0.0, 6:0.0},
+    17: {1:0.6667, 2:0.4, 3:0.4, 4:0.0667, 5:0.0, 6:0.0667},
+    18: {1:0.4706, 2:0.2941, 3:0.1765, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.1818, 2:0.1818, 3:0.0455, 4:0.0455, 5:0.0, 6:0.0},
+    20: {1:0.1083, 2:0.0318, 3:0.0255, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "14": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.0667, 2:0.1333, 3:0.1333, 4:0.0, 5:0.0667, 6:0.0},
+    10: {1:0.1, 2:0.1333, 3:0.0333, 4:0.0667, 5:0.0, 6:0.1667},
+    11: {1:0.1296, 2:0.0741, 3:0.037, 4:0.0556, 5:0.1481, 6:0.2222},
+    12: {1:0.0625, 2:0.0417, 3:0.1458, 4:0.0625, 5:0.2708, 6:0.2917},
+    13: {1:0.1, 2:0.075, 3:0.15, 4:0.125, 5:0.175, 6:0.325},
+    14: {1:0.0286, 2:0.1429, 3:0.0857, 4:0.1714, 5:0.2286, 6:0.1429},
+    15: {1:0.1111, 2:0.1111, 3:0.1944, 4:0.3333, 5:0.1389, 6:0.0556},
+    16: {1:0.2364, 2:0.1091, 3:0.2727, 4:0.0727, 5:0.0545, 6:0.0},
+    17: {1:0.625, 2:0.5, 3:0.125, 4:0.125, 5:0.0, 6:0.125},
+    18: {1:0.2857, 2:0.2857, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.1111, 2:0.1111, 3:0.1111, 4:0.1111, 5:0.0, 6:0.0},
+    20: {1:0.0825, 2:0.0103, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0213, 2:0.0213, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+  "15": {
+    0: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    1: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    2: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    3: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    4: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    5: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    6: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    7: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    8: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    9: {1:0.1, 2:0.1, 3:0.1, 4:0.0, 5:0.1, 6:0.0},
+    10: {1:0.1, 2:0.2, 3:0.05, 4:0.0, 5:0.0, 6:0.2},
+    11: {1:0.1429, 2:0.0857, 3:0.0286, 4:0.0571, 5:0.1143, 6:0.2286},
+    12: {1:0.0833, 2:0.0278, 3:0.0278, 4:0.0556, 5:0.25, 6:0.1667},
+    13: {1:0.0385, 2:0.1154, 3:0.0769, 4:0.0769, 5:0.1154, 6:0.2308},
+    14: {1:0.0, 2:0.0435, 3:0.0435, 4:0.1739, 5:0.2174, 6:0.087},
+    15: {1:0.0, 2:0.0, 3:0.0588, 4:0.2941, 5:0.0, 6:0.1176},
+    16: {1:0.2222, 2:0.0, 3:0.2222, 4:0.0, 5:0.0556, 6:0.0},
+    17: {1:0.1864, 2:0.0847, 3:0.0847, 4:0.0339, 5:0.0, 6:0.0},
+    18: {1:0.0972, 2:0.0972, 3:0.0417, 4:0.0, 5:0.0, 6:0.0},
+    19: {1:0.0, 2:0.0, 3:0.2, 4:0.0, 5:0.0, 6:0.0},
+    20: {1:0.0, 2:0.0169, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    21: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    22: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+    23: {1:0.0, 2:0.0, 3:0.0, 4:0.0, 5:0.0, 6:0.0},
+  },
+};
 const SURGE_ZERO_HOURS = {
-  6:  [],
-  7:  [],
-  8:  [2, 4, 5],
-  9:  [2, 4, 5],
-  10:  [2, 3, 4, 5, 6, 7],
-  11:  [2, 3, 4, 5, 6, 7],
-  12:  [0, 1, 2, 3, 4, 5, 6, 7],
-  13:  [0, 1, 2, 3, 4, 5, 6, 7],
-  14:  [0, 1, 2, 3, 4, 5, 6, 7, 8],
-  15:  [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  6: [],
+  7: [],
+  8: [2, 4, 5],
+  9: [2, 4, 5],
+  10: [2, 3, 4, 5, 6, 7],
+  11: [2, 3, 4, 5, 6, 7],
+  12: [0, 1, 2, 3, 4, 5, 6, 7],
+  13: [0, 1, 2, 3, 4, 5, 6, 7],
+  14: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  15: [0, 1, 2, 3, 4, 5, 6, 7, 8],
 };
 function isSurgeZeroHour(hour, thresh) {
   var zeros = SURGE_ZERO_HOURS[String(thresh)] || SURGE_ZERO_HOURS[thresh] || [];
   return zeros.indexOf(hour) !== -1;
 }
 function getSurvivalProb(startHour, offset) {
-  var tbl = SURGE_SURVIVAL[String(SURGE_THRESH)] || SURGE_SURVIVAL['10'];
+  var band = SURGE_FLAG_ACTIVE ? getVolBand(SURGE_VOL, SURGE_THRESH) : 'low';
+  var tables = {
+    low:  typeof SURGE_SURVIVAL_LOW  !== 'undefined' ? SURGE_SURVIVAL_LOW  : {},
+    mid:  typeof SURGE_SURVIVAL_MID  !== 'undefined' ? SURGE_SURVIVAL_MID  : {},
+    high: typeof SURGE_SURVIVAL_HIGH !== 'undefined' ? SURGE_SURVIVAL_HIGH : {},
+  };
+  var tbl = (tables[band] || tables['low'])[String(SURGE_THRESH)] ||
+            (tables['low'])[String(SURGE_THRESH)] || {};
   var row = tbl[startHour];
   if (!row) return 0.0;
   return row[offset] !== undefined ? row[offset] : 0.0;
 }
+
 const SURGE_WINDOW_MULTIPLIERS_BY_THRESH = {
   "6": {15:1.0, 16:0.8791, 17:0.8399, 18:0.7125, 19:0.3282, 20:0.352, 21:0.1808},
   "7": {15:1.0, 16:0.8821, 17:0.8544, 18:0.7711, 19:0.5813, 20:0.5062, 21:0.3991},
@@ -1985,6 +2463,15 @@ const SBM_BY_THRESH = {
 };
 
 // Active arrays — updated when threshold changes
+const HOURLY_MEDIAN = {
+  0: [3.0,3.0,2.0,2.0,2.0,2.0,2.0,3.0,4.0,6.0,7.5,9.0,8.0,8.0,8.0,8.0,9.0,9.0,10.0,11.0,9.0,7.0,6.0,5.0],
+  1: [3.0,3.0,2.0,2.0,2.0,2.0,2.0,2.0,4.0,7.0,7.0,7.0,7.0,8.0,7.0,7.0,8.0,8.0,9.0,9.0,9.0,8.0,6.0,4.0],
+  2: [4.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,3.0,6.0,8.0,8.0,8.0,7.0,7.0,7.0,8.0,8.0,9.0,10.0,9.0,8.0,6.0,5.0],
+  3: [4.0,3.0,2.0,2.0,2.0,2.0,2.0,2.0,4.0,6.0,7.0,7.0,7.0,7.0,7.0,7.0,8.0,8.0,9.0,10.0,9.0,8.0,6.5,5.0],
+  4: [3.0,3.0,2.0,2.0,2.0,2.0,2.0,2.0,4.0,6.0,6.0,7.0,7.0,7.0,7.0,7.0,7.0,8.0,9.0,9.0,8.0,8.0,6.0,5.0],
+  5: [4.0,3.0,2.0,2.0,2.0,2.0,2.0,2.0,3.0,4.0,5.0,6.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,8.0,8.0,7.0,6.0,5.0],
+  6: [4.0,3.0,2.0,2.0,2.0,2.0,2.0,2.0,3.0,4.0,6.0,7.0,7.0,7.0,7.0,7.0,7.0,7.5,7.0,9.0,8.0,8.0,6.0,5.0],
+};
 let HEATMAP = HM_BY_THRESH['10'];
 let SURGE_BY_HOUR = SBH_BY_THRESH['10'];
 let SURGE_BY_MONTH = SBM_BY_THRESH['10'];
@@ -1996,6 +2483,7 @@ function setThreshold(t) {
   SURGE_THRESH = t;
   HEATMAP = HM_BY_THRESH[String(t)];
   SURGE_BY_HOUR = SBH_BY_THRESH[String(t)];
+  if (!SURGE_FLAG_ACTIVE) SURGE_VOL = t;
   SURGE_BY_MONTH = SBM_BY_THRESH[String(t)];
 }
 
@@ -2708,12 +3196,7 @@ function renderDashboard(iliData = null) {
         const mult = getSurgeWindowMultiplier(hour);
         if(mult < 1.0){fp = fp * mult; isSurvival = true;}
       }
-      // Apply evening build-up late-night modifier to 22:00 and 23:00
-      // Only active when current hour is 18-23 (input is contextually relevant)
-      if((h===22 || h===23) && !SURGE_FLAG_ACTIVE && hour >= 18 && hour <= 23) {
-        const lnInfo = getLateNightMod();
-        if(lnInfo.mod > 1.0) { fp = Math.min(1.0, fp * lnInfo.mod); }
-      }
+
     } else if(SURGE_FLAG_ACTIVE&&i>=0&&i<=6){
       // Surge confirmed — use empirical survival lookup keyed by confirmed start hour
       const startH = SURGE_CONFIRMED_HOUR !== null ? SURGE_CONFIRMED_HOUR : hour;
@@ -2840,15 +3323,10 @@ function renderDashboard(iliData = null) {
     const fGradInfo7 = getGraduationModifier(fds);
     const fGradMod7 = fGradInfo7.modifier;
     const { modifier: fPostMod7 } = getPostEventModifier(fds, SURGE_THRESH);
-    const respMod7 = getRespLoadMod();
-    const giMod7   = getGILoadMod();
-    const internalMod7 = Math.min(2.5, respMod7 * giMod7); // cap combined internal modifier
-    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7) * internalMod7);
+    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7));
     const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => {
       const { modifier: hMod } = getLocalEventModifier(fds, h);
-      // internalMod (resp×GI load) calibrated at thresh=12; only apply to peak hours ≥12 to avoid double-counting illness burden at lower thresholds
-      const hInternalMod = h >= 12 ? internalMod7 : 1.0;
-      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod, fPostMod7) * hInternalMod);
+      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod, fPostMod7));
     }, 0) / 11;
     const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
     days7.push({
@@ -2861,9 +3339,6 @@ function renderDashboard(iliData = null) {
       localEvents: fEvents7,
       gradInfo: fGradInfo7,
       census,
-      respMod: respMod7,
-      giMod: giMod7,
-      internalMod: internalMod7,
     });
   }
 
@@ -2903,12 +3378,17 @@ function renderDashboard(iliData = null) {
   // Upcoming events
   const upcoming = getUpcomingEvents(todayStr, 7);
 
+  const hourLabelsHTML = nextHours.map((h, i) => {
+    return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+      <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;">${h.label}</div>
+    </div>`;
+  }).join('');
+
   const forecastBarsHTML = nextHours.map((h, i) => {
     const c = surgeBarColor(h.prob);
     const pct = (h.prob * 100).toFixed(0);
     const dot=h.isPersistence?`<div style="width:4px;height:4px;border-radius:50%;background:#ff4d6d;margin:0 auto;"></div>`:h.isSurvival?`<div style="width:4px;height:4px;border-radius:50%;background:#00e5c3;margin:0 auto;"></div>`:`<div style="width:4px;height:4px;"></div>`;
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;">
-      <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;">${h.label}</div>
       <div style="flex:1;width:100%;display:flex;align-items:flex-end;min-height:60px;">
         <div style="width:100%;height:${Math.max(4,Math.round(h.prob*90))}px;background:${c};border-radius:2px 2px 0 0;opacity:0.85;${h.isPersistence?'border-top:2px solid rgba(255,77,109,0.6);':h.isSurvival?'border-top:2px solid rgba(0,229,195,0.4);':''}"></div>
       </div>
@@ -2916,6 +3396,103 @@ function renderDashboard(iliData = null) {
       ${dot}
     </div>`;
   }).join('');
+
+  // ── 24h arrivals forecast ──────────────────────────────────────────────
+  const arrHourLabelsHTML = nextHours.map((h, i) => `
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+      <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;">${h.label}</div>
+    </div>`).join('');
+
+  // Arrivals forecast — base DOW×hour median × empirically validated volume modifiers
+  // All RRs validated against DOW×hour-adjusted arrival ratios, 2023-2025
+  // Events tested directly — NOT piped through surge probability functions
+  const arrEstimates = nextHours.map((h, i) => {
+    const fDate  = new Date(now.getTime() + i * 3600000);
+    const fDow   = (fDate.getDay() + 6) % 7;
+    const fds    = fDate.toISOString().slice(0,10);
+    const fSch   = getSchoolStatus(fds);
+    const fMonth = fDate.getMonth() + 1;
+    const fDay   = fDate.getDate();
+    const base   = (HOURLY_MEDIAN[fDow] || HOURLY_MEDIAN[0])[h.hour] || 0;
+
+    // ILI — full modifier (RR=1.35 peak vs summer, validated)
+    const iliAdj = iliMod;
+
+    // School calendar (validated volume RRs)
+    let schAdj = 1.0;
+    if (fSch.type === 'break') {
+      schAdj = (fMonth >= 6 && fMonth <= 8) ? 0.73   // summer ×0.73 p<0.001
+             : (fMonth === 12 || fMonth === 1) ? 1.08 // winter break ×1.08 p=0.022
+             : 1.0;                                   // spring break RR=1.04 p=0.19 ns
+    } else if (fSch.type === 'return') {
+      schAdj = 1.08;
+    }
+
+    // Graduation — Jun 1-7 only (RR=1.10 p=0.019; Jun 8-20 flat)
+    const gradAdj = (fMonth === 6 && fDay <= 7) ? 1.10 : 1.0;
+
+    // Zoolights Dec — RR=1.24 validated; ILI captures ~half, apply residual ×1.08
+    const zooAdj = (fMonth === 12) ? 1.08 : 1.0;
+
+    // Local events — hardcoded volume RRs (not surge-probability values)
+    // Derived from getLocalEventModifier date ranges but using volume-validated RRs
+    let eventAdj = 1.0;
+    const fLocalRaw = getLocalEventModifier(fds, h.hour);
+    if (fLocalRaw.activeEvents && fLocalRaw.activeEvents.length > 0) {
+      for (const ev of fLocalRaw.activeEvents) {
+        const key = ev.name || '';
+        if      (key.includes('Washington State Fair'))
+          eventAdj *= 0.781;  // RR=0.781 p<0.001
+        else if (key.includes('Spring Fair'))
+          eventAdj *= 1.0;    // RR=0.994 p=0.86 ns — not applied
+        else if (key.includes('WIAA'))
+          eventAdj *= 1.0;    // RR=0.96-1.00 p=0.24-0.98 ns — not applied
+        else if (key.includes('Taste Northwest'))
+          eventAdj *= 0.87;   // same displacement mechanism as Spring Fair
+        // All other events: use surge modifier direction only, attenuated
+        else eventAdj *= ev.surgeModifier > 1 ? 1.0 + (ev.surgeModifier-1)*0.3 : ev.surgeModifier;
+      }
+    }
+
+    // Post-event lags — hardcoded volume RRs
+    let lagAdj = 1.0;
+    const fPostRaw = getPostEventModifier(fds, SURGE_THRESH);
+    if (fPostRaw.activeEvents && fPostRaw.activeEvents.length > 0) {
+      for (const ev of fPostRaw.activeEvents) {
+        const key = ev.name || '';
+        if      (key.includes('Post-Thanksgiving'))     lagAdj *= 1.102; // RR=1.102 p=0.010
+        else if (key.includes('New Year'))                lagAdj *= 1.168; // RR=1.168 p=0.004
+        else if (key.includes('July 4') || key.includes('Independence'))
+                                                           lagAdj *= 0.871; // RR=0.871 p=0.015
+        else if (key.includes('Labor Day'))               lagAdj *= 0.745; // RR=0.745 p=0.002
+        else if (key.includes('Post-State Fair'))         lagAdj *= 0.894; // RR=0.894 p=0.002
+        else if (key.includes('Post-Pierce County Fair')) lagAdj *= 0.732; // RR=0.732 p<0.001
+        else if (key.includes('Post-WIAA'))               lagAdj *= 1.0;   // no volume signal
+        else if (key.includes('Zoolights lag'))           lagAdj *= 1.0;   // Zoolights handled via zooAdj
+        // Other lags: attenuated surge modifier
+        else lagAdj *= ev.surgeModifier > 1 ? 1.0 + (ev.surgeModifier-1)*0.3 : ev.surgeModifier;
+      }
+    }
+
+    return Math.max(0, Math.round(base * iliAdj * schAdj * gradAdj * zooAdj * eventAdj * lagAdj));
+  });
+
+  const arrMaxVal = Math.max(...arrEstimates, 1);
+
+  const arrivalsForecastHTML = nextHours.map((h, i) => {
+    const est   = arrEstimates[i];
+    const barH  = Math.max(3, Math.round((est / arrMaxVal) * 60));
+    const isNow = i === 0;
+    // Color mirrors surge bar color for consistency
+    const col   = est >= 12 ? 'var(--red)' : est >= 9 ? 'var(--orange)' : est >= 6 ? 'var(--accent3)' : 'var(--green)';
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;">
+      <div style="flex:1;width:100%;display:flex;align-items:flex-end;">
+        <div style="width:100%;height:${barH}px;background:${col};border-radius:2px 2px 0 0;opacity:0.75;"></div>
+      </div>
+      <div style="font-size:7.5px;color:#8892b0;font-family:'Space Mono',monospace;">${est}</div>
+    </div>`;
+  }).join('');
+
 
   const days7HTML = days7.map(d => {
     const c = surgeBarColor(d.peakProb);
@@ -3087,42 +3664,6 @@ function renderDashboard(iliData = null) {
       </div>
     </div>
 
-    <!-- 24h FORECAST -->
-
-    <div class="sdiv">24-Hour Surge Forecast</div>
-    <div class="panel">
-      <div class="ph"><div class="pt">Hourly Surge Probability · Next 24h</div><div class="badge badge-g">SCHOOL + LOCAL EVENTS</div></div>
-      <div class="pb">
-        <div class="forecast-bars-wrap">
-        <div class="forecast-bars-inner" style="display:flex;gap:3px;height:90px;align-items:flex-end;">
-          ${forecastBarsHTML}
-        </div></div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);">
-          ▪ Bar height = surge probability for that hour &nbsp;·&nbsp; 
-          <span style="color:var(--green);">■ LOW</span> &nbsp;
-          <span style="color:var(--accent3);">■ WATCH</span> &nbsp;
-          <span style="color:var(--orange);">■ ELEVATED</span> &nbsp;
-          <span style="color:var(--red);">■ SURGE RISK</span> &nbsp;·&nbsp;
-          <span style="color:#ff4d6d;">● crowding risk (mPEDOCS-based, ED state entered)</span> &nbsp;·&nbsp;
-          <span style="color:#00e5c3;">● surge window reduction (no surge confirmed)</span>
-        </div>
-        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
-          <div style="font-size:9px;color:#8892b0;">Surge window reduction (15–21:00 decay when no surge confirmed)</div>
-          <button id="surge-window-toggle" onclick="toggleSurgeWindowReduction()" class="bccf-toggle-btn on" style="white-space:nowrap;flex-shrink:0;">ON</button>
-        </div>
-        <!-- Late-night surge warning — shown when evening build-up threshold crossed -->
-        <div id="late-night-warning" style="display:none;margin-top:10px;padding:8px 10px;border-radius:6px;border:1px solid #ffd166;background:rgba(255,209,102,0.07);">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-            <span style="font-size:14px;">🌙</span>
-            <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;" id="late-night-warning-level">WATCH</span>
-            <span style="font-size:9px;color:#8892b0;font-family:'Space Mono',monospace;">Late-Night Surge Risk</span>
-          </div>
-          <div style="font-size:9px;color:#c8cfe8;" id="late-night-warning-text"></div>
-        </div>
-      </div>
-    </div>
-
-
     <!-- CURRENT STATUS -->
     <div class="sdiv">Current Status</div>
     <div class="panel">
@@ -3142,6 +3683,21 @@ function renderDashboard(iliData = null) {
               <div style="font-size:9px;color:#8892b0;" id="surge-start-offset-lbl">now</div>
             </div>
             <button class="tsbtn" onclick="adjustSurgeStartHour(1)" style="min-width:32px;">+</button>
+          </div>
+        </div>
+        <!-- Surge hour arrivals — shown when surge active, informs survival volume band -->
+        <div id="surge-vol-row" style="display:none;margin-bottom:10px;padding:8px 10px;background:rgba(255,77,109,0.04);border:1px solid rgba(255,77,109,0.2);border-radius:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div style="font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Arrivals This Hour</div>
+            <div style="font-size:9px;font-family:'Space Mono',monospace;color:#ff4d6d;" id="surge-vol-band-lbl"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="tsbtn" onclick="adjustSurgeVol(-1)" style="min-width:32px;">−</button>
+            <div style="flex:1;text-align:center;">
+              <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:#ff4d6d;" id="surge-vol-display">10</div>
+              <div style="font-size:8px;color:#8892b0;">arrivals / hour</div>
+            </div>
+            <button class="tsbtn" onclick="adjustSurgeVol(1)" style="min-width:32px;">+</button>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">
@@ -3165,26 +3721,60 @@ function renderDashboard(iliData = null) {
           </div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:#8892b0;" id="sf-calc-score">—</div>
         </div>
-        <!-- Evening Build-up Late Night Risk -->
-        <div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <div style="font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Evening Build-up · Total Arrivals 18–21:00</div>
-            <div id="eve-build-badge" style="font-size:8px;font-family:'Space Mono',monospace;color:#8892b0;">—</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="tsbtn" onclick="adjustEveBuild(-5)" style="min-width:32px;">−</button>
-            <div style="flex:1;text-align:center;">
-              <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:#8892b0;" id="eve-build-display">0</div>
-              <div style="font-size:8px;color:#8892b0;">combined across 18, 19, 20, 21:00</div>
-            </div>
-            <button class="tsbtn" onclick="adjustEveBuild(5)" style="min-width:32px;">+</button>
-          </div>
-          <div style="font-size:8px;color:#4a5568;margin-top:5px;text-align:center;">4-hour window total · 25=watch · 30=elevated · 35=high</div>
-        </div>
         <button onclick="resetSurgeInputs()" style="margin-top:10px;width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;padding:9px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Reset All Inputs</button>
       </div>
     </div>
 
+    <!-- 24h FORECAST -->
+
+    <div class="sdiv">24-Hour Surge Forecast</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Hourly Surge Probability · Next 24h</div><div class="badge badge-g">CALENDAR · ILI · EVENTS · SURVIVAL</div></div>
+      <div class="pb">
+        <div class="forecast-bars-wrap">
+        <div style="display:flex;gap:3px;">${hourLabelsHTML}</div>
+        <div class="forecast-bars-inner" style="display:flex;gap:3px;height:90px;align-items:flex-end;">
+          ${forecastBarsHTML}
+        </div></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);">
+          ▪ Bar height = surge probability for that hour &nbsp;·&nbsp; 
+          <span style="color:var(--green);">■ LOW</span> &nbsp;
+          <span style="color:var(--accent3);">■ WATCH</span> &nbsp;
+          <span style="color:var(--orange);">■ ELEVATED</span> &nbsp;
+          <span style="color:var(--red);">■ SURGE RISK</span> &nbsp;·&nbsp;
+          <span style="color:#ff4d6d;">● surge active (persistence model)</span> &nbsp;·&nbsp;
+          <span style="color:#00e5c3;">● surge window reduction (no surge confirmed)</span>
+        </div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <div style="font-size:9px;color:#8892b0;">Surge window reduction (15–21:00 decay when no surge confirmed)</div>
+          <button id="surge-window-toggle" onclick="toggleSurgeWindowReduction()" class="bccf-toggle-btn on" style="white-space:nowrap;flex-shrink:0;">ON</button>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- 24h ARRIVALS FORECAST -->
+    <div class="sdiv">24-Hour Arrivals Forecast</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Est. Arrivals / Hour · Next 24h</div><div class="badge badge-b">DOW × HOUR · VALIDATED MODIFIERS</div></div>
+      <div class="pb">
+        <div class="forecast-bars-wrap">
+        <div style="display:flex;gap:3px;">${arrHourLabelsHTML}</div>
+        <div style="display:flex;gap:3px;height:70px;align-items:flex-end;" class="arrivals-bars-inner">
+          ${arrivalsForecastHTML}
+        </div></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);">
+          ▪ DOW × hour median · ILI · school calendar · local events · post-event lags · Zoolights · graduation (Jun 1–7) &nbsp;·&nbsp;
+          <span style="color:var(--green);">■ &lt;6</span> &nbsp;
+          <span style="color:var(--accent3);">■ 6–8</span> &nbsp;
+          <span style="color:var(--orange);">■ 9–11</span> &nbsp;
+          <span style="color:var(--red);">■ ≥12</span> &nbsp;arrivals/hr
+        </div>
+      </div>
+    </div>
+
+    <!-- 7-DAY FORECAST -->
     <!-- ROW 1: ILI + School + Factors -->
     <div class="row3">
 
@@ -3283,7 +3873,7 @@ function renderDashboard(iliData = null) {
 
     </div>
 
-    <!-- 7-DAY FORECAST -->
+
     <div class="sdiv">7-Day Outlook</div>
     <div class="panel">
       <div class="ph"><div class="pt">7-Day Peak Surge Probability · Est. Daily Arrivals</div><div class="badge badge-b">SCHOOL &amp; LOCAL EVENTS · ILI ADJUSTED</div></div>
@@ -3366,7 +3956,7 @@ function renderDashboard(iliData = null) {
     });
     var sfMap = {mp_wr:'sf-d-wr', mp_tp:'sf-d-tp'};
     updateSurgeBacktimeUI();
-    updateEveBuildUI();
+    updateSurgeVolUI();
     // Restore surge window reduction toggle state
     var swBtn = document.getElementById('surge-window-toggle');
     if (swBtn) {
@@ -3518,7 +4108,7 @@ if(_obsBtn)_obsBtn.addEventListener('click',function(){switchTab('settings');});
 // ═══ mPEDOCS ═══
 var MP8_THRESH={"70": {"intercept": -2.623783, "mpedocs": 0.036972, "arrivals": 0.176066, "hour": 0.065275, "auc": 0.8418}, "80": {"intercept": -2.992394, "mpedocs": 0.031171, "arrivals": 0.205383, "hour": 0.04129, "auc": 0.8378}, "100": {"intercept": -4.109889, "mpedocs": 0.025049, "arrivals": 0.093652, "hour": 0.018659, "auc": 0.8517}, "120": {"intercept": -5.489003, "mpedocs": 0.022403, "arrivals": 0.113538, "hour": 0.011209, "auc": 0.868}};
 var MP8_SEL=100;
-var S={in_mpedocs:60,in_arrivals:0,in_hour:new Date().getHours(),in_resp_load:0,in_gi_load:0,in_mh_load:0,in_eve_build:0};
+var S={in_mpedocs:60,in_arrivals:0,in_hour:new Date().getHours(),in_mh_load:0};
 var SURGE_FLAG_ACTIVE = false;
 var SURGE_START_OFFSET = 0;
 var SURGE_WINDOW_REDUCTION_ON = true; // can be disabled in Settings // hours before now surge started (0=now, 1=1h ago, etc.)
@@ -3561,96 +4151,43 @@ function toggleSurgeWindowReduction() {
   renderDashboard(_cachedIliData);
 }
 
-// ── Evening Build-up Late Night Risk ──────────────────────────────────────
-function getLateNightMod() {
-  // Returns RR multiplier for 22:00-23:00 based on 18-21 build-up total
-  // Empirical: eve>=35 RR=2.05x, eve>=30 RR=2.46x, eve>=25 RR=2.54x (p<0.05)
-  var v = S.in_eve_build || 0;
-  if (v >= 35) return { mod: 2.05, level: 'HIGH',     col: '#ff4d6d' };
-  if (v >= 30) return { mod: 1.80, level: 'ELEVATED', col: '#ff9a3c' };
-  if (v >= 25) return { mod: 1.45, level: 'WATCH',    col: '#ffd166' };
-  return { mod: 1.0, level: null, col: null };
+function getVolBand(vol, thresh) {
+  if (vol <= thresh + 1) return 'low';
+  if (vol <= thresh + 4) return 'mid';
+  return 'high';
 }
 
-function adjustEveBuild(delta) {
-  var h = new Date().getHours();
-  if (h < 18 || h > 23) return;  // inactive outside 18:00-23:00
-  var current = S.in_eve_build || 0;
-  // First press from 0 jumps to 25 (minimum meaningful threshold)
-  if (current === 0 && delta > 0) {
-    S.in_eve_build = 25;
-  } else {
-    S.in_eve_build = Math.max(0, Math.min(80, current + delta));
+function updateSurgeVolUI() {
+  var row  = document.getElementById('surge-vol-row');
+  var disp = document.getElementById('surge-vol-display');
+  var lbl  = document.getElementById('surge-vol-band-lbl');
+  if (!row) return;
+  if (!SURGE_FLAG_ACTIVE) { row.style.display = 'none'; return; }
+  row.style.display = 'block';
+  if (disp) disp.textContent = SURGE_VOL;
+  if (lbl) {
+    var band = getVolBand(SURGE_VOL, SURGE_THRESH);
+    var labels = { low: 'LOW INTENSITY', mid: 'MODERATE', high: 'HIGH INTENSITY' };
+    lbl.textContent = labels[band];
   }
-  updateEveBuildUI();
+}
+
+function adjustSurgeVol(delta) {
+  SURGE_VOL = Math.max(SURGE_THRESH, Math.min(30, SURGE_VOL + delta));
+  updateSurgeVolUI();
   updateForecastBars();
   renderDashboard(_cachedIliData);
 }
 
-function updateEveBuildUI() {
-  var disp  = document.getElementById('eve-build-display');
-  var badge = document.getElementById('eve-build-badge');
-  var warn  = document.getElementById('late-night-warning');
-  var wlvl  = document.getElementById('late-night-warning-level');
-  var wtxt  = document.getElementById('late-night-warning-text');
-  if (!disp) return;
 
-  var h = new Date().getHours();
-  var active = h >= 18 && h <= 23;  // only active 18:00-23:00
-  var v = S.in_eve_build || 0;
-  var info = getLateNightMod();
 
-  // Display value — dim when outside active window
-  if (disp) {
-    disp.textContent = v;
-    disp.style.color = active ? (info.col || '#8892b0') : '#4a5568';
-  }
 
-  // Badge — show inactive state outside window
-  if (badge) {
-    if (!active) {
-      badge.textContent = 'inactive until 18:00';
-      badge.style.color = '#4a5568';
-    } else if (info.level) {
-      badge.textContent = info.level;
-      badge.style.color = info.col;
-    } else {
-      badge.textContent = v > 0 ? 'NORMAL' : '—';
-      badge.style.color = '#8892b0';
-    }
-  }
-
-  // Warning card — only when active window AND threshold crossed
-  var showWarn = active && info.level !== null;
-  if (warn) warn.style.display = showWarn ? 'block' : 'none';
-  if (showWarn && wlvl && wtxt) {
-    wlvl.textContent = info.level;
-    wlvl.style.color = info.col;
-    warn.style.borderColor = info.col;
-    warn.style.background  = info.col + '12';
-    wtxt.textContent = 'Evening build-up ' + v + ' arrivals (18–21:00). '
-      + 'Empirical RR ×' + info.mod.toFixed(2) + ' for 22:00 surge (4-hour window total). '
-      + '22:00–23:00 bars adjusted.';
-  }
-}
-
-// Auto-clear eve build at midnight so stale data doesn't carry to next day
-(function scheduleEveBuildReset() {
-  var now = new Date();
-  var msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1) - now;
-  setTimeout(function() {
-    S.in_eve_build = 0;
-    updateEveBuildUI();
-    updateForecastBars();
-    scheduleEveBuildReset();  // reschedule for next midnight
-  }, msUntilMidnight);
-})();
 var SURGE_CONFIRMED_HOUR = null;  // hour-of-day when surge was confirmed
- // true once staff enter any WR/TP/arrivals value
+
 function setSurgeFlag(val){
   SURGE_FLAG_ACTIVE = val;
-  if(val) { SURGE_CONFIRMED_HOUR = new Date().getHours(); SURGE_START_OFFSET = 0; }
-  else { SURGE_CONFIRMED_HOUR = null; SURGE_START_OFFSET = 0; }
+  if(val) { SURGE_CONFIRMED_HOUR = new Date().getHours(); SURGE_START_OFFSET = 0; SURGE_VOL = SURGE_THRESH; }
+  else { SURGE_CONFIRMED_HOUR = null; SURGE_START_OFFSET = 0; SURGE_VOL = SURGE_THRESH; }
 
   var yesBtn = document.getElementById('surge-flag-yes');
   var noBtn  = document.getElementById('surge-flag-no');
@@ -3666,6 +4203,7 @@ function setSurgeFlag(val){
   renderMpedocs();
   updateForecastBars();
   updateSurgeBacktimeUI();
+  updateSurgeVolUI();
   renderDashboard(_cachedIliData);
 }
 
@@ -3686,13 +4224,7 @@ function updateForecastBars(){
         var mult2=getSurgeWindowMultiplier(now.getHours());
         if(mult2<1.0){fp=fp*mult2;isSurv=true;}
       }
-      // Apply evening build-up late-night modifier to 22:00 and 23:00
-      // Only active when current hour is 18-23
-      var nowHr=now.getHours();
-      if((h===22||h===23)&&nowHr>=18&&nowHr<=23){
-        var lnInfo2=getLateNightMod();
-        if(lnInfo2.mod>1.0){fp=Math.min(1.0,fp*lnInfo2.mod);}
-      }
+
     } else if(SURGE_FLAG_ACTIVE&&i>=0&&i<=6){
       var startH2 = SURGE_CONFIRMED_HOUR !== null ? SURGE_CONFIRMED_HOUR : now.getHours();
       var effOff2 = i + SURGE_START_OFFSET;
@@ -3701,12 +4233,12 @@ function updateForecastBars(){
       else { fp=getSurvivalProb(startH2,6); isPers=true; }
     }
     var col=surgeBarColor(fp),pct=Math.round(fp*100);
-    var divs=cols[i].children; if(divs.length<3)continue;
-    var fill=divs[1].children[0];
+    var divs=cols[i].children; if(divs.length<2)continue;
+    var fill=divs[0].children[0];
     if(fill){fill.style.height=Math.max(4,Math.round(fp*90))+'px';fill.style.background=col;fill.style.borderTop=isPers?'2px solid rgba(255,77,109,0.6)':isSurv?'2px solid rgba(0,229,195,0.4)':'';
     }
-    divs[2].textContent=pct+'%'; divs[2].style.color=col;
-    if(divs[3])divs[3].style.background=isPers?'#ff4d6d':isSurv?'#00e5c3':'transparent';
+    divs[1].textContent=pct+'%'; divs[1].style.color=col;
+    if(divs[2])divs[2].style.background=isPers?'#ff4d6d':isSurv?'#00e5c3':'transparent';
   }
 }
 
@@ -3770,12 +4302,10 @@ document.querySelectorAll('.tstepper[data-id]').forEach(function(el){
     v=Math.max(mn,Math.min(mx2,+v||0));inp.value=v;S[id]=v;
     if(disp&&disp!==_DUMMY_EL)disp.textContent=v;
     renderMpedocs();
-    if(id==='in_resp_load') return; // handled by slider
-    if(id==='in_resp_load') { updateRespLoad(); renderDashboard(_cachedIliData); }
   }
   el.querySelectorAll('.tsbtn').forEach(function(b){b.addEventListener('click',function(){set(+inp.value + +this.dataset.d*st);});});
   inp.addEventListener('change',function(){set(this.value);});
-  inp.addEventListener('input',function(){var v=+this.value;if(!isNaN(v)){S[id]=v;renderMpedocs();if(id==='in_resp_load'){updateRespLoad();renderDashboard(_cachedIliData);}}});
+  inp.addEventListener('input',function(){var v=+this.value;if(!isNaN(v)){S[id]=v;renderMpedocs();}});
 });
 
 // ── Surge panel ─────────────────────────────────────────────────────────────
@@ -3787,7 +4317,7 @@ function resetSurgeInputs(){
   });
   // Reset state
   S.in_arrivals=0;
-  S.in_eve_build=0;
+  SURGE_VOL=SURGE_THRESH;
   // Reset displays
   var ids=['sf-d-wr','sf-d-tp'];
   ids.forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=0;});
@@ -3801,7 +4331,6 @@ function resetSurgeInputs(){
   if(arrInp)arrInp.value=0;
   if(arrD)arrD.textContent=0;
   updateSurgeBacktimeUI();
-  updateEveBuildUI();
   updateForecastBars();
   renderMpedocs();
 }
@@ -3865,131 +4394,11 @@ function updateMHLoad() {
   if(slider){ slider.style.background='linear-gradient(to right,'+col+' 0%,'+col+' '+pct+'%,#1a1e30 '+pct+'%,#1a1e30 100%)'; }
 }
 
-function getGILoadMod() {
-  // Derived from ED Dx: gastroenteritis|vomiting|diarrhea|nausea
-  // lag+1 Fishers exact. mean=14.1/day
-  var v = S.in_gi_load || 0;
-  if (v >= 25) return 1.08;
-  if (v >= 22) return 1.07;
-  if (v >= 19) return 1.08;
-  if (v >= 16) return 1.09;
-  if (v >= 14) return 1.11;
-  if (v >= 1)  return 1.05;
-  return 1.0;
-}
 
-function onGISlider(val) {
-  val = parseInt(val) || 0;
-  S.in_gi_load = val;
-  updateGILoad();
-  renderDashboard(_cachedIliData);
-}
 
-function updateGILoad() {
-  var v = S.in_gi_load || 0;
-  var slider = document.getElementById("gi-load-slider");
-  var badge  = document.getElementById("gi-load-badge");
-  var desc   = document.getElementById("gi-load-desc");
-  var fcast  = document.getElementById("gi-load-forecast");
-  var disp   = document.getElementById("d-gi-load");
-  var bar    = document.getElementById("gi-load-bar");
-  var level, col, descTxt, fcastTxt;
-  if (v >= 25) {
-    level="CRITICAL"; col="#ff4d6d";
-    descTxt=">=25 -- critical (x1.08)";
-    fcastTxt="⚠️ Critical load (RR=1.08x). Monitor closely.";
-  } else if (v >= 22) {
-    level="ELEVATED"; col="#ff9a3c";
-    descTxt=">=22 -- elevated (x1.07)";
-    fcastTxt="🔶 Elevated load (RR=1.07x). Monitor closely.";
-  } else if (v >= 19) {
-    level="ALERT"; col="#ffd166";
-    descTxt=">=19 -- alert (x1.08)";
-    fcastTxt="🟡 Alert load (RR=1.08x). Monitor closely.";
-  } else if (v >= 16) {
-    level="WATCH"; col="#60a5fa";
-    descTxt=">=16 -- watch (x1.09)";
-    fcastTxt="🔵 Watch load (RR=1.09x). Monitor closely.";
-  } else if (v >= 14) {
-    level="WATCH"; col="#60a5fa";
-    descTxt=">=14 -- watch (x1.11)";
-    fcastTxt="🔵 Watch load (RR=1.11x). Monitor closely.";
-  } else {
-    level="NORMAL"; col="#39d98a";
-    descTxt="within normal range";
-    fcastTxt = v > 0 ? "Load within normal range." : "";
-  }
-  var pct = Math.min(100, Math.round(v / 25 * 100));
-  if(badge)  { badge.textContent=level; badge.style.color=col; badge.style.borderColor=col; }
-  if(desc)   { desc.textContent=descTxt; desc.style.color=col; }
-  if(fcast)  { fcast.textContent=fcastTxt; fcast.style.color=v>=14?col:"#8892b0"; }
-  if(disp)   { disp.textContent=v; disp.style.color=col; }
-  if(bar)    { bar.style.width=pct+"%"; bar.style.background=col; }
-  if(slider) { slider.style.background="linear-gradient(to right,"+col+" 0%,"+col+" "+pct+"%,#1a1e30 "+pct+"%,#1a1e30 100%)"; }
-}
 
-function getRespLoadMod() {
-  // Derived from ED Dx: asthma|bronchiol|pneumonia|\buri\b|croup|rsv|influenza|otitis
-  // lag+1 Fishers exact. mean=27.6/day
-  var v = S.in_resp_load || 0;
-  if (v >= 57) return 1.08;
-  if (v >= 48) return 1.08;
-  if (v >= 38) return 1.09;
-  if (v >= 31) return 1.11;
-  if (v >= 26) return 1.13;
-  if (v >= 1)  return 1.05;
-  return 1.0;
-}
 
-function onRespSlider(val) {
-  val = parseInt(val) || 0;
-  S.in_resp_load = val;
-  updateRespLoad();
-  renderDashboard(_cachedIliData);
-}
 
-function updateRespLoad() {
-  var v = S.in_resp_load || 0;
-  var slider = document.getElementById("resp-load-slider");
-  var badge  = document.getElementById("resp-load-badge");
-  var desc   = document.getElementById("resp-load-desc");
-  var fcast  = document.getElementById("resp-load-forecast");
-  var disp   = document.getElementById("d-resp-load");
-  var bar    = document.getElementById("resp-load-bar");
-  var level, col, descTxt, fcastTxt;
-  if (v >= 57) {
-    level="CRITICAL"; col="#ff4d6d";
-    descTxt=">=57 -- critical (x1.08)";
-    fcastTxt="⚠️ Critical load (RR=1.08x). Monitor closely.";
-  } else if (v >= 48) {
-    level="ELEVATED"; col="#ff9a3c";
-    descTxt=">=48 -- elevated (x1.08)";
-    fcastTxt="🔶 Elevated load (RR=1.08x). Monitor closely.";
-  } else if (v >= 38) {
-    level="ALERT"; col="#ffd166";
-    descTxt=">=38 -- alert (x1.09)";
-    fcastTxt="🟡 Alert load (RR=1.09x). Monitor closely.";
-  } else if (v >= 31) {
-    level="WATCH"; col="#60a5fa";
-    descTxt=">=31 -- watch (x1.11)";
-    fcastTxt="🔵 Watch load (RR=1.11x). Monitor closely.";
-  } else if (v >= 26) {
-    level="WATCH"; col="#60a5fa";
-    descTxt=">=26 -- watch (x1.13)";
-    fcastTxt="🔵 Watch load (RR=1.13x). Monitor closely.";
-  } else {
-    level="NORMAL"; col="#39d98a";
-    descTxt="within normal range";
-    fcastTxt = v > 0 ? "Load within normal range." : "";
-  }
-  var pct = Math.min(100, Math.round(v / 57 * 100));
-  if(badge)  { badge.textContent=level; badge.style.color=col; badge.style.borderColor=col; }
-  if(desc)   { desc.textContent=descTxt; desc.style.color=col; }
-  if(fcast)  { fcast.textContent=fcastTxt; fcast.style.color=v>=26?col:"#8892b0"; }
-  if(disp)   { disp.textContent=v; disp.style.color=col; }
-  if(bar)    { bar.style.width=pct+"%"; bar.style.background=col; }
-  if(slider) { slider.style.background="linear-gradient(to right,"+col+" 0%,"+col+" "+pct+"%,#1a1e30 "+pct+"%,#1a1e30 100%)"; }
-}
 
 function getSfWR(){ var el=document.querySelector('.tstepper[data-sfid="mp_wr"] .tsval'); return el?+el.value||0:0; }
 function getSfTP(){ var el=document.querySelector('.tstepper[data-sfid="mp_tp"] .tsval'); return el?+el.value||0:0; }
@@ -4365,56 +4774,70 @@ autoMpBCCF();
 // ═══════════════════════════════════════════════════════════════════════════
 const TRENDS_BASELINE = {
   thresholds: {
-    'norovirus':           {p25:4,  p50:6,  p75:11},
-    'child cough':         {p25:2,  p50:2,  p75:2 },
-    'Mary Bridge':         {p25:9,  p50:10, p75:11},
-    'kids sick':           {p25:2,  p50:2,  p75:2 },
-    'child fever':         {p25:2,  p50:2,  p75:3 },
+    'norovirus': {p25:4, p50:6, p75:11},
+    'child cough': {p25:2, p50:2, p75:2},
+    'Mary Bridge': {p25:9, p50:10, p75:11},
+    'kids sick': {p25:2, p50:2, p75:2},
+    'child fever': {p25:2, p50:2, p75:3},
     'urgent care near me': {p25:55, p50:63, p75:73},
-    'croup':               {p25:12, p50:15, p75:20},
-    'mass shooting':       {p25:3,  p50:4,  p75:7 },
-    'suicide':             {p25:48, p50:51, p75:55},
-    'overdose symptoms':   {p25:0,  p50:0,  p75:58},
-    'crisis hotline':      {p25:0,  p50:0,  p75:0 },
-    'teen suicide':        {p25:0,  p50:0,  p75:0 },
-    'how to commit suicide':{p25:0, p50:0,  p75:0 },
-    'fentanyl overdose':   {p25:0,  p50:0,  p75:0 },
-    'melatonin overdose':  {p25:0,  p50:0,  p75:0 },
-    'Tylenol overdose':    {p25:0,  p50:0,  p75:0 },
-    'MultiCare behavioral health':{p25:0,p50:0,p75:0},
-    'anxiety attack':      {p25:49, p50:59, p75:69},
-    'youth crisis line':   {p25:0,  p50:0,  p75:23},
+    'croup': {p25:12, p50:15, p75:20},
+    'mass shooting': {p25:3, p50:4, p75:7},
+    'suicide': {p25:48, p50:51, p75:55},
+    'crisis hotline': {p25:0, p50:0, p75:0},
+    'overdose symptoms': {p25:0, p50:0, p75:58},
+    'anxiety attack': {p25:49, p50:59, p75:69},
+    'teen suicide': {p25:0, p50:0, p75:0},
+    'how to commit suicide': {p25:0, p50:0, p75:0},
+    'fentanyl overdose': {p25:0, p50:0, p75:0},
+    'melatonin overdose': {p25:0, p50:0, p75:0},
+    'Tylenol overdose': {p25:0, p50:0, p75:0},
+    'MultiCare behavioral health': {p25:0, p50:0, p75:0},
+    'youth crisis line': {p25:0, p50:0, p75:23},
   },
-  // Embedded snapshot: week of 2026-03-22 — auto-updated weekly
+  // Embedded snapshot: week of 2026-03-25 — auto-updated weekly
   latest: {
-    'norovirus':45.0,'child cough':4.0,'Mary Bridge':51.0,'kids sick':7.0,
-    'child fever':10.0,'urgent care near me':51.0,'croup':15.0,'mass shooting':3.0,
-    'suicide':60.0,'overdose symptoms':67.0,'crisis hotline':0.0,
-    'teen suicide':0.0,'how to commit suicide':0.0,'fentanyl overdose':0.0,
-    'melatonin overdose':0.0,'Tylenol overdose':0.0,'MultiCare behavioral health':0.0,
+    'norovirus':34.0,
+    'child cough':3.0,
+    'Mary Bridge':36.0,
+    'kids sick':6.0,
+    'child fever':9.0,
+    'urgent care near me':17.0,
+    'croup':5.0,
+    'mass shooting':2.0,
+    'suicide':48.0,
+    'crisis hotline':1.0,
+    'overdose symptoms':35.0,
+    'anxiety attack':83.0,
+    'teen suicide':27.0,
+    'how to commit suicide':22.0,
+    'fentanyl overdose':30.0,
+    'melatonin overdose':16.0,
+    'Tylenol overdose':22.0,
+    'MultiCare behavioral health':5.0,
+    'youth crisis line':5.0,
   },
   sparklines: {
-    'norovirus':          [29.0, 27.0, 20.0, 32.0, 39.0, 48.0, 14.0, 17.0, 17.0, 35.0, 57.0, 45.0],
-    'child cough':        [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 4.0],
-    'Mary Bridge':        [37.0, 38.0, 30.0, 36.0, 37.0, 42.0, 32.0, 39.0, 26.0, 63.0, 48.0, 51.0],
-    'kids sick':          [8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 6.0, 7.0],
-    'child fever':        [0.0, 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 10.0],
-    'urgent care near me':[64.0, 34.0, 57.0, 46.0, 51.0, 40.0, 77.0, 55.0, 39.0, 47.0, 49.0, 51.0],
-    'croup':              [0.0, 0.0, 0.0, 0.0, 11.0, 0.0, 0.0, 6.0, 0.0, 9.0, 15.0, 15.0],
-    'mass shooting':      [4.0, 4.0, 2.0, 0.0, 3.0, 2.0, 3.0, 14.0, 4.0, 26.0, 3.0, 3.0],
-    'suicide':            [47.0, 51.0, 52.0, 51.0, 50.0, 53.0, 48.0, 52.0, 51.0, 52.0, 52.0, 60.0],
-    'overdose symptoms':  [86.0, 0.0, 83.0, 68.0, 65.0, 0.0, 0.0, 77.0, 0.0, 0.0, 0.0, 67.0],
-    'crisis hotline':     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 77.0, 0.0, 0.0, 78.0],
-    'teen suicide':       [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'how to commit suicide':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 89.0, 0.0],
-    'fentanyl overdose':  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'melatonin overdose': [0.0, 0.0, 0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'Tylenol overdose':   [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'MultiCare behavioral health':[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    'anxiety attack':      [44.0, 36.0, 63.0, 80.0, 66.0, 79.0, 74.0, 49.0, 62.0, 71.0, 44.0, 43.0],
-    'youth crisis line':   [19.0, 19.0, 14.0, 23.0, 25.0, 17.0, 40.0, 20.0, 23.0, 23.0, 0.0, 16.0],
+    'norovirus':          [17.0, 21.0, 24.0, 30.0, 40.0, 43.0, 19.0, 28.0, 30.0, 55.0, 44.0, 34.0],
+    'child cough':          [0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0, 3.0, 3.0],
+    'Mary Bridge':          [23.0, 21.0, 24.0, 30.0, 38.0, 18.0, 29.0, 24.0, 20.0, 37.0, 34.0, 36.0],
+    'kids sick':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 5.0, 6.0],
+    'child fever':          [0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 9.0],
+    'urgent care near me':          [13.0, 17.0, 16.0, 20.0, 16.0, 20.0, 18.0, 18.0, 14.0, 17.0, 16.0, 17.0],
+    'croup':          [2.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 5.0, 5.0],
+    'mass shooting':          [0.0, 0.0, 2.0, 0.0, 0.0, 5.0, 3.0, 2.0, 9.0, 0.0, 2.0, 2.0],
+    'suicide':          [66.0, 51.0, 55.0, 56.0, 71.0, 71.0, 68.0, 75.0, 73.0, 62.0, 47.0, 48.0],
+    'crisis hotline':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+    'overdose symptoms':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 32.0, 35.0],
+    'anxiety attack':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 12.0, 81.0, 83.0],
+    'teen suicide':          [29.0, 22.0, 21.0, 36.0, 46.0, 54.0, 43.0, 42.0, 41.0, 40.0, 27.0, 27.0],
+    'how to commit suicide':          [12.0, 8.0, 19.0, 24.0, 31.0, 24.0, 24.0, 23.0, 21.0, 27.0, 22.0, 22.0],
+    'fentanyl overdose':          [44.0, 38.0, 50.0, 45.0, 45.0, 45.0, 54.0, 50.0, 54.0, 47.0, 31.0, 30.0],
+    'melatonin overdose':          [19.0, 12.0, 16.0, 13.0, 22.0, 11.0, 15.0, 12.0, 12.0, 18.0, 18.0, 16.0],
+    'Tylenol overdose':          [23.0, 26.0, 19.0, 19.0, 29.0, 24.0, 22.0, 28.0, 19.0, 26.0, 21.0, 22.0],
+    'MultiCare behavioral health':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 1.0, 6.0, 5.0],
+    'youth crisis line':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 6.0, 5.0],
   },
-  fetched: '2026-03-22',
+  fetched: '2026-03-25',
 };
 
 const TRENDS_META = {
@@ -4537,12 +4960,9 @@ function renderCommunitySignal() {
 })();
 calcMpCalc();
 updateMpTick();
-updateRespLoad();
-updateGILoad();
 updateMHLoad();
 renderMpedocs();
 renderSurgeDashboard();
-updateEveBuildUI();
 setTimeout(function(){
   var _s=document.getElementById('sc-surge');if(_s)_s.scrollTop=0;
   renderCommunitySignal();
