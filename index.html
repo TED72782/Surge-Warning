@@ -4874,7 +4874,7 @@ function renderCommunitySignal() {
   var fetched = data.fetched || TRENDS_BASELINE.fetched;
 
   // Days since last update
-  var daysSince = Math.round((new Date() - new Date(fetched)) / 86400000);
+  var daysSince = Math.floor((new Date() - new Date(fetched)) / 86400000);
   var staleBadge = daysSince > 30
     ? '<span style="color:#ff4d6d;font-size:9px;font-family:\'Space Mono\',monospace;">⚠️ '+daysSince+'d old — refresh in Settings</span>'
     : '<span style="color:#8892b0;font-size:9px;font-family:\'Space Mono\',monospace;">updated '+daysSince+'d ago</span>';
@@ -5066,7 +5066,7 @@ function renderMHTrends() {
   var sparks = data.sparklines || TRENDS_BASELINE.sparklines;
   var fetched = data.fetched || TRENDS_BASELINE.fetched;
 
-  var daysSince = Math.round((new Date() - new Date(fetched)) / 86400000);
+  var daysSince = Math.floor((new Date() - new Date(fetched)) / 86400000);
   var staleNote = daysSince > 30 ? ' · <span style="color:#ff4d6d;">⚠ '+daysSince+'d old</span>' : '';
 
   var groups = [
