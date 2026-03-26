@@ -3204,7 +3204,7 @@ function renderDashboard(iliData = null) {
       else if(effOffset<=6){ fp=getSurvivalProb(startH, effOffset); isPersistence=true; }
       else { fp=getSurvivalProb(startH, 6); isPersistence=true; }
     }
-    nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}:00`, isPersistence, isSurvival });
+    nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}`, isPersistence, isSurvival });
   }
 
   // ── 7-day daily surge forecast ─────────────────────────────────────────
@@ -5239,7 +5239,7 @@ function renderMHTab(){
       var fBarMod   = fMhMod.mod  * mhLoadMod;
       var lam = getMHExpected(fHour,fDow,fMonth) * fBarMod;
       var p=1-Math.exp(-lam); // Poisson P(>=1)
-      pVals.push({p:p, lam:lam, lbl:String(fh.getHours()).padStart(2,'0')+':00'});
+      pVals.push({p:p, lam:lam, lbl:String(fh.getHours()).padStart(2,'0')});
     }
     for(var i=0;i<24;i++){
       var pv=pVals[i];
