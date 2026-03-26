@@ -969,6 +969,19 @@ to { opacity:1; transform:translateY(0); }
 
 <div class="app-screen" id="sc-settings">
 <div class="t-body">
+  <div class="tsec">Community Illness Trends</div>
+  <div class="tp">
+    <div class="tph"><div class="tpt">Community Illness Modifier</div><div class="tbadge-g">GOOGLE TRENDS · TODAY ONLY</div></div>
+    <div class="tpb">
+      <div style="font-size:10px;color:#8892b0;margin-bottom:10px;line-height:1.6;">
+        Applies local Google Trends (norovirus · child fever · child cough) as a real-time modifier to today's surge probability and arrivals forecasts.
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="community-ill-toggle" onclick="toggleCommunityIllMod()" class="bccf-toggle-btn" style="white-space:nowrap;">OFF</button>
+        <div style="font-size:9px;color:#8892b0;" id="community-ill-status">Modifier inactive · toggle ON to apply community illness signal</div>
+      </div>
+    </div>
+  </div>
   <div class="tsec">mPEDOCS Threshold</div>
   <div class="tp" style="margin-bottom:16px;">
     <div class="tph"><div class="tpt">8h Prediction &amp; Persistence Model</div><div class="tbadge-g">Controls forecast bars</div></div>
@@ -1180,6 +1193,7 @@ to { opacity:1; transform:translateY(0); }
       <div><span style="color:#c8cfe8;font-weight:600;">LOS reference:</span> Discharge median 5.0h · Admit median 5.8h · Transfer median 17.7h · 90th pct 24.9h</div>
       <div><span style="color:#c8cfe8;font-weight:600;">LOS pattern:</span> Morning arrivals (08:00) avg 8.9h vs late evening (21:00) avg 20.8h</div>
       <div><span style="color:#c8cfe8;font-weight:600;">MH autocorrelation:</span> RR ×1.50 lag+1, ×1.85 lag+7 (weekly rhythm)</div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Above Threshold stat:</span> Shows today's estimated MH visits as a percentage of the user-set surge threshold (dailyEst ÷ threshold × 100%). A value of 100% means the estimate equals the threshold; &gt;100% means it exceeds it. The threshold is adjustable via the "MH Surge ≥" slider (default 8/day). Historical base rate at each threshold is shown below the slider for context.</div>
       <div><span style="color:#c8cfe8;font-weight:600;">Weather removed:</span> ΔR²&lt;0.001 after ILI controlled. No net predictive value retained.</div>
     </div>
   </div>
@@ -1207,19 +1221,31 @@ to { opacity:1; transform:translateY(0); }
   <div class="sdiv">Mental Health · Community Search Signal</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
-      <div style="margin-bottom:6px;">Google Trends keywords validated against weekly MH surge rate (≥8 MH visits/day) and suicidal CC visits, 2023–2025. All correlations season-adjusted (partial correlation controlling for summer). Displayed in the MH tab grouped by lead time — the risk badge reflects the search volume from <em>lag weeks ago</em>, not the current week.</div>
-      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;">
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">suicide (WA)</span><span>r=+0.25 · lag+2w · MH surge</span>
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">teen suicide</span><span>r=+0.21 · lag+4w · MH surge · national data (WA sparse)</span>
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">crisis hotline</span><span>r=+0.21 · lag+3w · suicidal CC — help-seeking before ED escalation</span>
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">mass shooting</span><span>r=+0.32 · lag+2w · MH surge — anxiety/contagion effect, season-independent</span>
-        <span style="color:#ffd166;">1w lead</span><span style="color:#c8cfe8;">overdose symptoms</span><span>r=+0.21 · lag+1w · MH surge — caregiver searching after near-miss</span>
-        <span style="color:#ffd166;">1w lead</span><span style="color:#c8cfe8;">Tylenol overdose</span><span>r=+0.20 · lag+1w · overdose CC — common self-harm method in adolescents</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">how to commit suicide</span><span>r=+0.20 · lag0w · MH surge + suicidal CC</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">fentanyl overdose</span><span>r=+0.25 · lag0w · MH surge — community opioid crisis activity</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">melatonin overdose</span><span>r=+0.18 · lag0w · MH surge — pediatric intentional ingestion</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">MultiCare behavioral health</span><span>r=+0.25 · lag0w · MH surge — direct health system search intent</span>
+      <div style="margin-bottom:6px;">Google Trends keywords displayed as leading indicators in the MH tab. Correlations validated against weekly MH visits (2023–2025, n=157 weeks), season-adjusted via partial correlation controlling for month and summer. A full multivariate Ridge regression was run to test whether any keywords justify wiring into the MH forecast model.</div>
+
+      <div style="margin-top:6px;font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Multivariate analysis results</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;margin-bottom:6px;">
+        <span style="color:#c8cfe8;">Seasonal controls only</span><span style="color:#ffd166;">R²_adj=0.390</span><span>Month dummies + summer flag explain 39% of MH visit variance</span>
+        <span style="color:#c8cfe8;">+ All 19 keywords</span><span style="color:#ffd166;">R²_adj=0.414</span><span>ΔR²=+0.025 — tiny incremental gain vs surge model (ΔR²=+0.146)</span>
+        <span style="color:#c8cfe8;">Only 2 significant</span><span style="color:#ffd166;">mass shooting, teen suicide</span><span>p&lt;0.05; all others p&gt;0.19 after seasonal adjustment</span>
       </div>
+
+      <div style="margin-top:6px;font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Keyword correlations (season-adjusted, best lag)</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#39d98a;">**mass shooting</span><span style="color:#c8cfe8;">r=+0.23  p=0.004  +4w</span><span>Only consistent significant predictor. Anxiety/contagion mechanism. Adds ~0.4 MH visits/wk at p75 — real but small.</span>
+        <span style="color:#39d98a;">*teen suicide</span><span style="color:#c8cfe8;">r=+0.20  p=0.016  +4w</span><span>US national data. Adds ~1.1 MH visits/wk at p75.</span>
+        <span style="color:#ffd166;">Tylenol overdose</span><span style="color:#c8cfe8;">r=+0.11  p=0.191</span><span>Not significant after seasonal adjustment.</span>
+        <span style="color:#ffd166;">suicide (WA)</span><span style="color:#c8cfe8;">r=-0.005 p=0.955</span><span>Near-zero after seasonal adjustment — seasonal confound only.</span>
+        <span style="color:#ffd166;">crisis hotline</span><span style="color:#c8cfe8;">r=-0.08  p=0.313</span><span>Not significant.</span>
+        <span style="color:#ffd166;">how to commit suicide</span><span style="color:#c8cfe8;">r=+0.06  p=0.445</span><span>Not significant.</span>
+        <span style="color:#ffd166;">fentanyl overdose</span><span style="color:#c8cfe8;">r=+0.06  p=0.474</span><span>Not significant.</span>
+        <span style="color:#ffd166;">melatonin overdose</span><span style="color:#c8cfe8;">r=+0.08  p=0.308</span><span>Not significant.</span>
+        <span style="color:#ffd166;">anxiety attack</span><span style="color:#c8cfe8;">r=+0.02  p=0.806</span><span>Not significant.</span>
+        <span style="color:#ffd166;">MultiCare BH</span><span style="color:#c8cfe8;">r=-0.08  p=0.311</span><span>Not significant.</span>
+      </div>
+
+      <div style="margin-top:8px;"><span style="color:#c8cfe8;font-weight:600;">Why not wired into the MH forecast model:</span> The keyword set adds only ΔR²=+0.025 to MH visit prediction — far too weak to justify modification of the forecast. The existing <code>getMHLoadMod()</code> autocorrelation (yesterday's MH count, RR=×1.50 lag+1) is a substantially stronger signal. Keywords are retained as display-only contextual indicators.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Contrast with surge model:</span> Respiratory keywords (norovirus, child fever, child cough) add ΔR²=+0.146 to surge prediction and are wired in as the Community Illness Modifier (Settings). MH keywords add ΔR²=+0.025 — not actionable.</div>
       <div style="margin-top:6px;font-size:9px;color:#4a5568;">Not included: cyberbullying/school bullying (seasonal confounding only), 988/suicide hotline/WISE/CCS (insufficient WA volume), suicide prevention (negative correlation — public awareness counter-cycle).</div>
     </div>
   </div>
@@ -1256,6 +1282,28 @@ to { opacity:1; transform:translateY(0); }
         <span style="color:#4a5568;">Month seasonality</span><span style="color:#4a5568;">F=49  p&lt;0.001</span><span>Residual after ILI — largely double-counts ILI. Not applied.</span>
       </div>
       <div style="margin-top:6px;font-size:9px;color:#4a5568;">All event RRs derived directly against DOW×hour-adjusted arrival ratios — not borrowed from the surge probability model. Spring Fair and WIAA Playoffs included in surge model but show no volume signal and are excluded here.</div>
+    </div>
+  </div>
+
+  <!-- Community Illness Trends -->
+  <div class="sdiv">Community Illness Trends Modifier</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Optional real-time modifier applying a composite of local Google Trends search volume (norovirus, child fever, child cough — Pierce County DMA 819) to today's surge probability and arrivals forecasts. Toggled ON/OFF in Settings. Default OFF.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Validation:</span> Composite ratio (average of keyword/p50 for each keyword) validated against 157 weeks of data (2023–2025):</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 12px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#39d98a;">vs weekly surge rate</span><span style="color:#c8cfe8;">r=+0.41–0.54</span><span>season-adjusted (partial r controlling for month dummies). p&lt;0.001 at all thresholds t=6–15.</span>
+        <span style="color:#39d98a;">vs weekly arrival volume</span><span style="color:#c8cfe8;">r=+0.24</span><span>season + ILI adjusted. p=0.002. Slope: +6.4 visits/day per unit ratio. ΔR²=+0.023 beyond ILI.</span>
+        <span style="color:#39d98a;">ILI independence</span><span style="color:#c8cfe8;">r=+0.26</span><span>beyond weekly ILI after seasonal adjustment — local Pierce Co. signal adds independent information.</span>
+      </div>
+      <div style="margin-top:6px;"><span style="color:#c8cfe8;font-weight:600;">Composite:</span> Average of (value / p50) for norovirus (p50=6), child fever (p50=2), child cough (p50=2). Ratio=1.0 = baseline; ratio=2.0 = double baseline search volume.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Scale factors (threshold-specific):</span> Higher thresholds use larger scale factors because rare extreme surge events are more tightly coupled to community illness burden.</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px 8px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#c8cfe8;">t=6: ×0.067</span><span style="color:#c8cfe8;">t=7: ×0.090</span><span style="color:#c8cfe8;">t=8: ×0.121</span><span style="color:#c8cfe8;">t=9: ×0.155</span><span style="color:#c8cfe8;">t=10: ×0.200</span>
+        <span style="color:#c8cfe8;">t=11: ×0.277</span><span style="color:#c8cfe8;">t=12: ×0.370</span><span style="color:#c8cfe8;">t=13: ×0.407</span><span style="color:#c8cfe8;">t=14: ×0.514</span><span style="color:#c8cfe8;">t=15: ×0.580</span>
+      </div>
+      <div style="margin-top:6px;"><span style="color:#c8cfe8;font-weight:600;">Applied to:</span> Today's column only — 24h surge probability bars (calendar model), 7-day today column (surge % and daily arrivals estimate), and 24h arrivals chart. Survival model unaffected (empirical persistence already reflects community illness). Future 7-day columns not adjusted (future search data unknown).</div>
+      <div style="margin-top:4px;font-size:9px;color:#4a5568;">Note: composite ratio uses embedded weekly snapshot updated by refresh_trends.py. Data may lag by up to 7 days.</div>
     </div>
   </div>
 
@@ -3024,7 +3072,8 @@ function onThreshChange(val) {
     calibNote.style.fontStyle = val < 12 ? 'normal' : 'italic';
   }
   // Re-render using cached API data — no network fetch needed
-  renderDashboard(_cachedIliData);
+  renderDashboard(_cachedIliData); // updates COMM_RATIO first
+  updateForecastBars();            // then uses updated COMM_RATIO with new SURGE_THRESH
 }
 
 function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, gradMod = 1.0, iliMod = 1.0, postEventMod = 1.0) {
@@ -3118,6 +3167,9 @@ let iliData = null;
   
 }
 
+var COMMUNITY_ILL_MOD_ON = false; // community illness modifier
+var COMM_RATIO = 1.0; // cached community illness composite ratio — updated each renderDashboard call
+
 function renderDashboard(iliData = null) {
   const now = new Date();
   const hour = now.getHours();
@@ -3177,6 +3229,16 @@ function renderDashboard(iliData = null) {
 
   // ── 24h hourly surge forecast ──────────────────────────────────────────
   const nextHours = [];
+  // Pre-compute community composite ratio (used in 24h bars, 7-day grid, and arrivals forecast)
+  const _commP50 = { 'norovirus': 6, 'child fever': 2, 'child cough': 2 };
+  const _commKws = ['norovirus', 'child fever', 'child cough'];
+  const _commLatest = (typeof TRENDS_BASELINE !== 'undefined' && TRENDS_BASELINE.latest) ? TRENDS_BASELINE.latest : {};
+  const _commRatios = _commKws.map(kw => {
+    const val = _commLatest[kw] || 0;
+    return val / (_commP50[kw] || 1);
+  });
+  COMM_RATIO = _commRatios.reduce((a,b) => a+b, 0) / _commRatios.length; // update module-level cache
+
   for (let i = 0; i < 24; i++) {
     const h = (hour + i) % 24;
     const futureDate = new Date(now.getTime() + i * 3600000);
@@ -3188,6 +3250,8 @@ function renderDashboard(iliData = null) {
     const fGradMod = getGraduationModifier(fd).modifier;
     const { modifier: fPostMod } = getPostEventModifier(fd, SURGE_THRESH);
     let fp = computeSurgeProb(h, fdow, fm, fSchool, fLocalMod, fGradMod, iliMod, fPostMod);
+    // Apply community illness modifier (same signal as 7-day grid, today only)
+    if (COMMUNITY_ILL_MOD_ON) fp = Math.min(0.95, fp * getCommunityIllnessMod());
     let isSurvival = false, isPersistence = false;
     if(!SURGE_FLAG_ACTIVE) {
       // Apply surge window multiplier if in/past surge window with no confirmed surge
@@ -3297,15 +3361,16 @@ function renderDashboard(iliData = null) {
   '9_5':{mean:116.8,std:9.7},
   '9_6':{mean:115.3,std:14.3},
 };
-  function getCensusEstimate(month, dow, schoolType, localMod, iliMod) {
+  function getCensusEstimate(month, dow, schoolType, localMod, iliMod, commRatio = 1.0) {
     const base = CENSUS_LOOKUP[`${month}_${dow}`] || {mean:134,std:22.7};
     let adj = 0;
     if (schoolType === 'break' || schoolType === 'holiday') adj += -7.1;
     else if (schoolType === 'no-school') adj += -2.7;
     if (localMod < 0.95) adj += -6.1;       // protective event (Spring Fair etc)
     else if (localMod > 1.02) adj += -2.3;  // State Fair (positive modifier but mild suppression)
-    const iliAdj = (iliMod - 1.0) * 47.1;   // empirical: +47 pts per unit ILI modifier
-    const mean = Math.round(base.mean + adj + iliAdj);
+    const iliAdj  = (iliMod - 1.0) * 47.1;     // empirical: +47 pts per unit ILI modifier
+    const commAdj = COMMUNITY_ILL_MOD_ON ? (commRatio - 1.0) * 6.4 : 0;  // +6.4 visits/day per unit ratio (r=+0.24, p=0.002)
+    const mean = Math.round(base.mean + adj + iliAdj + commAdj);
     const ci95 = Math.round(1.96 * base.std);
     return { mean, lo: mean - ci95, hi: mean + ci95, ci95 };
   }
@@ -3322,12 +3387,13 @@ function renderDashboard(iliData = null) {
     const fGradInfo7 = getGraduationModifier(fds);
     const fGradMod7 = fGradInfo7.modifier;
     const { modifier: fPostMod7 } = getPostEventModifier(fds, SURGE_THRESH);
-    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7));
+    const commMod7 = (d === 0) ? getCommunityIllnessMod() : 1.0; // only apply to today — future weeks unknown
+    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7) * commMod7);
     const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => {
       const { modifier: hMod } = getLocalEventModifier(fds, h);
-      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod, fPostMod7));
+      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod, fPostMod7) * commMod7);
     }, 0) / 11;
-    const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
+    const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod, d === 0 ? COMM_RATIO : 1.0);
     days7.push({
       dowLabel: DOW_NAMES[fdow],
       dateLabel: `${MON_NAMES[fm-1]} ${fd.getDate()}`,
@@ -3473,7 +3539,8 @@ function renderDashboard(iliData = null) {
       }
     }
 
-    return Math.max(0, Math.round(base * iliAdj * schAdj * gradAdj * zooAdj * eventAdj * lagAdj));
+    const arrCommAdj = COMMUNITY_ILL_MOD_ON ? (1.0 + (COMM_RATIO - 1.0) * 0.048) : 1.0;
+    return Math.max(0, Math.round(base * iliAdj * schAdj * gradAdj * zooAdj * eventAdj * lagAdj * arrCommAdj));
   });
 
   const arrMaxVal = Math.max(...arrEstimates, 1);
@@ -3622,6 +3689,19 @@ function renderDashboard(iliData = null) {
       rawLabel: gradInfo.isGraduation ? `×${gradInfo.modifier.toFixed(2)}` : 'NONE',
     },
   ];
+
+  // Add community illness factor if toggle is ON
+  if (COMMUNITY_ILL_MOD_ON) {
+    const commMod = getCommunityIllnessMod();
+    factors.push({
+      icon: '🔍',
+      name: 'Community Illness Trends',
+      desc: `Norovirus · child fever · child cough (Pierce Co.) · composite ratio ${COMM_RATIO.toFixed(2)}× baseline`,
+      score: commMod > 1.0 ? Math.min(0.40, (commMod - 1.0) * 2) : 0.02,
+      maxScore: 0.40,
+      rawLabel: `×${commMod.toFixed(3)}`,
+    });
+  }
 
   const factorsHTML = factors.map(f => {
     const pct = Math.min(100, Math.round((f.score / f.maxScore) * 100));
@@ -3886,6 +3966,7 @@ function renderDashboard(iliData = null) {
           "pk %" = peak hour (19:00) surge probability for that day, incorporating school calendar + local events. Estimated arrivals = empirical (month × DOW) baseline adjusted for school status, local events, and ILI; 95% CI shown as range. MAE ±17 patients/day.
           🏫 school day · 🏖️ break · 🎉 holiday · ⚠️ post-break return
         </div>
+
       </div>
     </div>
 
@@ -4114,7 +4195,7 @@ var MP8_SEL=100;
 var S={in_mpedocs:60,in_arrivals:0,in_hour:new Date().getHours(),in_mh_load:0};
 var SURGE_FLAG_ACTIVE = false;
 var SURGE_START_OFFSET = 0;
-var SURGE_WINDOW_REDUCTION_ON = true; // can be disabled in Settings // hours before now surge started (0=now, 1=1h ago, etc.)
+var SURGE_WINDOW_REDUCTION_ON = true; // can be disabled in Settings
 
 function updateSurgeBacktimeUI() {
   var row  = document.getElementById('surge-backtime-row');
@@ -4140,6 +4221,38 @@ function adjustSurgeStartHour(delta) {
   updateSurgeBacktimeUI();
   updateForecastBars();
   renderDashboard(_cachedIliData);
+}
+
+const COMMUNITY_ILL_SCALE = {
+  6: 0.0665, 7: 0.0898, 8: 0.1208, 9: 0.1551, 10: 0.1998,
+  11: 0.2773, 12: 0.3695, 13: 0.4067, 14: 0.5142, 15: 0.5802,
+};
+
+function getCommunityIllnessMod() {
+  if (!COMMUNITY_ILL_MOD_ON) return 1.0;
+  try {
+    var scale = COMMUNITY_ILL_SCALE[SURGE_THRESH] || 0.15;
+    var mod = 1.0 + (COMM_RATIO - 1.0) * scale;
+    return Math.max(0.85, Math.min(1.30, mod));
+  } catch(e) { return 1.0; }
+}
+
+function toggleCommunityIllMod() {
+  COMMUNITY_ILL_MOD_ON = !COMMUNITY_ILL_MOD_ON;
+  var btn = document.getElementById('community-ill-toggle');
+  if (btn) {
+    btn.textContent = COMMUNITY_ILL_MOD_ON ? 'ON' : 'OFF';
+    if (COMMUNITY_ILL_MOD_ON) btn.classList.add('on');
+    else btn.classList.remove('on');
+  }
+  var status = document.getElementById('community-ill-status');
+  if (status) {
+    status.textContent = COMMUNITY_ILL_MOD_ON
+      ? 'Modifier active · norovirus · child fever · child cough · Pierce Co. DMA 819'
+      : 'Modifier inactive · toggle ON to apply community illness signal';
+  }
+  renderDashboard(_cachedIliData);
+  updateForecastBars();
 }
 
 function toggleSurgeWindowReduction() {
@@ -4221,6 +4334,7 @@ function updateForecastBars(){
     var school=getSchoolStatus(ds),ev=getLocalEventModifier(ds,h),grad=getGraduationModifier(ds);
     var postEv=getPostEventModifier(ds, SURGE_THRESH);
     var fp=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,postEv.modifier);
+    if(COMMUNITY_ILL_MOD_ON) fp=Math.min(0.95, fp*getCommunityIllnessMod());
     var isSurv=false,isPers=false;
     if(!SURGE_FLAG_ACTIVE){
       if(h>=15&&h<=21&&SURGE_WINDOW_REDUCTION_ON){
@@ -5239,7 +5353,7 @@ function renderMHTab(){
       var fBarMod   = fMhMod.mod  * mhLoadMod;
       var lam = getMHExpected(fHour,fDow,fMonth) * fBarMod;
       var p=1-Math.exp(-lam); // Poisson P(>=1)
-      pVals.push({p:p, lam:lam, lbl:String(fh.getHours()).padStart(2,'0')});
+      pVals.push({p:p, lam:lam, lbl:String(fh.getHours()).padStart(2,'0')+':00'});
     }
     for(var i=0;i<24;i++){
       var pv=pVals[i];
