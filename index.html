@@ -693,6 +693,29 @@ to { opacity:1; transform:translateY(0); }
 
 .bccf-toggle-btn{padding:4px 10px;border-radius:4px;border:1px solid #1a1e30;background:transparent;color:#8892b0;font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;transition:all .15s;}
 .bccf-toggle-btn.on{border-color:#00e5c3;color:#00e5c3;background:rgba(0,229,195,.08);}
+
+/* 90-Day Forecast Calendar */
+.cal90-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal90-header { text-align:center; font-size:9px; color:#8892b0; font-family:'Space Mono',monospace; padding:3px 0; }
+.cal90-day {
+  border-radius:4px; padding:3px 2px; text-align:center; cursor:default;
+  min-height:44px; display:flex; flex-direction:column; justify-content:space-between;
+  border:1px solid transparent; transition:opacity .15s;
+}
+.cal90-day.empty { background:transparent; border:none; }
+.cal90-day.today { border-color:#00e5c3 !important; }
+.cal90-day .cal-date { font-size:9px; font-family:'Space Mono',monospace; color:#8892b0; }
+.cal90-day .cal-surge { font-size:8px; font-weight:700; font-family:'Space Mono',monospace; }
+.cal90-day .cal-census { font-size:8px; color:#8892b0; }
+.cal90-day.risk-low    { background:rgba(57,217,138,0.25); border-color:rgba(57,217,138,0.55); }
+.cal90-day.risk-mod    { background:rgba(255,209,102,0.35); border-color:rgba(255,209,102,0.70); }
+.cal90-day.risk-high   { background:rgba(255,154,60,0.35);  border-color:rgba(255,154,60,0.70); }
+.cal90-day.risk-vhigh  { background:rgba(255,77,109,0.35);  border-color:rgba(255,77,109,0.70); }
+.cal90-month-label { grid-column:1/-1; font-size:9px; color:#00e5c3; font-family:'Space Mono',monospace;
+  letter-spacing:1px; text-transform:uppercase; padding:6px 2px 2px; border-top:1px solid #1a1e30; margin-top:4px; }
+.cal90-legend { display:flex; gap:10px; flex-wrap:wrap; font-size:9px; color:#8892b0; margin-top:8px; }
+.cal90-legend span { display:flex; align-items:center; gap:4px; }
+.cal90-legend .dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -971,10 +994,10 @@ to { opacity:1; transform:translateY(0); }
 <div class="t-body">
   <div class="tsec">Community Illness Trends</div>
   <div class="tp">
-    <div class="tph"><div class="tpt">Community Illness Modifier</div><div class="tbadge-g">GOOGLE TRENDS · TODAY ONLY</div></div>
+    <div class="tph"><div class="tpt">Community Illness Modifier</div><div class="tbadge-g">GOOGLE TRENDS · WEEKLY SIGNAL</div></div>
     <div class="tpb">
       <div style="font-size:10px;color:#8892b0;margin-bottom:10px;line-height:1.6;">
-        Applies local Google Trends (norovirus · child fever · child cough) as a real-time modifier to today's surge probability and arrivals forecasts.
+        Applies local Google Trends (norovirus · child fever · child cough) as a weekly community illness modifier. Signal is same-week resolution — accuracy declines with data age (refreshed weekly).
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <button id="community-ill-toggle" onclick="toggleCommunityIllMod()" class="bccf-toggle-btn" style="white-space:nowrap;">OFF</button>
@@ -3074,6 +3097,7 @@ function onThreshChange(val) {
   // Re-render using cached API data — no network fetch needed
   renderDashboard(_cachedIliData); // updates COMM_RATIO first
   updateForecastBars();            // then uses updated COMM_RATIO with new SURGE_THRESH
+  render90DayCalendar();
 }
 
 function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, gradMod = 1.0, iliMod = 1.0, postEventMod = 1.0) {
@@ -3167,8 +3191,171 @@ let iliData = null;
   
 }
 
+
+// ── 90-Day Forecast Calendar ─────────────────────────────────────────────
+const CENSUS_DOW_MONTH = {
+  0: {1:{m:148,s:24}, 2:{m:167,s:18}, 3:{m:174,s:13}, 4:{m:155,s:16}, 5:{m:167,s:17}, 6:{m:133,s:19}, 7:{m:114,s:8}, 8:{m:113,s:9}, 9:{m:131,s:21}, 10:{m:138,s:12}, 11:{m:151,s:15}, 12:{m:172,s:26}},
+  1: {1:{m:150,s:18}, 2:{m:158,s:23}, 3:{m:162,s:12}, 4:{m:152,s:13}, 5:{m:156,s:18}, 6:{m:129,s:17}, 7:{m:103,s:13}, 8:{m:104,s:8}, 9:{m:130,s:17}, 10:{m:126,s:12}, 11:{m:143,s:20}, 12:{m:165,s:21}},
+  2: {1:{m:146,s:27}, 2:{m:153,s:25}, 3:{m:156,s:14}, 4:{m:140,s:16}, 5:{m:148,s:16}, 6:{m:128,s:18}, 7:{m:113,s:11}, 8:{m:102,s:13}, 9:{m:125,s:16}, 10:{m:124,s:13}, 11:{m:144,s:17}, 12:{m:158,s:20}},
+  3: {1:{m:154,s:28}, 2:{m:148,s:18}, 3:{m:153,s:13}, 4:{m:146,s:12}, 5:{m:147,s:14}, 6:{m:131,s:17}, 7:{m:102,s:12}, 8:{m:102,s:13}, 9:{m:120,s:13}, 10:{m:123,s:14}, 11:{m:135,s:22}, 12:{m:163,s:25}},
+  4: {1:{m:140,s:32}, 2:{m:147,s:17}, 3:{m:148,s:14}, 4:{m:137,s:10}, 5:{m:146,s:19}, 6:{m:124,s:18}, 7:{m:103,s:12}, 8:{m:94,s:11}, 9:{m:116,s:13}, 10:{m:117,s:16}, 11:{m:135,s:16}, 12:{m:156,s:22}},
+  5: {1:{m:131,s:18}, 2:{m:131,s:22}, 3:{m:135,s:10}, 4:{m:120,s:12}, 5:{m:132,s:10}, 6:{m:117,s:11}, 7:{m:106,s:10}, 8:{m:94,s:12}, 9:{m:117,s:10}, 10:{m:111,s:13}, 11:{m:126,s:14}, 12:{m:145,s:18}},
+  6: {1:{m:132,s:17}, 2:{m:144,s:21}, 3:{m:143,s:14}, 4:{m:134,s:16}, 5:{m:137,s:15}, 6:{m:121,s:16}, 7:{m:110,s:10}, 8:{m:104,s:9}, 9:{m:115,s:14}, 10:{m:119,s:11}, 11:{m:128,s:12}, 12:{m:152,s:24}},
+};
+const ILI_SEASONAL = {
+  1:1.3424, 2:1.4085, 3:1.2000, 4:1.0754, 5:1.0441, 6:1.0187,
+  7:0.9697, 8:0.9661, 9:0.9975, 10:1.0161, 11:1.0727, 12:1.3964,
+};
+
+function render90DayCalendar() {
+  var el = document.getElementById('cal90-content');
+  if (!el) return;
+
+  var now   = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var DOW_HDR = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var MON_NAMES = ['January','February','March','April','May','June',
+                   'July','August','September','October','November','December'];
+
+  var html = '';
+
+  // Build 90 days starting from today, grouped by month
+  var days = [];
+  for (var i = 0; i < 90; i++) {
+    var d = new Date(today.getTime() + i * 86400000);
+    days.push(d);
+  }
+
+  // Group by month
+  var months = [];
+  var cur = null;
+  days.forEach(function(d) {
+    var key = d.getFullYear()*100 + d.getMonth();
+    if (!cur || cur.key !== key) {
+      cur = {key:key, year:d.getFullYear(), month:d.getMonth()+1, days:[]};
+      months.push(cur);
+    }
+    cur.days.push(d);
+  });
+
+  months.forEach(function(mo) {
+    html += '<div class="cal90-grid">';
+    html += '<div class="cal90-month-label">'+MON_NAMES[mo.month-1]+' '+mo.year+'</div>';
+    // Column headers repeated per month
+    DOW_HDR.forEach(function(d){ html += '<div class="cal90-header">'+d+'</div>'; });
+
+    // Pad start of month to correct DOW (Mon=0)
+    var firstDow = (mo.days[0].getDay() + 6) % 7; // convert Sun=0 to Mon=0
+    for (var p = 0; p < firstDow; p++) {
+      html += '<div class="cal90-day empty"></div>';
+    }
+
+    mo.days.forEach(function(d) {
+      var dow   = (d.getDay() + 6) % 7;
+      var month = d.getMonth() + 1;
+      var isToday = d.getTime() === today.getTime();
+      var dateStr = d.toISOString().slice(0,10);
+
+      // Census estimate
+      var cenRow = (CENSUS_DOW_MONTH[dow] || {})[month] || {m:134,s:22};
+      var iliMod = ILI_SEASONAL[month] || 1.0;
+      var school = getSchoolStatus(dateStr);
+      var schAdj = (school.type==='break'||school.type==='holiday') ? 0.939
+                  : school.type==='return' ? 1.08
+                  : school.type==='no-school' ? 0.980 : 1.0;
+      var evMod  = getLocalEventModifier(dateStr, 12).modifier;
+      var postMod= getPostEventModifier(dateStr, SURGE_THRESH).modifier;
+      var gradMod= getGraduationModifier(dateStr).modifier;
+
+      // Census: base × ILI seasonal × school adj × event
+      var censMult = iliMod * schAdj
+                   * (evMod < 0.95 ? 0.923 : evMod > 1.02 ? 0.983 : 1.0)
+                   * postMod * gradMod;
+      var census   = Math.round(cenRow.m * censMult);
+      var censLo   = Math.round((cenRow.m - cenRow.s) * censMult);
+      var censHi   = Math.round((cenRow.m + cenRow.s) * censMult);
+
+      // Surge probability: HM_BY_THRESH[thresh][hour][dow]
+      var hmTable    = HM_BY_THRESH[String(SURGE_THRESH)] || HM_BY_THRESH['10'];
+      var baseSurge  = (hmTable[19] || [])[dow] || 0.15;
+      var schoolMod  = school.type==='return'?1.15:school.type==='school-day'?1.06:0.85;
+      var surgePct   = Math.min(0.95, baseSurge * iliMod * schoolMod
+                       * evMod * postMod * gradMod);
+
+      // Risk tier
+      var riskClass = surgePct >= 0.55 ? 'risk-vhigh'
+                    : surgePct >= 0.35 ? 'risk-high'
+                    : surgePct >= 0.20 ? 'risk-mod'
+                    : 'risk-low';
+      var surgeCol  = surgePct >= 0.55 ? '#ff4d6d'
+                    : surgePct >= 0.35 ? '#ff9a3c'
+                    : surgePct >= 0.20 ? '#ffd166'
+                    : '#39d98a';
+
+      var flags = '';
+      if (school.type==='holiday') flags += '🎉';
+      else if (school.type==='break') flags += '🏖️';
+      else if (school.type==='return') flags += '⚠️';
+      var evInfo = getLocalEventModifier(dateStr, 12);
+      if (evInfo.activeEvents && evInfo.activeEvents.length) {
+        evInfo.activeEvents.slice(0,2).forEach(function(e){ flags += e.icon; });
+      }
+      // Holiday events (they come through as local events too)
+      var postInfo = getPostEventModifier(dateStr, SURGE_THRESH);
+      if (postInfo.activeEvents && postInfo.activeEvents.length) flags += '🔁';
+      if (getGraduationModifier(dateStr).isGraduation) flags += '🎓';
+
+      html += '<div class="cal90-day '+riskClass+(isToday?' today':'')+'">';
+      html += '<div class="cal-date" style="display:flex;justify-content:space-between;align-items:center;">'
+            + '<span>'+d.getDate()+'</span>'
+            + (flags?'<span style="font-size:9px;">'+flags+'</span>':'')
+            + '</div>';
+      html += '<div class="cal-surge" style="color:'+surgeCol+';">'+(surgePct*100).toFixed(0)+'%</div>';
+      html += '<div class="cal-census">'
+            + '<span style="font-weight:700;color:var(--text);">'+census+'</span>'
+            + '<br><span>'+censLo+'–'+censHi+'</span>'
+            + '</div>';
+      html += '</div>';
+    });
+
+    // Pad end of month
+    var lastDow = (mo.days[mo.days.length-1].getDay() + 6) % 7;
+    for (var p2 = lastDow+1; p2 < 7; p2++) {
+      html += '<div class="cal90-day empty"></div>';
+    }
+    html += '</div>';
+  });
+
+  // Legend
+  html += '<div class="cal90-legend">';
+  html += '<span><div class="dot" style="background:rgba(57,217,138,0.4);"></div>&lt;20% surge</span>';
+  html += '<span><div class="dot" style="background:rgba(255,209,102,0.5);"></div>20–35%</span>';
+  html += '<span><div class="dot" style="background:rgba(255,154,60,0.5);"></div>35–55%</span>';
+  html += '<span><div class="dot" style="background:rgba(255,77,109,0.5);"></div>≥55%</span>';
+  html += '</div>';
+  html += '<div class="cal90-legend" style="margin-top:4px;">';
+  html += '<span>🏖️ school break</span>';
+  html += '<span>⚠️ post-break return</span>';
+  html += '<span>🎓 graduation</span>';
+  html += '<span>🎡 fair / event</span>';
+  html += '<span>🌸 Spring Fair</span>';
+  html += '<span>🎄 Christmas</span>';
+  html += '<span>🎃 Halloween</span>';
+  html += '<span>🎆 July 4th / NYE</span>';
+  html += '<span>🦃 Thanksgiving</span>';
+  html += '<span>🐣 Easter</span>';
+  html += '<span>🇺🇸 Memorial Day</span>';
+  html += '<span>👷 Labor Day</span>';
+  html += '<span>🔁 post-event lag</span>';
+  html += '</div>';
+  html += '<div style="font-size:9px;color:#4a5568;margin-top:4px;">% = peak surge prob · N–N = est. daily arrivals ±1 SD · Calendar model only — school calendar, local events, seasonal ILI baseline. Live ILI and community trends not applied. Uncertainty grows with horizon.</div>';
+
+  el.innerHTML = html;
+}
+
 var COMMUNITY_ILL_MOD_ON = false; // community illness modifier
 var COMM_RATIO = 1.0; // cached community illness composite ratio — updated each renderDashboard call
+var COMM_P50 = {'norovirus': 6, 'child fever': 2, 'child cough': 2}; // re-derived by refresh_models.py
 
 function renderDashboard(iliData = null) {
   const now = new Date();
@@ -3230,12 +3417,11 @@ function renderDashboard(iliData = null) {
   // ── 24h hourly surge forecast ──────────────────────────────────────────
   const nextHours = [];
   // Pre-compute community composite ratio (used in 24h bars, 7-day grid, and arrivals forecast)
-  const _commP50 = { 'norovirus': 6, 'child fever': 2, 'child cough': 2 };
   const _commKws = ['norovirus', 'child fever', 'child cough'];
   const _commLatest = (typeof TRENDS_BASELINE !== 'undefined' && TRENDS_BASELINE.latest) ? TRENDS_BASELINE.latest : {};
   const _commRatios = _commKws.map(kw => {
     const val = _commLatest[kw] || 0;
-    return val / (_commP50[kw] || 1);
+    return val / (COMM_P50[kw] || 1);
   });
   COMM_RATIO = _commRatios.reduce((a,b) => a+b, 0) / _commRatios.length; // update module-level cache
 
@@ -3970,6 +4156,18 @@ function renderDashboard(iliData = null) {
       </div>
     </div>
 
+
+    <div class="sdiv">90-Day Forecast Calendar</div>
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">Surge Risk & Expected Census · 90 Days</div>
+        <div class="badge badge-b">CALENDAR MODEL · SEASONAL ILI BASELINE</div>
+      </div>
+      <div class="pb">
+        <div id="cal90-content" style="font-size:10px;color:var(--muted);">Loading…</div>
+      </div>
+    </div>
+
     <div class="sdiv">Community Search Signal</div>
     <div class="panel" id="community-signal-panel">
       <div class="ph">
@@ -4054,6 +4252,8 @@ function renderDashboard(iliData = null) {
   setTimeout(renderSurgeDashboard, 60 * 60 * 1000);
   // Render community signal after DOM settles
   setTimeout(renderCommunitySignal, 100);
+  // Render 90-day calendar after DOM settles
+  setTimeout(render90DayCalendar, 50);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4156,6 +4356,7 @@ function saveSettings() {
 
   // Re-render dashboard with updated settings
   renderSurgeDashboard();
+  render90DayCalendar();
   closeSettings();
 }
 
@@ -4232,8 +4433,11 @@ function getCommunityIllnessMod() {
   if (!COMMUNITY_ILL_MOD_ON) return 1.0;
   try {
     var scale = COMMUNITY_ILL_SCALE[SURGE_THRESH] || 0.15;
-    var mod = 1.0 + (COMM_RATIO - 1.0) * scale;
-    return Math.max(0.85, Math.min(1.30, mod));
+    // P50 baselines — module-level COMM_P50, re-derived by refresh_models.py
+    // P90 caps — modifier at p90 composite ratio from training data
+    var COMM_CAP = {6:1.0510,7:1.0688,8:1.0926,9:1.1189,10:1.1532,11:1.2126,12:1.2833,13:1.3118,14:1.3942,15:1.4448};
+    var cap = COMM_CAP[SURGE_THRESH] || 1.20;
+    return Math.min(cap, 1.0 + (COMM_RATIO - 1.0) * scale);
   } catch(e) { return 1.0; }
 }
 
@@ -4248,7 +4452,7 @@ function toggleCommunityIllMod() {
   var status = document.getElementById('community-ill-status');
   if (status) {
     status.textContent = COMMUNITY_ILL_MOD_ON
-      ? 'Modifier active · norovirus · child fever · child cough · Pierce Co. DMA 819'
+      ? 'Modifier active · weekly signal · accuracy declines with data age · Pierce Co. DMA 819'
       : 'Modifier inactive · toggle ON to apply community illness signal';
   }
   renderDashboard(_cachedIliData);
@@ -4667,11 +4871,16 @@ var _tbSettings=document.getElementById('tb-settings');
 
 // ── Save as My Default ───────────────────────────────────────────────────
 function captureMyDefault(){
+  var mhThresh = parseInt(document.getElementById('mh-thresh-slider')?.value || 8);
   return {
     gradSettings: {events:GRADUATION_EVENTS, seasonStart:GRAD_SEASON_START, seasonEnd:GRAD_SEASON_END},
     shifts: {dayStart:SHIFT_DAY_START, eveStart:SHIFT_EVE_START, nightStart:SHIFT_NIGHT_START,
              dayBeds:MP_DAY_BEDS, eveBeds:MP_EVE_BEDS, nightBeds:MP_NIGHT_BEDS},
     mp8Sel: MP8_SEL,
+    surgeThresh: SURGE_THRESH,
+    surgeWindowOn: SURGE_WINDOW_REDUCTION_ON,
+    communityIllOn: COMMUNITY_ILL_MOD_ON,
+    mhThresh: mhThresh,
   };
 }
 function applyMyDefault(snap){
@@ -4708,6 +4917,29 @@ function applyMyDefault(snap){
     document.querySelectorAll('.tbtn[data-m]').forEach(function(b){b.classList.remove('on');});
     document.querySelectorAll('.tbtn[data-m="'+MP8_SEL+'"]').forEach(function(b){b.classList.add('on');});
     updateMpTick(); renderMpedocs();
+  }
+  // Surge threshold slider
+  if(snap.surgeThresh != null){
+    setThreshold(snap.surgeThresh);
+    var sl=document.getElementById('thresh-slider');
+    if(sl) sl.value=snap.surgeThresh;
+    var tv=document.getElementById('thresh-val');
+    if(tv) tv.textContent='>'+snap.surgeThresh+'/hr';
+    var td=document.getElementById('thresh-display');
+    if(td) td.textContent=snap.surgeThresh;
+  }
+  // Surge window reduction toggle
+  if(snap.surgeWindowOn != null && snap.surgeWindowOn !== SURGE_WINDOW_REDUCTION_ON){
+    toggleSurgeWindowReduction();
+  }
+  // Community illness modifier toggle
+  if(snap.communityIllOn != null && snap.communityIllOn !== COMMUNITY_ILL_MOD_ON){
+    toggleCommunityIllMod();
+  }
+  // MH threshold slider
+  if(snap.mhThresh != null){
+    var mhSl=document.getElementById('mh-thresh-slider');
+    if(mhSl){ mhSl.value=snap.mhThresh; mhSl.dispatchEvent(new Event('input')); }
   }
   renderSurgeDashboard();
 }
