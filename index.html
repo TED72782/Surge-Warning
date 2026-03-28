@@ -184,7 +184,6 @@ body {
 .badge-r { background: rgba(255,77,109,0.12); color: var(--red); border: 1px solid rgba(255,77,109,0.25); }
 .badge-b { background: rgba(96,165,250,0.12); color: var(--blue); border: 1px solid rgba(96,165,250,0.25); }
 .badge-p { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
-.surge-profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 /* ── SCHOOL CALENDAR ── */
 .cal-today {
   padding: 12px;
@@ -362,8 +361,6 @@ to { opacity:1; transform:translateY(0); }
     grid-template-columns: 1fr;
     gap: 12px;
   }
-/* Surge profile — stack on mobile */
-  .surge-profile-grid { grid-template-columns: 1fr; }
 /* Panel padding */
   .pb { padding: 12px; }
 .ph { padding: 9px 12px; }
@@ -696,6 +693,29 @@ to { opacity:1; transform:translateY(0); }
 
 .bccf-toggle-btn{padding:4px 10px;border-radius:4px;border:1px solid #1a1e30;background:transparent;color:#8892b0;font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;transition:all .15s;}
 .bccf-toggle-btn.on{border-color:#00e5c3;color:#00e5c3;background:rgba(0,229,195,.08);}
+
+/* 90-Day Forecast Calendar */
+.cal90-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal90-header { text-align:center; font-size:9px; color:#8892b0; font-family:'Space Mono',monospace; padding:3px 0; }
+.cal90-day {
+  border-radius:4px; padding:3px 2px; text-align:center; cursor:default;
+  min-height:44px; display:flex; flex-direction:column; justify-content:space-between;
+  border:1px solid transparent; transition:opacity .15s;
+}
+.cal90-day.empty { background:transparent; border:none; }
+.cal90-day.today { border-color:#00e5c3 !important; }
+.cal90-day .cal-date { font-size:9px; font-family:'Space Mono',monospace; color:#8892b0; }
+.cal90-day .cal-surge { font-size:8px; font-weight:700; font-family:'Space Mono',monospace; }
+.cal90-day .cal-census { font-size:8px; color:#8892b0; }
+.cal90-day.risk-low    { background:rgba(57,217,138,0.25); border-color:rgba(57,217,138,0.55); }
+.cal90-day.risk-mod    { background:rgba(255,209,102,0.35); border-color:rgba(255,209,102,0.70); }
+.cal90-day.risk-high   { background:rgba(255,154,60,0.35);  border-color:rgba(255,154,60,0.70); }
+.cal90-day.risk-vhigh  { background:rgba(255,77,109,0.35);  border-color:rgba(255,77,109,0.70); }
+.cal90-month-label { grid-column:1/-1; font-size:9px; color:#00e5c3; font-family:'Space Mono',monospace;
+  letter-spacing:1px; text-transform:uppercase; padding:6px 2px 2px; border-top:1px solid #1a1e30; margin-top:4px; }
+.cal90-legend { display:flex; gap:10px; flex-wrap:wrap; font-size:9px; color:#8892b0; margin-top:8px; }
+.cal90-legend span { display:flex; align-items:center; gap:4px; }
+.cal90-legend .dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -972,11 +992,24 @@ to { opacity:1; transform:translateY(0); }
 
 <div class="app-screen" id="sc-settings">
 <div class="t-body">
+  <div class="tsec">Community Illness Trends</div>
+  <div class="tp">
+    <div class="tph"><div class="tpt">Community Illness Modifier</div><div class="tbadge-g">GOOGLE TRENDS · WEEKLY SIGNAL</div></div>
+    <div class="tpb">
+      <div style="font-size:10px;color:#8892b0;margin-bottom:10px;line-height:1.6;">
+        Applies local Google Trends (norovirus · child fever · child cough) as a weekly community illness modifier. Signal is same-week resolution — accuracy declines with data age (refreshed weekly).
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="community-ill-toggle" onclick="toggleCommunityIllMod()" class="bccf-toggle-btn" style="white-space:nowrap;">OFF</button>
+        <div style="font-size:9px;color:#8892b0;" id="community-ill-status">Modifier inactive · toggle ON to apply community illness signal</div>
+      </div>
+    </div>
+  </div>
   <div class="tsec">mPEDOCS Threshold</div>
   <div class="tp" style="margin-bottom:16px;">
     <div class="tph"><div class="tpt">8h Prediction &amp; Persistence Model</div><div class="tbadge-g">Controls forecast bars</div></div>
     <div class="tpb">
-      <div style="font-size:10px;color:#8892b0;margin-bottom:10px;">Sets the mPEDOCS level used by the 8h prediction model and the persistence forecast bars when ED state is entered.</div>
+      <div style="font-size:10px;color:#8892b0;margin-bottom:10px;">Sets the mPEDOCS level used by the 8h prediction model.</div>
       <div class="thr-btns">
         <button class="tbtn" id="mt70"  data-m="70">70</button>
         <button class="tbtn" id="mt80"  data-m="80">80</button>
@@ -1183,6 +1216,7 @@ to { opacity:1; transform:translateY(0); }
       <div><span style="color:#c8cfe8;font-weight:600;">LOS reference:</span> Discharge median 5.0h · Admit median 5.8h · Transfer median 17.7h · 90th pct 24.9h</div>
       <div><span style="color:#c8cfe8;font-weight:600;">LOS pattern:</span> Morning arrivals (08:00) avg 8.9h vs late evening (21:00) avg 20.8h</div>
       <div><span style="color:#c8cfe8;font-weight:600;">MH autocorrelation:</span> RR ×1.50 lag+1, ×1.85 lag+7 (weekly rhythm)</div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Above Threshold stat:</span> Shows today's estimated MH visits as a percentage of the user-set surge threshold (dailyEst ÷ threshold × 100%). A value of 100% means the estimate equals the threshold; &gt;100% means it exceeds it. The threshold is adjustable via the "MH Surge ≥" slider (default 8/day). Historical base rate at each threshold is shown below the slider for context.</div>
       <div><span style="color:#c8cfe8;font-weight:600;">Weather removed:</span> ΔR²&lt;0.001 after ILI controlled. No net predictive value retained.</div>
     </div>
   </div>
@@ -1210,19 +1244,31 @@ to { opacity:1; transform:translateY(0); }
   <div class="sdiv">Mental Health · Community Search Signal</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
-      <div style="margin-bottom:6px;">Google Trends keywords validated against weekly MH surge rate (≥8 MH visits/day) and suicidal CC visits, 2023–2025. All correlations season-adjusted (partial correlation controlling for summer). Displayed in the MH tab grouped by lead time — the risk badge reflects the search volume from <em>lag weeks ago</em>, not the current week.</div>
-      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;">
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">suicide (WA)</span><span>r=+0.25 · lag+2w · MH surge</span>
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">teen suicide</span><span>r=+0.21 · lag+4w · MH surge · national data (WA sparse)</span>
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">crisis hotline</span><span>r=+0.21 · lag+3w · suicidal CC — help-seeking before ED escalation</span>
-        <span style="color:#a78bfa;">2–4w lead</span><span style="color:#c8cfe8;">mass shooting</span><span>r=+0.32 · lag+2w · MH surge — anxiety/contagion effect, season-independent</span>
-        <span style="color:#ffd166;">1w lead</span><span style="color:#c8cfe8;">overdose symptoms</span><span>r=+0.21 · lag+1w · MH surge — caregiver searching after near-miss</span>
-        <span style="color:#ffd166;">1w lead</span><span style="color:#c8cfe8;">Tylenol overdose</span><span>r=+0.20 · lag+1w · overdose CC — common self-harm method in adolescents</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">how to commit suicide</span><span>r=+0.20 · lag0w · MH surge + suicidal CC</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">fentanyl overdose</span><span>r=+0.25 · lag0w · MH surge — community opioid crisis activity</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">melatonin overdose</span><span>r=+0.18 · lag0w · MH surge — pediatric intentional ingestion</span>
-        <span style="color:#00e5c3;">same week</span><span style="color:#c8cfe8;">MultiCare behavioral health</span><span>r=+0.25 · lag0w · MH surge — direct health system search intent</span>
+      <div style="margin-bottom:6px;">Google Trends keywords displayed as leading indicators in the MH tab. Correlations validated against weekly MH visits (2023–2025, n=157 weeks), season-adjusted via partial correlation controlling for month and summer. A full multivariate Ridge regression was run to test whether any keywords justify wiring into the MH forecast model.</div>
+
+      <div style="margin-top:6px;font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Multivariate analysis results</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;margin-bottom:6px;">
+        <span style="color:#c8cfe8;">Seasonal controls only</span><span style="color:#ffd166;">R²_adj=0.390</span><span>Month dummies + summer flag explain 39% of MH visit variance</span>
+        <span style="color:#c8cfe8;">+ All 19 keywords</span><span style="color:#ffd166;">R²_adj=0.414</span><span>ΔR²=+0.025 — tiny incremental gain vs surge model (ΔR²=+0.146)</span>
+        <span style="color:#c8cfe8;">Only 2 significant</span><span style="color:#ffd166;">mass shooting, teen suicide</span><span>p&lt;0.05; all others p&gt;0.19 after seasonal adjustment</span>
       </div>
+
+      <div style="margin-top:6px;font-size:9px;color:#8892b0;letter-spacing:1px;text-transform:uppercase;">Keyword correlations (season-adjusted, best lag)</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#39d98a;">**mass shooting</span><span style="color:#c8cfe8;">r=+0.23  p=0.004  +4w</span><span>Only consistent significant predictor. Anxiety/contagion mechanism. Adds ~0.4 MH visits/wk at p75 — real but small.</span>
+        <span style="color:#39d98a;">*teen suicide</span><span style="color:#c8cfe8;">r=+0.20  p=0.016  +4w</span><span>US national data. Adds ~1.1 MH visits/wk at p75.</span>
+        <span style="color:#ffd166;">Tylenol overdose</span><span style="color:#c8cfe8;">r=+0.11  p=0.191</span><span>Not significant after seasonal adjustment.</span>
+        <span style="color:#ffd166;">suicide (WA)</span><span style="color:#c8cfe8;">r=-0.005 p=0.955</span><span>Near-zero after seasonal adjustment — seasonal confound only.</span>
+        <span style="color:#ffd166;">crisis hotline</span><span style="color:#c8cfe8;">r=-0.08  p=0.313</span><span>Not significant.</span>
+        <span style="color:#ffd166;">how to commit suicide</span><span style="color:#c8cfe8;">r=+0.06  p=0.445</span><span>Not significant.</span>
+        <span style="color:#ffd166;">fentanyl overdose</span><span style="color:#c8cfe8;">r=+0.06  p=0.474</span><span>Not significant.</span>
+        <span style="color:#ffd166;">melatonin overdose</span><span style="color:#c8cfe8;">r=+0.08  p=0.308</span><span>Not significant.</span>
+        <span style="color:#ffd166;">anxiety attack</span><span style="color:#c8cfe8;">r=+0.02  p=0.806</span><span>Not significant.</span>
+        <span style="color:#ffd166;">MultiCare BH</span><span style="color:#c8cfe8;">r=-0.08  p=0.311</span><span>Not significant.</span>
+      </div>
+
+      <div style="margin-top:8px;"><span style="color:#c8cfe8;font-weight:600;">Why not wired into the MH forecast model:</span> The keyword set adds only ΔR²=+0.025 to MH visit prediction — far too weak to justify modification of the forecast. The existing <code>getMHLoadMod()</code> autocorrelation (yesterday's MH count, RR=×1.50 lag+1) is a substantially stronger signal. Keywords are retained as display-only contextual indicators.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Contrast with surge model:</span> Respiratory keywords (norovirus, child fever, child cough) add ΔR²=+0.146 to surge prediction and are wired in as the Community Illness Modifier (Settings). MH keywords add ΔR²=+0.025 — not actionable.</div>
       <div style="margin-top:6px;font-size:9px;color:#4a5568;">Not included: cyberbullying/school bullying (seasonal confounding only), 988/suicide hotline/WISE/CCS (insufficient WA volume), suicide prevention (negative correlation — public awareness counter-cycle).</div>
     </div>
   </div>
@@ -1259,6 +1305,28 @@ to { opacity:1; transform:translateY(0); }
         <span style="color:#4a5568;">Month seasonality</span><span style="color:#4a5568;">F=49  p&lt;0.001</span><span>Residual after ILI — largely double-counts ILI. Not applied.</span>
       </div>
       <div style="margin-top:6px;font-size:9px;color:#4a5568;">All event RRs derived directly against DOW×hour-adjusted arrival ratios — not borrowed from the surge probability model. Spring Fair and WIAA Playoffs included in surge model but show no volume signal and are excluded here.</div>
+    </div>
+  </div>
+
+  <!-- Community Illness Trends -->
+  <div class="sdiv">Community Illness Trends Modifier</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Optional real-time modifier applying a composite of local Google Trends search volume (norovirus, child fever, child cough — Pierce County DMA 819) to today's surge probability and arrivals forecasts. Toggled ON/OFF in Settings. Default OFF.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Validation:</span> Composite ratio (average of keyword/p50 for each keyword) validated against 157 weeks of data (2023–2025):</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:auto auto 1fr;gap:3px 12px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#39d98a;">vs weekly surge rate</span><span style="color:#c8cfe8;">r=+0.41–0.54</span><span>season-adjusted (partial r controlling for month dummies). p&lt;0.001 at all thresholds t=6–15.</span>
+        <span style="color:#39d98a;">vs weekly arrival volume</span><span style="color:#c8cfe8;">r=+0.24</span><span>season + ILI adjusted. p=0.002. Slope: +6.4 visits/day per unit ratio. ΔR²=+0.023 beyond ILI.</span>
+        <span style="color:#39d98a;">ILI independence</span><span style="color:#c8cfe8;">r=+0.26</span><span>beyond weekly ILI after seasonal adjustment — local Pierce Co. signal adds independent information.</span>
+      </div>
+      <div style="margin-top:6px;"><span style="color:#c8cfe8;font-weight:600;">Composite:</span> Average of (value / p50) for norovirus (p50=6), child fever (p50=2), child cough (p50=2). Ratio=1.0 = baseline; ratio=2.0 = double baseline search volume.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Scale factors (threshold-specific):</span> Higher thresholds use larger scale factors because rare extreme surge events are more tightly coupled to community illness burden.</div>
+      <div style="margin-top:4px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px 8px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#c8cfe8;">t=6: ×0.067</span><span style="color:#c8cfe8;">t=7: ×0.090</span><span style="color:#c8cfe8;">t=8: ×0.121</span><span style="color:#c8cfe8;">t=9: ×0.155</span><span style="color:#c8cfe8;">t=10: ×0.200</span>
+        <span style="color:#c8cfe8;">t=11: ×0.277</span><span style="color:#c8cfe8;">t=12: ×0.370</span><span style="color:#c8cfe8;">t=13: ×0.407</span><span style="color:#c8cfe8;">t=14: ×0.514</span><span style="color:#c8cfe8;">t=15: ×0.580</span>
+      </div>
+      <div style="margin-top:6px;"><span style="color:#c8cfe8;font-weight:600;">Applied to:</span> Today's column only — 24h surge probability bars (calendar model), 7-day today column (surge % and daily arrivals estimate), and 24h arrivals chart. Survival model unaffected (empirical persistence already reflects community illness). Future 7-day columns not adjusted (future search data unknown).</div>
+      <div style="margin-top:4px;font-size:9px;color:#4a5568;">Note: composite ratio uses embedded weekly snapshot updated by refresh_trends.py. Data may lag by up to 7 days.</div>
     </div>
   </div>
 
@@ -2481,5439 +2549,6 @@ let SURGE_BY_MONTH = SBM_BY_THRESH['10'];
 // Day-of-week marginal surge rates (constant — not threshold-dependent in display)
 const SURGE_BY_DOW = [0.22, 0.175, 0.178, 0.167, 0.142, 0.11, 0.136];
 
-// ── SURGE PROFILE TABLES v3 (hour-block aware, 6 CC categories, 146K visits) ──
-// Keys: [month][dow][hblock]  hblock: 0=overnight(0-6), 1=morning(7-11), 2=afternoon(12-17), 3=evening(18-23)
-const SURGE_PROFILE = {
-  "1": {
-    "0": {
-      "0": {
-        "infant": 23.3,
-        "toddler": 35.3,
-        "school": 23.7,
-        "teen": 17.7
-      },
-      "1": {
-        "infant": 15.3,
-        "toddler": 33.6,
-        "school": 36.1,
-        "teen": 15.0
-      },
-      "2": {
-        "infant": 19.3,
-        "toddler": 34.2,
-        "school": 29.5,
-        "teen": 17.0
-      },
-      "3": {
-        "infant": 17.2,
-        "toddler": 36.4,
-        "school": 28.9,
-        "teen": 17.5
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 19.9,
-        "toddler": 44.1,
-        "school": 20.9,
-        "teen": 15.2
-      },
-      "1": {
-        "infant": 14.7,
-        "toddler": 29.5,
-        "school": 34.5,
-        "teen": 21.3
-      },
-      "2": {
-        "infant": 14.1,
-        "toddler": 30.5,
-        "school": 35.7,
-        "teen": 19.7
-      },
-      "3": {
-        "infant": 22.3,
-        "toddler": 30.2,
-        "school": 33.3,
-        "teen": 14.2
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 22.0,
-        "toddler": 35.2,
-        "school": 29.5,
-        "teen": 13.2
-      },
-      "1": {
-        "infant": 15.2,
-        "toddler": 32.6,
-        "school": 34.5,
-        "teen": 17.6
-      },
-      "2": {
-        "infant": 16.0,
-        "toddler": 30.7,
-        "school": 34.6,
-        "teen": 18.7
-      },
-      "3": {
-        "infant": 17.8,
-        "toddler": 35.3,
-        "school": 27.7,
-        "teen": 19.1
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 22.3,
-        "toddler": 35.7,
-        "school": 27.2,
-        "teen": 14.7
-      },
-      "1": {
-        "infant": 13.0,
-        "toddler": 32.6,
-        "school": 33.7,
-        "teen": 20.7
-      },
-      "2": {
-        "infant": 17.4,
-        "toddler": 31.9,
-        "school": 33.3,
-        "teen": 17.4
-      },
-      "3": {
-        "infant": 17.7,
-        "toddler": 36.4,
-        "school": 28.3,
-        "teen": 17.7
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 23.3,
-        "toddler": 35.8,
-        "school": 28.8,
-        "teen": 12.1
-      },
-      "1": {
-        "infant": 13.9,
-        "toddler": 32.5,
-        "school": 34.1,
-        "teen": 19.4
-      },
-      "2": {
-        "infant": 16.6,
-        "toddler": 30.6,
-        "school": 32.1,
-        "teen": 20.7
-      },
-      "3": {
-        "infant": 19.4,
-        "toddler": 34.0,
-        "school": 27.6,
-        "teen": 19.0
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 22.2,
-        "toddler": 42.4,
-        "school": 20.7,
-        "teen": 14.8
-      },
-      "1": {
-        "infant": 18.2,
-        "toddler": 35.0,
-        "school": 32.8,
-        "teen": 13.9
-      },
-      "2": {
-        "infant": 19.5,
-        "toddler": 35.0,
-        "school": 29.9,
-        "teen": 15.7
-      },
-      "3": {
-        "infant": 13.7,
-        "toddler": 39.6,
-        "school": 32.8,
-        "teen": 13.9
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 22.0,
-        "toddler": 40.7,
-        "school": 21.5,
-        "teen": 15.9
-      },
-      "1": {
-        "infant": 17.7,
-        "toddler": 37.3,
-        "school": 30.0,
-        "teen": 15.0
-      },
-      "2": {
-        "infant": 17.6,
-        "toddler": 36.2,
-        "school": 33.5,
-        "teen": 12.7
-      },
-      "3": {
-        "infant": 18.7,
-        "toddler": 35.4,
-        "school": 29.7,
-        "teen": 16.2
-      }
-    }
-  },
-  "2": {
-    "0": {
-      "0": {
-        "infant": 21.3,
-        "toddler": 38.3,
-        "school": 27.8,
-        "teen": 12.6
-      },
-      "1": {
-        "infant": 13.3,
-        "toddler": 30.5,
-        "school": 40.3,
-        "teen": 15.9
-      },
-      "2": {
-        "infant": 14.9,
-        "toddler": 34.0,
-        "school": 33.9,
-        "teen": 17.2
-      },
-      "3": {
-        "infant": 14.5,
-        "toddler": 34.5,
-        "school": 35.4,
-        "teen": 15.6
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 18.3,
-        "toddler": 36.6,
-        "school": 30.2,
-        "teen": 14.9
-      },
-      "1": {
-        "infant": 12.4,
-        "toddler": 33.0,
-        "school": 38.8,
-        "teen": 15.8
-      },
-      "2": {
-        "infant": 14.1,
-        "toddler": 34.1,
-        "school": 35.0,
-        "teen": 16.7
-      },
-      "3": {
-        "infant": 17.5,
-        "toddler": 30.3,
-        "school": 34.7,
-        "teen": 17.5
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 19.5,
-        "toddler": 35.0,
-        "school": 33.0,
-        "teen": 12.5
-      },
-      "1": {
-        "infant": 14.0,
-        "toddler": 34.8,
-        "school": 34.8,
-        "teen": 16.5
-      },
-      "2": {
-        "infant": 14.6,
-        "toddler": 28.3,
-        "school": 38.1,
-        "teen": 18.9
-      },
-      "3": {
-        "infant": 15.6,
-        "toddler": 32.4,
-        "school": 35.8,
-        "teen": 16.3
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 15.5,
-        "toddler": 34.2,
-        "school": 34.8,
-        "teen": 15.5
-      },
-      "1": {
-        "infant": 11.6,
-        "toddler": 29.6,
-        "school": 42.7,
-        "teen": 16.1
-      },
-      "2": {
-        "infant": 12.7,
-        "toddler": 33.4,
-        "school": 34.8,
-        "teen": 19.1
-      },
-      "3": {
-        "infant": 16.8,
-        "toddler": 30.6,
-        "school": 35.5,
-        "teen": 17.1
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 24.2,
-        "toddler": 39.9,
-        "school": 22.2,
-        "teen": 13.6
-      },
-      "1": {
-        "infant": 14.2,
-        "toddler": 30.8,
-        "school": 36.2,
-        "teen": 18.8
-      },
-      "2": {
-        "infant": 15.2,
-        "toddler": 31.8,
-        "school": 37.2,
-        "teen": 15.9
-      },
-      "3": {
-        "infant": 19.4,
-        "toddler": 31.6,
-        "school": 33.0,
-        "teen": 16.0
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 19.9,
-        "toddler": 42.0,
-        "school": 25.0,
-        "teen": 13.1
-      },
-      "1": {
-        "infant": 16.1,
-        "toddler": 36.1,
-        "school": 33.6,
-        "teen": 14.3
-      },
-      "2": {
-        "infant": 14.1,
-        "toddler": 36.2,
-        "school": 34.3,
-        "teen": 15.3
-      },
-      "3": {
-        "infant": 13.6,
-        "toddler": 41.4,
-        "school": 31.4,
-        "teen": 13.6
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 17.5,
-        "toddler": 39.3,
-        "school": 34.0,
-        "teen": 9.2
-      },
-      "1": {
-        "infant": 11.7,
-        "toddler": 38.0,
-        "school": 38.6,
-        "teen": 11.7
-      },
-      "2": {
-        "infant": 16.2,
-        "toddler": 37.0,
-        "school": 32.5,
-        "teen": 14.4
-      },
-      "3": {
-        "infant": 14.8,
-        "toddler": 37.3,
-        "school": 30.5,
-        "teen": 17.5
-      }
-    }
-  },
-  "3": {
-    "0": {
-      "0": {
-        "infant": 14.5,
-        "toddler": 40.0,
-        "school": 31.8,
-        "teen": 13.6
-      },
-      "1": {
-        "infant": 12.9,
-        "toddler": 36.3,
-        "school": 32.6,
-        "teen": 18.1
-      },
-      "2": {
-        "infant": 15.8,
-        "toddler": 27.7,
-        "school": 37.1,
-        "teen": 19.4
-      },
-      "3": {
-        "infant": 17.0,
-        "toddler": 31.0,
-        "school": 35.6,
-        "teen": 16.4
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 16.7,
-        "toddler": 40.2,
-        "school": 28.9,
-        "teen": 14.2
-      },
-      "1": {
-        "infant": 12.9,
-        "toddler": 32.3,
-        "school": 38.1,
-        "teen": 16.7
-      },
-      "2": {
-        "infant": 13.9,
-        "toddler": 29.6,
-        "school": 35.9,
-        "teen": 20.7
-      },
-      "3": {
-        "infant": 15.1,
-        "toddler": 33.9,
-        "school": 34.5,
-        "teen": 16.5
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 17.6,
-        "toddler": 42.0,
-        "school": 26.9,
-        "teen": 13.5
-      },
-      "1": {
-        "infant": 12.5,
-        "toddler": 35.3,
-        "school": 35.8,
-        "teen": 16.4
-      },
-      "2": {
-        "infant": 15.0,
-        "toddler": 30.7,
-        "school": 34.6,
-        "teen": 19.7
-      },
-      "3": {
-        "infant": 17.1,
-        "toddler": 31.6,
-        "school": 32.7,
-        "teen": 18.6
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 21.2,
-        "toddler": 36.8,
-        "school": 30.7,
-        "teen": 11.3
-      },
-      "1": {
-        "infant": 15.3,
-        "toddler": 23.9,
-        "school": 42.5,
-        "teen": 18.3
-      },
-      "2": {
-        "infant": 14.6,
-        "toddler": 29.3,
-        "school": 36.3,
-        "teen": 19.7
-      },
-      "3": {
-        "infant": 15.8,
-        "toddler": 36.1,
-        "school": 31.9,
-        "teen": 16.2
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 19.3,
-        "toddler": 42.5,
-        "school": 26.5,
-        "teen": 11.6
-      },
-      "1": {
-        "infant": 11.7,
-        "toddler": 34.1,
-        "school": 36.6,
-        "teen": 17.6
-      },
-      "2": {
-        "infant": 16.3,
-        "toddler": 30.0,
-        "school": 34.9,
-        "teen": 18.8
-      },
-      "3": {
-        "infant": 14.2,
-        "toddler": 37.0,
-        "school": 31.8,
-        "teen": 16.9
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 19.5,
-        "toddler": 35.2,
-        "school": 32.4,
-        "teen": 12.9
-      },
-      "1": {
-        "infant": 15.7,
-        "toddler": 32.6,
-        "school": 38.1,
-        "teen": 13.7
-      },
-      "2": {
-        "infant": 14.8,
-        "toddler": 34.5,
-        "school": 35.6,
-        "teen": 15.2
-      },
-      "3": {
-        "infant": 14.8,
-        "toddler": 36.3,
-        "school": 34.1,
-        "teen": 14.8
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 17.7,
-        "toddler": 39.9,
-        "school": 31.9,
-        "teen": 10.5
-      },
-      "1": {
-        "infant": 15.1,
-        "toddler": 40.0,
-        "school": 35.5,
-        "teen": 9.4
-      },
-      "2": {
-        "infant": 16.3,
-        "toddler": 33.4,
-        "school": 34.9,
-        "teen": 15.4
-      },
-      "3": {
-        "infant": 13.0,
-        "toddler": 39.3,
-        "school": 32.0,
-        "teen": 15.8
-      }
-    }
-  },
-  "4": {
-    "0": {
-      "0": {
-        "infant": 19.8,
-        "toddler": 34.6,
-        "school": 30.8,
-        "teen": 14.8
-      },
-      "1": {
-        "infant": 13.9,
-        "toddler": 31.6,
-        "school": 36.8,
-        "teen": 17.7
-      },
-      "2": {
-        "infant": 14.4,
-        "toddler": 31.8,
-        "school": 34.6,
-        "teen": 19.2
-      },
-      "3": {
-        "infant": 13.7,
-        "toddler": 35.9,
-        "school": 34.9,
-        "teen": 15.4
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 19.0,
-        "toddler": 36.0,
-        "school": 29.4,
-        "teen": 15.6
-      },
-      "1": {
-        "infant": 12.8,
-        "toddler": 33.1,
-        "school": 37.6,
-        "teen": 16.5
-      },
-      "2": {
-        "infant": 12.1,
-        "toddler": 30.4,
-        "school": 36.4,
-        "teen": 21.1
-      },
-      "3": {
-        "infant": 15.1,
-        "toddler": 34.6,
-        "school": 34.3,
-        "teen": 16.0
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 16.0,
-        "toddler": 42.0,
-        "school": 28.2,
-        "teen": 13.8
-      },
-      "1": {
-        "infant": 16.4,
-        "toddler": 34.7,
-        "school": 30.6,
-        "teen": 18.3
-      },
-      "2": {
-        "infant": 14.1,
-        "toddler": 34.2,
-        "school": 31.3,
-        "teen": 20.4
-      },
-      "3": {
-        "infant": 15.3,
-        "toddler": 31.8,
-        "school": 35.3,
-        "teen": 17.7
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 16.8,
-        "toddler": 38.4,
-        "school": 30.3,
-        "teen": 14.6
-      },
-      "1": {
-        "infant": 15.9,
-        "toddler": 33.0,
-        "school": 33.0,
-        "teen": 18.0
-      },
-      "2": {
-        "infant": 13.9,
-        "toddler": 31.6,
-        "school": 38.2,
-        "teen": 16.3
-      },
-      "3": {
-        "infant": 19.0,
-        "toddler": 32.7,
-        "school": 29.8,
-        "teen": 18.4
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 18.7,
-        "toddler": 43.3,
-        "school": 24.1,
-        "teen": 13.8
-      },
-      "1": {
-        "infant": 13.6,
-        "toddler": 34.6,
-        "school": 34.0,
-        "teen": 17.9
-      },
-      "2": {
-        "infant": 13.0,
-        "toddler": 35.3,
-        "school": 34.3,
-        "teen": 17.4
-      },
-      "3": {
-        "infant": 15.8,
-        "toddler": 36.3,
-        "school": 32.0,
-        "teen": 15.8
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 22.4,
-        "toddler": 34.3,
-        "school": 26.9,
-        "teen": 16.4
-      },
-      "1": {
-        "infant": 18.2,
-        "toddler": 43.5,
-        "school": 26.8,
-        "teen": 11.5
-      },
-      "2": {
-        "infant": 14.9,
-        "toddler": 37.1,
-        "school": 34.7,
-        "teen": 13.3
-      },
-      "3": {
-        "infant": 16.8,
-        "toddler": 37.2,
-        "school": 32.7,
-        "teen": 13.3
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 21.8,
-        "toddler": 38.9,
-        "school": 23.2,
-        "teen": 16.1
-      },
-      "1": {
-        "infant": 13.6,
-        "toddler": 37.5,
-        "school": 33.6,
-        "teen": 15.4
-      },
-      "2": {
-        "infant": 13.8,
-        "toddler": 38.3,
-        "school": 33.5,
-        "teen": 14.4
-      },
-      "3": {
-        "infant": 11.8,
-        "toddler": 37.3,
-        "school": 35.6,
-        "teen": 15.3
-      }
-    }
-  },
-  "5": {
-    "0": {
-      "0": {
-        "infant": 21.4,
-        "toddler": 37.9,
-        "school": 27.2,
-        "teen": 13.6
-      },
-      "1": {
-        "infant": 11.6,
-        "toddler": 34.5,
-        "school": 38.0,
-        "teen": 15.9
-      },
-      "2": {
-        "infant": 14.1,
-        "toddler": 30.7,
-        "school": 34.0,
-        "teen": 21.2
-      },
-      "3": {
-        "infant": 15.0,
-        "toddler": 33.0,
-        "school": 37.5,
-        "teen": 14.6
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 13.4,
-        "toddler": 39.2,
-        "school": 27.3,
-        "teen": 20.1
-      },
-      "1": {
-        "infant": 13.4,
-        "toddler": 29.5,
-        "school": 37.4,
-        "teen": 19.7
-      },
-      "2": {
-        "infant": 13.6,
-        "toddler": 30.0,
-        "school": 36.1,
-        "teen": 20.2
-      },
-      "3": {
-        "infant": 16.0,
-        "toddler": 32.2,
-        "school": 36.9,
-        "teen": 14.8
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 15.7,
-        "toddler": 38.2,
-        "school": 31.4,
-        "teen": 14.7
-      },
-      "1": {
-        "infant": 11.1,
-        "toddler": 31.7,
-        "school": 35.4,
-        "teen": 21.9
-      },
-      "2": {
-        "infant": 12.6,
-        "toddler": 31.5,
-        "school": 34.6,
-        "teen": 21.2
-      },
-      "3": {
-        "infant": 15.3,
-        "toddler": 32.3,
-        "school": 35.5,
-        "teen": 16.9
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 20.0,
-        "toddler": 34.0,
-        "school": 28.8,
-        "teen": 17.2
-      },
-      "1": {
-        "infant": 12.4,
-        "toddler": 34.3,
-        "school": 34.0,
-        "teen": 19.3
-      },
-      "2": {
-        "infant": 13.4,
-        "toddler": 28.6,
-        "school": 38.4,
-        "teen": 19.6
-      },
-      "3": {
-        "infant": 16.5,
-        "toddler": 34.6,
-        "school": 33.6,
-        "teen": 15.4
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 18.3,
-        "toddler": 33.3,
-        "school": 31.5,
-        "teen": 16.9
-      },
-      "1": {
-        "infant": 12.3,
-        "toddler": 32.6,
-        "school": 37.3,
-        "teen": 17.8
-      },
-      "2": {
-        "infant": 13.2,
-        "toddler": 29.3,
-        "school": 36.2,
-        "teen": 21.3
-      },
-      "3": {
-        "infant": 14.7,
-        "toddler": 35.4,
-        "school": 36.2,
-        "teen": 13.6
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 21.1,
-        "toddler": 31.1,
-        "school": 30.1,
-        "teen": 17.7
-      },
-      "1": {
-        "infant": 15.7,
-        "toddler": 36.1,
-        "school": 35.1,
-        "teen": 13.1
-      },
-      "2": {
-        "infant": 16.1,
-        "toddler": 31.9,
-        "school": 37.7,
-        "teen": 14.4
-      },
-      "3": {
-        "infant": 14.8,
-        "toddler": 36.1,
-        "school": 33.8,
-        "teen": 15.3
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 12.7,
-        "toddler": 38.1,
-        "school": 33.9,
-        "teen": 15.3
-      },
-      "1": {
-        "infant": 16.1,
-        "toddler": 37.2,
-        "school": 35.6,
-        "teen": 11.1
-      },
-      "2": {
-        "infant": 15.4,
-        "toddler": 37.4,
-        "school": 31.8,
-        "teen": 15.4
-      },
-      "3": {
-        "infant": 14.6,
-        "toddler": 33.9,
-        "school": 38.4,
-        "teen": 13.1
-      }
-    }
-  },
-  "6": {
-    "0": {
-      "0": {
-        "infant": 18.8,
-        "toddler": 32.6,
-        "school": 32.6,
-        "teen": 16.0
-      },
-      "1": {
-        "infant": 16.5,
-        "toddler": 38.6,
-        "school": 30.0,
-        "teen": 14.9
-      },
-      "2": {
-        "infant": 16.7,
-        "toddler": 29.1,
-        "school": 39.5,
-        "teen": 14.8
-      },
-      "3": {
-        "infant": 14.0,
-        "toddler": 35.4,
-        "school": 33.9,
-        "teen": 16.6
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 19.0,
-        "toddler": 36.5,
-        "school": 28.6,
-        "teen": 15.9
-      },
-      "1": {
-        "infant": 14.7,
-        "toddler": 32.3,
-        "school": 32.7,
-        "teen": 20.3
-      },
-      "2": {
-        "infant": 15.8,
-        "toddler": 33.8,
-        "school": 34.2,
-        "teen": 16.2
-      },
-      "3": {
-        "infant": 16.8,
-        "toddler": 33.8,
-        "school": 32.8,
-        "teen": 16.6
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 20.3,
-        "toddler": 28.5,
-        "school": 37.2,
-        "teen": 14.0
-      },
-      "1": {
-        "infant": 10.4,
-        "toddler": 33.9,
-        "school": 35.6,
-        "teen": 20.1
-      },
-      "2": {
-        "infant": 12.9,
-        "toddler": 32.8,
-        "school": 36.9,
-        "teen": 17.5
-      },
-      "3": {
-        "infant": 17.3,
-        "toddler": 33.6,
-        "school": 33.4,
-        "teen": 15.8
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 16.6,
-        "toddler": 33.7,
-        "school": 36.8,
-        "teen": 13.0
-      },
-      "1": {
-        "infant": 12.6,
-        "toddler": 31.6,
-        "school": 35.7,
-        "teen": 20.1
-      },
-      "2": {
-        "infant": 14.5,
-        "toddler": 31.3,
-        "school": 35.7,
-        "teen": 18.5
-      },
-      "3": {
-        "infant": 16.5,
-        "toddler": 33.2,
-        "school": 33.4,
-        "teen": 16.9
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 19.5,
-        "toddler": 33.7,
-        "school": 32.7,
-        "teen": 14.1
-      },
-      "1": {
-        "infant": 15.7,
-        "toddler": 32.0,
-        "school": 35.9,
-        "teen": 16.4
-      },
-      "2": {
-        "infant": 15.9,
-        "toddler": 33.1,
-        "school": 33.3,
-        "teen": 17.6
-      },
-      "3": {
-        "infant": 17.0,
-        "toddler": 33.0,
-        "school": 34.2,
-        "teen": 15.8
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 14.0,
-        "toddler": 42.0,
-        "school": 30.9,
-        "teen": 13.0
-      },
-      "1": {
-        "infant": 16.4,
-        "toddler": 40.6,
-        "school": 29.7,
-        "teen": 13.3
-      },
-      "2": {
-        "infant": 15.0,
-        "toddler": 35.8,
-        "school": 36.2,
-        "teen": 13.0
-      },
-      "3": {
-        "infant": 13.3,
-        "toddler": 32.6,
-        "school": 38.3,
-        "teen": 15.8
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 22.5,
-        "toddler": 33.9,
-        "school": 28.0,
-        "teen": 15.7
-      },
-      "1": {
-        "infant": 15.5,
-        "toddler": 36.0,
-        "school": 33.7,
-        "teen": 14.8
-      },
-      "2": {
-        "infant": 14.3,
-        "toddler": 32.5,
-        "school": 35.0,
-        "teen": 18.2
-      },
-      "3": {
-        "infant": 13.4,
-        "toddler": 36.2,
-        "school": 35.0,
-        "teen": 15.4
-      }
-    }
-  },
-  "7": {
-    "0": {
-      "0": {
-        "infant": 23.8,
-        "toddler": 30.4,
-        "school": 27.6,
-        "teen": 18.2
-      },
-      "1": {
-        "infant": 16.7,
-        "toddler": 38.0,
-        "school": 31.2,
-        "teen": 14.1
-      },
-      "2": {
-        "infant": 17.1,
-        "toddler": 34.6,
-        "school": 29.8,
-        "teen": 18.4
-      },
-      "3": {
-        "infant": 16.4,
-        "toddler": 32.9,
-        "school": 33.7,
-        "teen": 17.0
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 17.8,
-        "toddler": 37.9,
-        "school": 23.7,
-        "teen": 20.7
-      },
-      "1": {
-        "infant": 16.7,
-        "toddler": 34.2,
-        "school": 32.4,
-        "teen": 16.7
-      },
-      "2": {
-        "infant": 16.8,
-        "toddler": 36.8,
-        "school": 31.1,
-        "teen": 15.3
-      },
-      "3": {
-        "infant": 13.2,
-        "toddler": 35.4,
-        "school": 34.3,
-        "teen": 17.1
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 17.0,
-        "toddler": 33.0,
-        "school": 28.4,
-        "teen": 21.6
-      },
-      "1": {
-        "infant": 19.8,
-        "toddler": 37.7,
-        "school": 29.8,
-        "teen": 12.7
-      },
-      "2": {
-        "infant": 18.8,
-        "toddler": 34.9,
-        "school": 30.3,
-        "teen": 16.0
-      },
-      "3": {
-        "infant": 14.2,
-        "toddler": 35.2,
-        "school": 35.5,
-        "teen": 15.1
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 21.8,
-        "toddler": 37.3,
-        "school": 23.2,
-        "teen": 17.6
-      },
-      "1": {
-        "infant": 16.3,
-        "toddler": 36.1,
-        "school": 32.7,
-        "teen": 14.9
-      },
-      "2": {
-        "infant": 16.9,
-        "toddler": 32.5,
-        "school": 33.4,
-        "teen": 17.2
-      },
-      "3": {
-        "infant": 14.8,
-        "toddler": 34.0,
-        "school": 33.1,
-        "teen": 18.1
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 18.1,
-        "toddler": 30.2,
-        "school": 34.9,
-        "teen": 16.8
-      },
-      "1": {
-        "infant": 18.3,
-        "toddler": 42.0,
-        "school": 26.3,
-        "teen": 13.4
-      },
-      "2": {
-        "infant": 17.7,
-        "toddler": 32.9,
-        "school": 33.3,
-        "teen": 16.1
-      },
-      "3": {
-        "infant": 17.1,
-        "toddler": 30.1,
-        "school": 35.0,
-        "teen": 17.8
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 20.9,
-        "toddler": 31.4,
-        "school": 30.2,
-        "teen": 17.4
-      },
-      "1": {
-        "infant": 16.4,
-        "toddler": 33.8,
-        "school": 35.7,
-        "teen": 14.1
-      },
-      "2": {
-        "infant": 14.6,
-        "toddler": 37.4,
-        "school": 31.4,
-        "teen": 16.6
-      },
-      "3": {
-        "infant": 16.0,
-        "toddler": 34.2,
-        "school": 31.9,
-        "teen": 17.9
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 21.6,
-        "toddler": 27.8,
-        "school": 32.5,
-        "teen": 18.0
-      },
-      "1": {
-        "infant": 16.8,
-        "toddler": 31.2,
-        "school": 35.2,
-        "teen": 16.8
-      },
-      "2": {
-        "infant": 16.3,
-        "toddler": 34.7,
-        "school": 33.3,
-        "teen": 15.7
-      },
-      "3": {
-        "infant": 15.9,
-        "toddler": 33.5,
-        "school": 34.2,
-        "teen": 16.4
-      }
-    }
-  },
-  "8": {
-    "0": {
-      "0": {
-        "infant": 21.3,
-        "toddler": 32.0,
-        "school": 24.7,
-        "teen": 22.0
-      },
-      "1": {
-        "infant": 14.4,
-        "toddler": 34.3,
-        "school": 39.3,
-        "teen": 11.9
-      },
-      "2": {
-        "infant": 20.7,
-        "toddler": 32.4,
-        "school": 28.1,
-        "teen": 18.9
-      },
-      "3": {
-        "infant": 17.3,
-        "toddler": 29.6,
-        "school": 33.6,
-        "teen": 19.5
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 22.9,
-        "toddler": 32.5,
-        "school": 28.7,
-        "teen": 15.9
-      },
-      "1": {
-        "infant": 17.6,
-        "toddler": 38.2,
-        "school": 29.0,
-        "teen": 15.1
-      },
-      "2": {
-        "infant": 17.1,
-        "toddler": 29.4,
-        "school": 33.9,
-        "teen": 19.6
-      },
-      "3": {
-        "infant": 15.9,
-        "toddler": 33.4,
-        "school": 33.4,
-        "teen": 17.3
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 20.5,
-        "toddler": 45.0,
-        "school": 25.2,
-        "teen": 9.3
-      },
-      "1": {
-        "infant": 18.1,
-        "toddler": 35.2,
-        "school": 30.7,
-        "teen": 16.1
-      },
-      "2": {
-        "infant": 17.2,
-        "toddler": 36.4,
-        "school": 28.9,
-        "teen": 17.4
-      },
-      "3": {
-        "infant": 19.8,
-        "toddler": 32.2,
-        "school": 32.0,
-        "teen": 15.9
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 20.8,
-        "toddler": 30.5,
-        "school": 26.0,
-        "teen": 22.7
-      },
-      "1": {
-        "infant": 15.9,
-        "toddler": 39.4,
-        "school": 30.7,
-        "teen": 13.9
-      },
-      "2": {
-        "infant": 18.6,
-        "toddler": 35.5,
-        "school": 30.7,
-        "teen": 15.2
-      },
-      "3": {
-        "infant": 14.4,
-        "toddler": 32.4,
-        "school": 31.4,
-        "teen": 21.8
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 18.1,
-        "toddler": 34.1,
-        "school": 29.0,
-        "teen": 18.8
-      },
-      "1": {
-        "infant": 18.9,
-        "toddler": 39.5,
-        "school": 30.5,
-        "teen": 11.1
-      },
-      "2": {
-        "infant": 18.1,
-        "toddler": 33.9,
-        "school": 29.1,
-        "teen": 18.8
-      },
-      "3": {
-        "infant": 17.0,
-        "toddler": 36.6,
-        "school": 28.2,
-        "teen": 18.3
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 24.3,
-        "toddler": 30.9,
-        "school": 33.1,
-        "teen": 11.6
-      },
-      "1": {
-        "infant": 18.7,
-        "toddler": 36.9,
-        "school": 28.0,
-        "teen": 16.4
-      },
-      "2": {
-        "infant": 18.1,
-        "toddler": 34.4,
-        "school": 28.0,
-        "teen": 19.5
-      },
-      "3": {
-        "infant": 15.3,
-        "toddler": 31.8,
-        "school": 36.4,
-        "teen": 16.5
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 20.1,
-        "toddler": 33.8,
-        "school": 26.6,
-        "teen": 19.5
-      },
-      "1": {
-        "infant": 21.9,
-        "toddler": 36.2,
-        "school": 29.9,
-        "teen": 12.1
-      },
-      "2": {
-        "infant": 15.7,
-        "toddler": 33.7,
-        "school": 35.0,
-        "teen": 15.7
-      },
-      "3": {
-        "infant": 19.2,
-        "toddler": 30.8,
-        "school": 33.0,
-        "teen": 17.0
-      }
-    }
-  },
-  "9": {
-    "0": {
-      "0": {
-        "infant": 20.2,
-        "toddler": 40.5,
-        "school": 25.6,
-        "teen": 13.7
-      },
-      "1": {
-        "infant": 10.0,
-        "toddler": 26.2,
-        "school": 41.2,
-        "teen": 22.6
-      },
-      "2": {
-        "infant": 16.9,
-        "toddler": 28.8,
-        "school": 32.3,
-        "teen": 22.0
-      },
-      "3": {
-        "infant": 16.4,
-        "toddler": 32.0,
-        "school": 32.0,
-        "teen": 19.6
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 20.6,
-        "toddler": 40.0,
-        "school": 23.6,
-        "teen": 15.8
-      },
-      "1": {
-        "infant": 12.3,
-        "toddler": 29.1,
-        "school": 33.9,
-        "teen": 24.6
-      },
-      "2": {
-        "infant": 16.9,
-        "toddler": 27.6,
-        "school": 34.0,
-        "teen": 21.5
-      },
-      "3": {
-        "infant": 17.2,
-        "toddler": 30.1,
-        "school": 32.5,
-        "teen": 20.2
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 31.5,
-        "toddler": 30.7,
-        "school": 27.6,
-        "teen": 10.2
-      },
-      "1": {
-        "infant": 12.2,
-        "toddler": 30.9,
-        "school": 29.5,
-        "teen": 27.4
-      },
-      "2": {
-        "infant": 17.6,
-        "toddler": 26.1,
-        "school": 36.8,
-        "teen": 19.5
-      },
-      "3": {
-        "infant": 15.6,
-        "toddler": 32.3,
-        "school": 32.9,
-        "teen": 19.1
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 27.3,
-        "toddler": 31.8,
-        "school": 25.0,
-        "teen": 15.9
-      },
-      "1": {
-        "infant": 19.3,
-        "toddler": 26.8,
-        "school": 35.3,
-        "teen": 18.6
-      },
-      "2": {
-        "infant": 14.1,
-        "toddler": 29.8,
-        "school": 34.5,
-        "teen": 21.6
-      },
-      "3": {
-        "infant": 13.3,
-        "toddler": 30.8,
-        "school": 36.3,
-        "teen": 19.7
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 25.2,
-        "toddler": 28.6,
-        "school": 23.1,
-        "teen": 23.1
-      },
-      "1": {
-        "infant": 12.2,
-        "toddler": 34.7,
-        "school": 34.1,
-        "teen": 19.0
-      },
-      "2": {
-        "infant": 16.3,
-        "toddler": 25.8,
-        "school": 34.5,
-        "teen": 23.4
-      },
-      "3": {
-        "infant": 17.6,
-        "toddler": 29.9,
-        "school": 33.8,
-        "teen": 18.7
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 20.1,
-        "toddler": 33.7,
-        "school": 26.1,
-        "teen": 20.1
-      },
-      "1": {
-        "infant": 20.2,
-        "toddler": 30.9,
-        "school": 32.2,
-        "teen": 16.7
-      },
-      "2": {
-        "infant": 18.0,
-        "toddler": 31.9,
-        "school": 31.7,
-        "teen": 18.4
-      },
-      "3": {
-        "infant": 16.6,
-        "toddler": 32.5,
-        "school": 33.6,
-        "teen": 17.3
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 18.9,
-        "toddler": 31.4,
-        "school": 34.1,
-        "teen": 15.7
-      },
-      "1": {
-        "infant": 20.6,
-        "toddler": 34.1,
-        "school": 31.3,
-        "teen": 13.9
-      },
-      "2": {
-        "infant": 13.1,
-        "toddler": 33.9,
-        "school": 34.8,
-        "teen": 18.2
-      },
-      "3": {
-        "infant": 18.4,
-        "toddler": 29.4,
-        "school": 34.9,
-        "teen": 17.3
-      }
-    }
-  },
-  "10": {
-    "0": {
-      "0": {
-        "infant": 22.8,
-        "toddler": 29.9,
-        "school": 33.5,
-        "teen": 13.8
-      },
-      "1": {
-        "infant": 12.5,
-        "toddler": 29.6,
-        "school": 33.4,
-        "teen": 24.5
-      },
-      "2": {
-        "infant": 15.3,
-        "toddler": 30.4,
-        "school": 32.3,
-        "teen": 22.0
-      },
-      "3": {
-        "infant": 15.2,
-        "toddler": 31.6,
-        "school": 30.9,
-        "teen": 22.3
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 19.7,
-        "toddler": 28.0,
-        "school": 28.7,
-        "teen": 23.6
-      },
-      "1": {
-        "infant": 13.8,
-        "toddler": 27.9,
-        "school": 36.6,
-        "teen": 21.8
-      },
-      "2": {
-        "infant": 16.9,
-        "toddler": 26.9,
-        "school": 33.3,
-        "teen": 22.9
-      },
-      "3": {
-        "infant": 14.6,
-        "toddler": 26.2,
-        "school": 37.1,
-        "teen": 22.1
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 20.7,
-        "toddler": 39.1,
-        "school": 26.4,
-        "teen": 13.8
-      },
-      "1": {
-        "infant": 12.0,
-        "toddler": 31.1,
-        "school": 35.4,
-        "teen": 21.5
-      },
-      "2": {
-        "infant": 15.1,
-        "toddler": 26.7,
-        "school": 34.0,
-        "teen": 24.3
-      },
-      "3": {
-        "infant": 16.2,
-        "toddler": 32.3,
-        "school": 30.7,
-        "teen": 20.8
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 19.0,
-        "toddler": 39.3,
-        "school": 26.2,
-        "teen": 15.5
-      },
-      "1": {
-        "infant": 15.5,
-        "toddler": 26.9,
-        "school": 32.7,
-        "teen": 24.9
-      },
-      "2": {
-        "infant": 13.9,
-        "toddler": 25.3,
-        "school": 38.0,
-        "teen": 22.8
-      },
-      "3": {
-        "infant": 12.9,
-        "toddler": 33.9,
-        "school": 33.6,
-        "teen": 19.6
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 21.3,
-        "toddler": 37.8,
-        "school": 23.8,
-        "teen": 17.1
-      },
-      "1": {
-        "infant": 16.3,
-        "toddler": 27.7,
-        "school": 36.7,
-        "teen": 19.4
-      },
-      "2": {
-        "infant": 14.6,
-        "toddler": 27.6,
-        "school": 37.3,
-        "teen": 20.5
-      },
-      "3": {
-        "infant": 18.3,
-        "toddler": 31.7,
-        "school": 29.0,
-        "teen": 21.0
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 24.3,
-        "toddler": 37.6,
-        "school": 26.0,
-        "teen": 12.2
-      },
-      "1": {
-        "infant": 11.6,
-        "toddler": 38.2,
-        "school": 36.5,
-        "teen": 13.7
-      },
-      "2": {
-        "infant": 16.2,
-        "toddler": 35.6,
-        "school": 32.0,
-        "teen": 16.2
-      },
-      "3": {
-        "infant": 15.1,
-        "toddler": 36.9,
-        "school": 31.3,
-        "teen": 16.7
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 22.8,
-        "toddler": 33.0,
-        "school": 31.6,
-        "teen": 12.6
-      },
-      "1": {
-        "infant": 18.8,
-        "toddler": 32.5,
-        "school": 33.9,
-        "teen": 14.8
-      },
-      "2": {
-        "infant": 18.8,
-        "toddler": 30.2,
-        "school": 31.3,
-        "teen": 19.6
-      },
-      "3": {
-        "infant": 15.3,
-        "toddler": 34.1,
-        "school": 31.8,
-        "teen": 18.8
-      }
-    }
-  },
-  "11": {
-    "0": {
-      "0": {
-        "infant": 16.2,
-        "toddler": 41.6,
-        "school": 25.9,
-        "teen": 16.2
-      },
-      "1": {
-        "infant": 14.5,
-        "toddler": 35.1,
-        "school": 30.2,
-        "teen": 20.1
-      },
-      "2": {
-        "infant": 17.5,
-        "toddler": 30.3,
-        "school": 33.2,
-        "teen": 19.0
-      },
-      "3": {
-        "infant": 16.8,
-        "toddler": 32.4,
-        "school": 32.2,
-        "teen": 18.7
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 23.0,
-        "toddler": 42.5,
-        "school": 23.0,
-        "teen": 11.5
-      },
-      "1": {
-        "infant": 14.3,
-        "toddler": 31.1,
-        "school": 34.3,
-        "teen": 20.3
-      },
-      "2": {
-        "infant": 16.1,
-        "toddler": 31.4,
-        "school": 33.7,
-        "teen": 18.8
-      },
-      "3": {
-        "infant": 13.0,
-        "toddler": 39.4,
-        "school": 30.8,
-        "teen": 16.7
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 23.2,
-        "toddler": 42.1,
-        "school": 22.6,
-        "teen": 12.2
-      },
-      "1": {
-        "infant": 14.7,
-        "toddler": 28.7,
-        "school": 36.4,
-        "teen": 20.2
-      },
-      "2": {
-        "infant": 14.6,
-        "toddler": 34.1,
-        "school": 32.7,
-        "teen": 18.7
-      },
-      "3": {
-        "infant": 16.4,
-        "toddler": 33.0,
-        "school": 31.5,
-        "teen": 19.1
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 18.8,
-        "toddler": 45.3,
-        "school": 21.5,
-        "teen": 14.3
-      },
-      "1": {
-        "infant": 14.6,
-        "toddler": 36.3,
-        "school": 29.9,
-        "teen": 19.2
-      },
-      "2": {
-        "infant": 14.8,
-        "toddler": 32.7,
-        "school": 32.5,
-        "teen": 20.0
-      },
-      "3": {
-        "infant": 20.0,
-        "toddler": 30.6,
-        "school": 34.5,
-        "teen": 14.9
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 19.7,
-        "toddler": 47.5,
-        "school": 21.8,
-        "teen": 10.9
-      },
-      "1": {
-        "infant": 15.0,
-        "toddler": 32.3,
-        "school": 34.3,
-        "teen": 18.5
-      },
-      "2": {
-        "infant": 17.5,
-        "toddler": 31.6,
-        "school": 32.8,
-        "teen": 18.0
-      },
-      "3": {
-        "infant": 17.6,
-        "toddler": 34.4,
-        "school": 30.8,
-        "teen": 17.2
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 17.9,
-        "toddler": 45.5,
-        "school": 23.3,
-        "teen": 13.2
-      },
-      "1": {
-        "infant": 17.3,
-        "toddler": 38.7,
-        "school": 31.2,
-        "teen": 12.7
-      },
-      "2": {
-        "infant": 16.3,
-        "toddler": 36.0,
-        "school": 30.9,
-        "teen": 16.8
-      },
-      "3": {
-        "infant": 22.0,
-        "toddler": 35.0,
-        "school": 28.4,
-        "teen": 14.6
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 26.1,
-        "toddler": 35.7,
-        "school": 27.8,
-        "teen": 10.4
-      },
-      "1": {
-        "infant": 20.9,
-        "toddler": 37.6,
-        "school": 30.2,
-        "teen": 11.3
-      },
-      "2": {
-        "infant": 17.2,
-        "toddler": 38.9,
-        "school": 26.9,
-        "teen": 17.0
-      },
-      "3": {
-        "infant": 15.7,
-        "toddler": 37.4,
-        "school": 30.9,
-        "teen": 15.9
-      }
-    }
-  },
-  "12": {
-    "0": {
-      "0": {
-        "infant": 23.1,
-        "toddler": 40.1,
-        "school": 25.1,
-        "teen": 11.7
-      },
-      "1": {
-        "infant": 16.6,
-        "toddler": 33.2,
-        "school": 35.0,
-        "teen": 15.2
-      },
-      "2": {
-        "infant": 20.4,
-        "toddler": 33.1,
-        "school": 30.5,
-        "teen": 16.1
-      },
-      "3": {
-        "infant": 18.9,
-        "toddler": 36.3,
-        "school": 30.5,
-        "teen": 14.4
-      }
-    },
-    "1": {
-      "0": {
-        "infant": 21.4,
-        "toddler": 39.9,
-        "school": 25.3,
-        "teen": 13.5
-      },
-      "1": {
-        "infant": 14.3,
-        "toddler": 36.6,
-        "school": 36.2,
-        "teen": 12.9
-      },
-      "2": {
-        "infant": 15.5,
-        "toddler": 36.0,
-        "school": 31.9,
-        "teen": 16.5
-      },
-      "3": {
-        "infant": 19.6,
-        "toddler": 36.5,
-        "school": 30.0,
-        "teen": 13.9
-      }
-    },
-    "2": {
-      "0": {
-        "infant": 26.4,
-        "toddler": 35.4,
-        "school": 22.0,
-        "teen": 16.2
-      },
-      "1": {
-        "infant": 21.0,
-        "toddler": 34.3,
-        "school": 31.5,
-        "teen": 13.3
-      },
-      "2": {
-        "infant": 16.5,
-        "toddler": 34.0,
-        "school": 34.6,
-        "teen": 14.9
-      },
-      "3": {
-        "infant": 20.1,
-        "toddler": 38.7,
-        "school": 27.1,
-        "teen": 14.0
-      }
-    },
-    "3": {
-      "0": {
-        "infant": 15.7,
-        "toddler": 41.7,
-        "school": 27.3,
-        "teen": 15.3
-      },
-      "1": {
-        "infant": 13.6,
-        "toddler": 38.2,
-        "school": 32.4,
-        "teen": 15.8
-      },
-      "2": {
-        "infant": 19.2,
-        "toddler": 34.9,
-        "school": 29.1,
-        "teen": 16.7
-      },
-      "3": {
-        "infant": 20.1,
-        "toddler": 34.1,
-        "school": 33.0,
-        "teen": 12.9
-      }
-    },
-    "4": {
-      "0": {
-        "infant": 26.6,
-        "toddler": 38.5,
-        "school": 23.4,
-        "teen": 11.5
-      },
-      "1": {
-        "infant": 19.1,
-        "toddler": 34.2,
-        "school": 33.5,
-        "teen": 13.2
-      },
-      "2": {
-        "infant": 18.8,
-        "toddler": 34.3,
-        "school": 32.4,
-        "teen": 14.5
-      },
-      "3": {
-        "infant": 22.0,
-        "toddler": 33.2,
-        "school": 31.9,
-        "teen": 12.9
-      }
-    },
-    "5": {
-      "0": {
-        "infant": 22.0,
-        "toddler": 39.0,
-        "school": 22.7,
-        "teen": 16.2
-      },
-      "1": {
-        "infant": 19.6,
-        "toddler": 35.3,
-        "school": 35.0,
-        "teen": 10.0
-      },
-      "2": {
-        "infant": 19.8,
-        "toddler": 35.8,
-        "school": 31.2,
-        "teen": 13.2
-      },
-      "3": {
-        "infant": 19.5,
-        "toddler": 34.6,
-        "school": 31.7,
-        "teen": 14.2
-      }
-    },
-    "6": {
-      "0": {
-        "infant": 24.3,
-        "toddler": 36.5,
-        "school": 27.0,
-        "teen": 12.2
-      },
-      "1": {
-        "infant": 20.6,
-        "toddler": 36.4,
-        "school": 32.9,
-        "teen": 10.1
-      },
-      "2": {
-        "infant": 19.4,
-        "toddler": 38.2,
-        "school": 31.7,
-        "teen": 10.8
-      },
-      "3": {
-        "infant": 20.1,
-        "toddler": 36.2,
-        "school": 32.9,
-        "teen": 10.7
-      }
-    }
-  }
-};
-
-const SURGE_CC_MIX = {
-  "1": {
-    "0": {
-      "0": {
-        "resp": 37.2,
-        "mh": 4.0,
-        "gi": 18.4,
-        "injury": 2.8,
-        "fever": 15.6,
-        "ent": 4.4,
-        "other": 17.6
-      },
-      "1": {
-        "resp": 25.0,
-        "mh": 2.7,
-        "gi": 20.0,
-        "injury": 9.7,
-        "fever": 12.9,
-        "ent": 4.7,
-        "other": 25.0
-      },
-      "2": {
-        "resp": 23.6,
-        "mh": 3.9,
-        "gi": 18.8,
-        "injury": 11.4,
-        "fever": 9.7,
-        "ent": 3.8,
-        "other": 28.9
-      },
-      "3": {
-        "resp": 22.0,
-        "mh": 5.2,
-        "gi": 17.6,
-        "injury": 10.5,
-        "fever": 10.1,
-        "ent": 3.6,
-        "other": 30.9
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 36.0,
-        "mh": 4.3,
-        "gi": 17.1,
-        "injury": 2.8,
-        "fever": 14.7,
-        "ent": 3.3,
-        "other": 21.8
-      },
-      "1": {
-        "resp": 25.2,
-        "mh": 3.6,
-        "gi": 16.9,
-        "injury": 7.6,
-        "fever": 6.7,
-        "ent": 4.3,
-        "other": 35.7
-      },
-      "2": {
-        "resp": 18.4,
-        "mh": 4.9,
-        "gi": 19.1,
-        "injury": 12.2,
-        "fever": 8.5,
-        "ent": 4.3,
-        "other": 32.6
-      },
-      "3": {
-        "resp": 24.8,
-        "mh": 3.9,
-        "gi": 17.0,
-        "injury": 10.9,
-        "fever": 9.4,
-        "ent": 3.8,
-        "other": 30.2
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 31.6,
-        "mh": 3.5,
-        "gi": 21.5,
-        "injury": 4.4,
-        "fever": 14.0,
-        "ent": 5.3,
-        "other": 19.7
-      },
-      "1": {
-        "resp": 26.4,
-        "mh": 2.6,
-        "gi": 20.9,
-        "injury": 9.1,
-        "fever": 8.9,
-        "ent": 2.6,
-        "other": 29.3
-      },
-      "2": {
-        "resp": 26.9,
-        "mh": 4.6,
-        "gi": 18.1,
-        "injury": 11.5,
-        "fever": 7.5,
-        "ent": 3.4,
-        "other": 28.0
-      },
-      "3": {
-        "resp": 22.1,
-        "mh": 4.8,
-        "gi": 16.2,
-        "injury": 13.0,
-        "fever": 10.7,
-        "ent": 4.3,
-        "other": 29.0
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 34.8,
-        "mh": 2.7,
-        "gi": 18.8,
-        "injury": 4.0,
-        "fever": 17.0,
-        "ent": 4.9,
-        "other": 17.9
-      },
-      "1": {
-        "resp": 21.9,
-        "mh": 1.0,
-        "gi": 19.1,
-        "injury": 9.5,
-        "fever": 12.9,
-        "ent": 4.1,
-        "other": 31.4
-      },
-      "2": {
-        "resp": 20.9,
-        "mh": 4.4,
-        "gi": 15.8,
-        "injury": 13.5,
-        "fever": 9.9,
-        "ent": 3.4,
-        "other": 32.1
-      },
-      "3": {
-        "resp": 20.0,
-        "mh": 3.8,
-        "gi": 14.5,
-        "injury": 12.6,
-        "fever": 11.8,
-        "ent": 2.8,
-        "other": 34.5
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 43.7,
-        "mh": 0.9,
-        "gi": 22.8,
-        "injury": 2.3,
-        "fever": 12.6,
-        "ent": 3.3,
-        "other": 14.4
-      },
-      "1": {
-        "resp": 18.0,
-        "mh": 2.1,
-        "gi": 26.0,
-        "injury": 8.1,
-        "fever": 9.6,
-        "ent": 2.3,
-        "other": 33.9
-      },
-      "2": {
-        "resp": 19.9,
-        "mh": 7.1,
-        "gi": 14.9,
-        "injury": 12.1,
-        "fever": 10.2,
-        "ent": 2.8,
-        "other": 33.0
-      },
-      "3": {
-        "resp": 20.6,
-        "mh": 3.3,
-        "gi": 13.6,
-        "injury": 13.0,
-        "fever": 14.0,
-        "ent": 3.7,
-        "other": 31.8
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 28.6,
-        "mh": 1.9,
-        "gi": 21.4,
-        "injury": 3.4,
-        "fever": 18.4,
-        "ent": 2.4,
-        "other": 23.8
-      },
-      "1": {
-        "resp": 23.7,
-        "mh": 1.5,
-        "gi": 21.2,
-        "injury": 8.4,
-        "fever": 11.3,
-        "ent": 3.3,
-        "other": 30.7
-      },
-      "2": {
-        "resp": 20.1,
-        "mh": 2.4,
-        "gi": 17.4,
-        "injury": 14.3,
-        "fever": 10.2,
-        "ent": 3.7,
-        "other": 31.9
-      },
-      "3": {
-        "resp": 23.0,
-        "mh": 2.0,
-        "gi": 17.4,
-        "injury": 13.4,
-        "fever": 9.8,
-        "ent": 4.6,
-        "other": 29.8
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 34.3,
-        "mh": 0.0,
-        "gi": 20.4,
-        "injury": 6.9,
-        "fever": 11.6,
-        "ent": 7.9,
-        "other": 19.0
-      },
-      "1": {
-        "resp": 25.1,
-        "mh": 1.7,
-        "gi": 21.8,
-        "injury": 8.6,
-        "fever": 8.9,
-        "ent": 5.3,
-        "other": 28.7
-      },
-      "2": {
-        "resp": 22.4,
-        "mh": 2.0,
-        "gi": 17.9,
-        "injury": 12.2,
-        "fever": 11.9,
-        "ent": 3.1,
-        "other": 30.3
-      },
-      "3": {
-        "resp": 23.3,
-        "mh": 4.8,
-        "gi": 18.9,
-        "injury": 11.3,
-        "fever": 9.9,
-        "ent": 5.2,
-        "other": 26.6
-      }
-    }
-  },
-  "2": {
-    "0": {
-      "0": {
-        "resp": 29.6,
-        "mh": 2.6,
-        "gi": 28.3,
-        "injury": 2.1,
-        "fever": 12.9,
-        "ent": 3.0,
-        "other": 21.5
-      },
-      "1": {
-        "resp": 25.7,
-        "mh": 2.5,
-        "gi": 27.5,
-        "injury": 5.3,
-        "fever": 10.2,
-        "ent": 4.3,
-        "other": 24.4
-      },
-      "2": {
-        "resp": 21.2,
-        "mh": 4.0,
-        "gi": 19.2,
-        "injury": 10.3,
-        "fever": 8.9,
-        "ent": 3.8,
-        "other": 32.6
-      },
-      "3": {
-        "resp": 20.7,
-        "mh": 3.1,
-        "gi": 23.5,
-        "injury": 10.3,
-        "fever": 11.7,
-        "ent": 4.3,
-        "other": 26.4
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 25.5,
-        "mh": 2.0,
-        "gi": 26.0,
-        "injury": 2.9,
-        "fever": 15.7,
-        "ent": 6.9,
-        "other": 21.1
-      },
-      "1": {
-        "resp": 22.7,
-        "mh": 2.1,
-        "gi": 23.4,
-        "injury": 6.8,
-        "fever": 8.9,
-        "ent": 2.1,
-        "other": 34.1
-      },
-      "2": {
-        "resp": 17.0,
-        "mh": 4.1,
-        "gi": 19.7,
-        "injury": 12.1,
-        "fever": 8.8,
-        "ent": 3.9,
-        "other": 34.4
-      },
-      "3": {
-        "resp": 22.0,
-        "mh": 3.4,
-        "gi": 19.6,
-        "injury": 10.4,
-        "fever": 13.4,
-        "ent": 5.4,
-        "other": 25.9
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 28.7,
-        "mh": 0.5,
-        "gi": 27.7,
-        "injury": 3.5,
-        "fever": 12.4,
-        "ent": 7.4,
-        "other": 19.8
-      },
-      "1": {
-        "resp": 23.3,
-        "mh": 3.5,
-        "gi": 24.1,
-        "injury": 7.5,
-        "fever": 11.0,
-        "ent": 2.8,
-        "other": 27.8
-      },
-      "2": {
-        "resp": 17.9,
-        "mh": 4.1,
-        "gi": 22.4,
-        "injury": 12.4,
-        "fever": 8.9,
-        "ent": 1.9,
-        "other": 32.3
-      },
-      "3": {
-        "resp": 21.2,
-        "mh": 4.4,
-        "gi": 19.8,
-        "injury": 12.3,
-        "fever": 13.1,
-        "ent": 4.4,
-        "other": 24.9
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 20.3,
-        "mh": 2.7,
-        "gi": 29.4,
-        "injury": 5.9,
-        "fever": 16.6,
-        "ent": 4.8,
-        "other": 20.3
-      },
-      "1": {
-        "resp": 21.9,
-        "mh": 4.4,
-        "gi": 20.4,
-        "injury": 8.1,
-        "fever": 9.1,
-        "ent": 4.2,
-        "other": 31.9
-      },
-      "2": {
-        "resp": 15.0,
-        "mh": 5.1,
-        "gi": 18.7,
-        "injury": 11.7,
-        "fever": 13.1,
-        "ent": 3.0,
-        "other": 33.5
-      },
-      "3": {
-        "resp": 15.2,
-        "mh": 3.7,
-        "gi": 19.7,
-        "injury": 12.1,
-        "fever": 13.3,
-        "ent": 4.5,
-        "other": 31.6
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 25.6,
-        "mh": 1.5,
-        "gi": 27.1,
-        "injury": 3.0,
-        "fever": 15.1,
-        "ent": 6.0,
-        "other": 21.6
-      },
-      "1": {
-        "resp": 21.7,
-        "mh": 2.9,
-        "gi": 24.6,
-        "injury": 8.8,
-        "fever": 9.4,
-        "ent": 5.3,
-        "other": 27.3
-      },
-      "2": {
-        "resp": 18.5,
-        "mh": 3.5,
-        "gi": 18.7,
-        "injury": 16.0,
-        "fever": 10.4,
-        "ent": 2.4,
-        "other": 30.6
-      },
-      "3": {
-        "resp": 20.8,
-        "mh": 4.0,
-        "gi": 17.5,
-        "injury": 11.3,
-        "fever": 10.3,
-        "ent": 5.7,
-        "other": 30.3
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 28.9,
-        "mh": 1.7,
-        "gi": 20.0,
-        "injury": 2.8,
-        "fever": 16.7,
-        "ent": 6.1,
-        "other": 23.9
-      },
-      "1": {
-        "resp": 26.4,
-        "mh": 1.1,
-        "gi": 20.7,
-        "injury": 9.3,
-        "fever": 11.4,
-        "ent": 3.6,
-        "other": 27.5
-      },
-      "2": {
-        "resp": 15.1,
-        "mh": 1.7,
-        "gi": 18.5,
-        "injury": 16.3,
-        "fever": 12.5,
-        "ent": 4.3,
-        "other": 31.5
-      },
-      "3": {
-        "resp": 18.6,
-        "mh": 2.1,
-        "gi": 23.1,
-        "injury": 12.2,
-        "fever": 14.3,
-        "ent": 3.8,
-        "other": 26.1
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 26.2,
-        "mh": 0.5,
-        "gi": 25.7,
-        "injury": 6.3,
-        "fever": 18.4,
-        "ent": 2.4,
-        "other": 20.4
-      },
-      "1": {
-        "resp": 21.9,
-        "mh": 1.2,
-        "gi": 23.0,
-        "injury": 9.3,
-        "fever": 11.4,
-        "ent": 3.8,
-        "other": 29.4
-      },
-      "2": {
-        "resp": 19.5,
-        "mh": 2.4,
-        "gi": 20.8,
-        "injury": 10.6,
-        "fever": 10.6,
-        "ent": 4.2,
-        "other": 32.0
-      },
-      "3": {
-        "resp": 22.0,
-        "mh": 3.2,
-        "gi": 17.9,
-        "injury": 12.7,
-        "fever": 13.9,
-        "ent": 3.2,
-        "other": 27.1
-      }
-    }
-  },
-  "3": {
-    "0": {
-      "0": {
-        "resp": 34.8,
-        "mh": 0.9,
-        "gi": 24.4,
-        "injury": 2.3,
-        "fever": 11.3,
-        "ent": 5.9,
-        "other": 20.4
-      },
-      "1": {
-        "resp": 20.6,
-        "mh": 3.3,
-        "gi": 22.2,
-        "injury": 8.6,
-        "fever": 9.6,
-        "ent": 3.9,
-        "other": 31.8
-      },
-      "2": {
-        "resp": 14.9,
-        "mh": 5.1,
-        "gi": 20.1,
-        "injury": 10.5,
-        "fever": 8.0,
-        "ent": 3.8,
-        "other": 37.5
-      },
-      "3": {
-        "resp": 21.4,
-        "mh": 4.8,
-        "gi": 22.3,
-        "injury": 11.1,
-        "fever": 9.4,
-        "ent": 3.0,
-        "other": 27.9
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 35.1,
-        "mh": 1.5,
-        "gi": 28.3,
-        "injury": 2.0,
-        "fever": 12.7,
-        "ent": 2.0,
-        "other": 18.5
-      },
-      "1": {
-        "resp": 21.2,
-        "mh": 4.5,
-        "gi": 23.4,
-        "injury": 7.7,
-        "fever": 7.2,
-        "ent": 3.7,
-        "other": 32.2
-      },
-      "2": {
-        "resp": 15.4,
-        "mh": 5.7,
-        "gi": 19.4,
-        "injury": 15.4,
-        "fever": 6.9,
-        "ent": 3.1,
-        "other": 34.0
-      },
-      "3": {
-        "resp": 17.2,
-        "mh": 4.2,
-        "gi": 20.4,
-        "injury": 16.5,
-        "fever": 10.8,
-        "ent": 3.3,
-        "other": 27.6
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 27.8,
-        "mh": 2.1,
-        "gi": 23.7,
-        "injury": 4.6,
-        "fever": 13.4,
-        "ent": 3.6,
-        "other": 24.7
-      },
-      "1": {
-        "resp": 26.8,
-        "mh": 3.2,
-        "gi": 23.1,
-        "injury": 9.0,
-        "fever": 7.4,
-        "ent": 4.2,
-        "other": 26.3
-      },
-      "2": {
-        "resp": 17.8,
-        "mh": 4.3,
-        "gi": 18.8,
-        "injury": 12.4,
-        "fever": 10.4,
-        "ent": 1.8,
-        "other": 34.5
-      },
-      "3": {
-        "resp": 17.8,
-        "mh": 4.0,
-        "gi": 20.2,
-        "injury": 13.5,
-        "fever": 10.5,
-        "ent": 4.0,
-        "other": 30.0
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 31.9,
-        "mh": 1.3,
-        "gi": 26.7,
-        "injury": 3.0,
-        "fever": 12.9,
-        "ent": 6.5,
-        "other": 17.7
-      },
-      "1": {
-        "resp": 17.6,
-        "mh": 2.8,
-        "gi": 25.9,
-        "injury": 9.3,
-        "fever": 10.1,
-        "ent": 4.5,
-        "other": 29.9
-      },
-      "2": {
-        "resp": 14.2,
-        "mh": 5.8,
-        "gi": 19.3,
-        "injury": 14.8,
-        "fever": 8.0,
-        "ent": 3.9,
-        "other": 34.0
-      },
-      "3": {
-        "resp": 18.1,
-        "mh": 4.1,
-        "gi": 21.4,
-        "injury": 14.2,
-        "fever": 10.6,
-        "ent": 3.9,
-        "other": 27.7
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 34.6,
-        "mh": 1.1,
-        "gi": 22.0,
-        "injury": 3.8,
-        "fever": 12.1,
-        "ent": 3.3,
-        "other": 23.1
-      },
-      "1": {
-        "resp": 19.7,
-        "mh": 3.7,
-        "gi": 24.7,
-        "injury": 10.0,
-        "fever": 8.5,
-        "ent": 4.5,
-        "other": 28.9
-      },
-      "2": {
-        "resp": 17.3,
-        "mh": 5.2,
-        "gi": 21.0,
-        "injury": 14.0,
-        "fever": 6.7,
-        "ent": 1.5,
-        "other": 34.4
-      },
-      "3": {
-        "resp": 15.7,
-        "mh": 2.2,
-        "gi": 21.9,
-        "injury": 13.2,
-        "fever": 11.9,
-        "ent": 5.2,
-        "other": 29.9
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 29.2,
-        "mh": 4.7,
-        "gi": 21.2,
-        "injury": 5.7,
-        "fever": 10.4,
-        "ent": 4.2,
-        "other": 24.5
-      },
-      "1": {
-        "resp": 22.9,
-        "mh": 0.6,
-        "gi": 22.6,
-        "injury": 8.3,
-        "fever": 9.5,
-        "ent": 5.7,
-        "other": 30.4
-      },
-      "2": {
-        "resp": 14.6,
-        "mh": 2.5,
-        "gi": 21.3,
-        "injury": 15.3,
-        "fever": 10.5,
-        "ent": 4.3,
-        "other": 31.6
-      },
-      "3": {
-        "resp": 18.6,
-        "mh": 2.2,
-        "gi": 21.9,
-        "injury": 13.1,
-        "fever": 11.2,
-        "ent": 4.0,
-        "other": 29.1
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 32.7,
-        "mh": 1.6,
-        "gi": 21.4,
-        "injury": 4.8,
-        "fever": 12.9,
-        "ent": 4.0,
-        "other": 22.6
-      },
-      "1": {
-        "resp": 23.9,
-        "mh": 1.0,
-        "gi": 24.9,
-        "injury": 10.6,
-        "fever": 11.6,
-        "ent": 5.4,
-        "other": 22.7
-      },
-      "2": {
-        "resp": 18.1,
-        "mh": 2.1,
-        "gi": 19.5,
-        "injury": 15.4,
-        "fever": 9.2,
-        "ent": 3.6,
-        "other": 32.1
-      },
-      "3": {
-        "resp": 19.4,
-        "mh": 3.4,
-        "gi": 22.5,
-        "injury": 13.2,
-        "fever": 8.5,
-        "ent": 3.8,
-        "other": 29.2
-      }
-    }
-  },
-  "4": {
-    "0": {
-      "0": {
-        "resp": 33.2,
-        "mh": 1.6,
-        "gi": 20.1,
-        "injury": 3.8,
-        "fever": 15.8,
-        "ent": 3.8,
-        "other": 21.7
-      },
-      "1": {
-        "resp": 19.1,
-        "mh": 4.8,
-        "gi": 24.2,
-        "injury": 9.7,
-        "fever": 9.4,
-        "ent": 4.1,
-        "other": 28.6
-      },
-      "2": {
-        "resp": 12.7,
-        "mh": 5.1,
-        "gi": 21.4,
-        "injury": 14.4,
-        "fever": 7.9,
-        "ent": 3.1,
-        "other": 35.4
-      },
-      "3": {
-        "resp": 14.8,
-        "mh": 3.4,
-        "gi": 20.5,
-        "injury": 15.2,
-        "fever": 11.2,
-        "ent": 4.2,
-        "other": 30.6
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 28.7,
-        "mh": 3.2,
-        "gi": 25.9,
-        "injury": 3.2,
-        "fever": 13.0,
-        "ent": 5.1,
-        "other": 20.8
-      },
-      "1": {
-        "resp": 17.6,
-        "mh": 4.4,
-        "gi": 23.7,
-        "injury": 8.4,
-        "fever": 8.4,
-        "ent": 4.7,
-        "other": 32.8
-      },
-      "2": {
-        "resp": 16.0,
-        "mh": 5.4,
-        "gi": 18.5,
-        "injury": 14.6,
-        "fever": 7.6,
-        "ent": 4.2,
-        "other": 33.7
-      },
-      "3": {
-        "resp": 17.2,
-        "mh": 3.8,
-        "gi": 18.1,
-        "injury": 14.1,
-        "fever": 11.0,
-        "ent": 4.4,
-        "other": 31.3
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 25.7,
-        "mh": 1.0,
-        "gi": 27.7,
-        "injury": 4.7,
-        "fever": 9.4,
-        "ent": 5.2,
-        "other": 26.2
-      },
-      "1": {
-        "resp": 21.6,
-        "mh": 3.6,
-        "gi": 22.4,
-        "injury": 10.5,
-        "fever": 6.9,
-        "ent": 3.3,
-        "other": 31.6
-      },
-      "2": {
-        "resp": 14.3,
-        "mh": 5.8,
-        "gi": 21.3,
-        "injury": 16.7,
-        "fever": 9.0,
-        "ent": 3.0,
-        "other": 29.8
-      },
-      "3": {
-        "resp": 13.9,
-        "mh": 4.7,
-        "gi": 19.8,
-        "injury": 17.4,
-        "fever": 9.2,
-        "ent": 3.5,
-        "other": 31.5
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 29.4,
-        "mh": 1.1,
-        "gi": 20.9,
-        "injury": 2.7,
-        "fever": 15.5,
-        "ent": 4.8,
-        "other": 25.7
-      },
-      "1": {
-        "resp": 19.1,
-        "mh": 3.8,
-        "gi": 23.1,
-        "injury": 10.7,
-        "fever": 5.8,
-        "ent": 3.2,
-        "other": 34.4
-      },
-      "2": {
-        "resp": 14.1,
-        "mh": 5.2,
-        "gi": 20.0,
-        "injury": 17.0,
-        "fever": 8.6,
-        "ent": 2.2,
-        "other": 32.9
-      },
-      "3": {
-        "resp": 17.9,
-        "mh": 5.6,
-        "gi": 19.0,
-        "injury": 14.3,
-        "fever": 10.3,
-        "ent": 3.8,
-        "other": 29.2
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 25.5,
-        "mh": 1.5,
-        "gi": 23.0,
-        "injury": 3.9,
-        "fever": 15.2,
-        "ent": 5.4,
-        "other": 25.5
-      },
-      "1": {
-        "resp": 16.6,
-        "mh": 1.8,
-        "gi": 20.9,
-        "injury": 9.2,
-        "fever": 10.1,
-        "ent": 4.9,
-        "other": 36.5
-      },
-      "2": {
-        "resp": 14.4,
-        "mh": 4.9,
-        "gi": 17.4,
-        "injury": 15.2,
-        "fever": 10.5,
-        "ent": 3.2,
-        "other": 34.5
-      },
-      "3": {
-        "resp": 16.3,
-        "mh": 2.6,
-        "gi": 16.5,
-        "injury": 16.5,
-        "fever": 11.5,
-        "ent": 4.5,
-        "other": 32.2
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 29.5,
-        "mh": 3.4,
-        "gi": 17.4,
-        "injury": 5.3,
-        "fever": 14.0,
-        "ent": 8.7,
-        "other": 21.7
-      },
-      "1": {
-        "resp": 17.2,
-        "mh": 1.8,
-        "gi": 20.1,
-        "injury": 8.1,
-        "fever": 14.3,
-        "ent": 5.9,
-        "other": 32.6
-      },
-      "2": {
-        "resp": 13.1,
-        "mh": 3.3,
-        "gi": 20.2,
-        "injury": 14.7,
-        "fever": 11.3,
-        "ent": 4.0,
-        "other": 33.5
-      },
-      "3": {
-        "resp": 16.8,
-        "mh": 2.8,
-        "gi": 19.0,
-        "injury": 15.5,
-        "fever": 12.3,
-        "ent": 3.4,
-        "other": 30.2
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 28.2,
-        "mh": 2.8,
-        "gi": 18.8,
-        "injury": 4.7,
-        "fever": 15.0,
-        "ent": 5.2,
-        "other": 25.4
-      },
-      "1": {
-        "resp": 18.0,
-        "mh": 1.1,
-        "gi": 24.4,
-        "injury": 8.5,
-        "fever": 8.5,
-        "ent": 4.6,
-        "other": 35.0
-      },
-      "2": {
-        "resp": 17.5,
-        "mh": 3.8,
-        "gi": 16.5,
-        "injury": 14.8,
-        "fever": 10.7,
-        "ent": 4.7,
-        "other": 32.0
-      },
-      "3": {
-        "resp": 18.1,
-        "mh": 3.3,
-        "gi": 18.3,
-        "injury": 16.0,
-        "fever": 10.7,
-        "ent": 3.4,
-        "other": 30.2
-      }
-    }
-  },
-  "5": {
-    "0": {
-      "0": {
-        "resp": 29.8,
-        "mh": 2.9,
-        "gi": 18.8,
-        "injury": 5.8,
-        "fever": 12.0,
-        "ent": 3.8,
-        "other": 26.9
-      },
-      "1": {
-        "resp": 19.9,
-        "mh": 3.6,
-        "gi": 23.9,
-        "injury": 8.3,
-        "fever": 8.1,
-        "ent": 5.1,
-        "other": 31.1
-      },
-      "2": {
-        "resp": 14.5,
-        "mh": 6.7,
-        "gi": 17.9,
-        "injury": 14.8,
-        "fever": 8.0,
-        "ent": 4.6,
-        "other": 33.4
-      },
-      "3": {
-        "resp": 17.1,
-        "mh": 4.4,
-        "gi": 20.4,
-        "injury": 12.9,
-        "fever": 10.3,
-        "ent": 4.5,
-        "other": 30.4
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 29.7,
-        "mh": 4.8,
-        "gi": 23.9,
-        "injury": 3.3,
-        "fever": 10.0,
-        "ent": 3.8,
-        "other": 24.4
-      },
-      "1": {
-        "resp": 18.5,
-        "mh": 2.8,
-        "gi": 23.1,
-        "injury": 9.5,
-        "fever": 6.8,
-        "ent": 5.5,
-        "other": 33.8
-      },
-      "2": {
-        "resp": 11.9,
-        "mh": 5.5,
-        "gi": 17.7,
-        "injury": 16.2,
-        "fever": 7.7,
-        "ent": 3.8,
-        "other": 37.2
-      },
-      "3": {
-        "resp": 14.4,
-        "mh": 5.2,
-        "gi": 17.3,
-        "injury": 16.1,
-        "fever": 9.8,
-        "ent": 4.6,
-        "other": 32.6
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 28.4,
-        "mh": 2.9,
-        "gi": 29.4,
-        "injury": 6.9,
-        "fever": 7.4,
-        "ent": 3.9,
-        "other": 21.1
-      },
-      "1": {
-        "resp": 20.1,
-        "mh": 4.4,
-        "gi": 20.1,
-        "injury": 10.2,
-        "fever": 13.3,
-        "ent": 6.3,
-        "other": 25.6
-      },
-      "2": {
-        "resp": 12.6,
-        "mh": 5.2,
-        "gi": 17.4,
-        "injury": 17.5,
-        "fever": 7.8,
-        "ent": 4.0,
-        "other": 35.4
-      },
-      "3": {
-        "resp": 15.6,
-        "mh": 5.6,
-        "gi": 21.7,
-        "injury": 15.7,
-        "fever": 10.6,
-        "ent": 3.8,
-        "other": 27.0
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 28.0,
-        "mh": 3.7,
-        "gi": 24.3,
-        "injury": 4.1,
-        "fever": 10.6,
-        "ent": 5.0,
-        "other": 24.3
-      },
-      "1": {
-        "resp": 14.9,
-        "mh": 4.0,
-        "gi": 23.9,
-        "injury": 10.9,
-        "fever": 8.8,
-        "ent": 3.6,
-        "other": 33.9
-      },
-      "2": {
-        "resp": 12.3,
-        "mh": 6.2,
-        "gi": 16.7,
-        "injury": 17.5,
-        "fever": 9.9,
-        "ent": 3.6,
-        "other": 33.9
-      },
-      "3": {
-        "resp": 18.8,
-        "mh": 3.2,
-        "gi": 18.0,
-        "injury": 17.5,
-        "fever": 9.7,
-        "ent": 3.1,
-        "other": 29.7
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 26.6,
-        "mh": 3.7,
-        "gi": 27.6,
-        "injury": 4.7,
-        "fever": 10.7,
-        "ent": 5.6,
-        "other": 21.0
-      },
-      "1": {
-        "resp": 17.6,
-        "mh": 4.1,
-        "gi": 21.8,
-        "injury": 10.4,
-        "fever": 7.3,
-        "ent": 3.4,
-        "other": 35.5
-      },
-      "2": {
-        "resp": 12.6,
-        "mh": 5.8,
-        "gi": 19.6,
-        "injury": 18.0,
-        "fever": 7.6,
-        "ent": 2.5,
-        "other": 34.0
-      },
-      "3": {
-        "resp": 16.3,
-        "mh": 2.7,
-        "gi": 15.9,
-        "injury": 17.0,
-        "fever": 10.7,
-        "ent": 3.8,
-        "other": 33.6
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 27.6,
-        "mh": 2.4,
-        "gi": 24.3,
-        "injury": 5.7,
-        "fever": 11.4,
-        "ent": 5.7,
-        "other": 22.9
-      },
-      "1": {
-        "resp": 20.8,
-        "mh": 2.3,
-        "gi": 22.8,
-        "injury": 8.5,
-        "fever": 9.4,
-        "ent": 4.2,
-        "other": 31.9
-      },
-      "2": {
-        "resp": 15.7,
-        "mh": 2.3,
-        "gi": 17.7,
-        "injury": 20.0,
-        "fever": 9.2,
-        "ent": 4.9,
-        "other": 30.3
-      },
-      "3": {
-        "resp": 16.5,
-        "mh": 1.4,
-        "gi": 20.3,
-        "injury": 16.0,
-        "fever": 10.8,
-        "ent": 6.7,
-        "other": 28.4
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 27.7,
-        "mh": 2.6,
-        "gi": 18.3,
-        "injury": 5.8,
-        "fever": 12.0,
-        "ent": 4.7,
-        "other": 28.8
-      },
-      "1": {
-        "resp": 18.6,
-        "mh": 0.8,
-        "gi": 21.7,
-        "injury": 14.1,
-        "fever": 13.7,
-        "ent": 3.8,
-        "other": 27.4
-      },
-      "2": {
-        "resp": 15.6,
-        "mh": 2.4,
-        "gi": 17.9,
-        "injury": 15.9,
-        "fever": 10.4,
-        "ent": 4.9,
-        "other": 32.9
-      },
-      "3": {
-        "resp": 17.7,
-        "mh": 1.8,
-        "gi": 21.6,
-        "injury": 16.7,
-        "fever": 10.7,
-        "ent": 4.5,
-        "other": 26.9
-      }
-    }
-  },
-  "6": {
-    "0": {
-      "0": {
-        "resp": 22.1,
-        "mh": 3.9,
-        "gi": 21.5,
-        "injury": 4.4,
-        "fever": 18.2,
-        "ent": 5.0,
-        "other": 24.9
-      },
-      "1": {
-        "resp": 17.8,
-        "mh": 1.6,
-        "gi": 19.7,
-        "injury": 11.2,
-        "fever": 10.9,
-        "ent": 5.9,
-        "other": 32.9
-      },
-      "2": {
-        "resp": 12.0,
-        "mh": 3.8,
-        "gi": 19.0,
-        "injury": 16.8,
-        "fever": 9.0,
-        "ent": 3.0,
-        "other": 36.3
-      },
-      "3": {
-        "resp": 12.0,
-        "mh": 2.8,
-        "gi": 19.0,
-        "injury": 18.2,
-        "fever": 11.0,
-        "ent": 4.1,
-        "other": 33.1
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 24.3,
-        "mh": 2.6,
-        "gi": 27.0,
-        "injury": 5.3,
-        "fever": 11.6,
-        "ent": 3.7,
-        "other": 25.4
-      },
-      "1": {
-        "resp": 15.4,
-        "mh": 4.9,
-        "gi": 21.4,
-        "injury": 10.2,
-        "fever": 7.1,
-        "ent": 3.8,
-        "other": 37.2
-      },
-      "2": {
-        "resp": 9.6,
-        "mh": 4.1,
-        "gi": 19.4,
-        "injury": 14.7,
-        "fever": 8.4,
-        "ent": 2.6,
-        "other": 41.1
-      },
-      "3": {
-        "resp": 11.4,
-        "mh": 2.1,
-        "gi": 20.3,
-        "injury": 16.7,
-        "fever": 11.9,
-        "ent": 4.6,
-        "other": 33.0
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 20.3,
-        "mh": 2.9,
-        "gi": 22.1,
-        "injury": 4.7,
-        "fever": 14.0,
-        "ent": 9.9,
-        "other": 26.2
-      },
-      "1": {
-        "resp": 14.4,
-        "mh": 1.4,
-        "gi": 22.6,
-        "injury": 13.4,
-        "fever": 9.9,
-        "ent": 3.4,
-        "other": 34.9
-      },
-      "2": {
-        "resp": 8.9,
-        "mh": 4.7,
-        "gi": 18.3,
-        "injury": 15.9,
-        "fever": 8.9,
-        "ent": 3.4,
-        "other": 39.9
-      },
-      "3": {
-        "resp": 12.4,
-        "mh": 2.5,
-        "gi": 14.5,
-        "injury": 20.3,
-        "fever": 10.6,
-        "ent": 4.7,
-        "other": 35.0
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 32.7,
-        "mh": 2.6,
-        "gi": 20.4,
-        "injury": 5.1,
-        "fever": 15.8,
-        "ent": 2.0,
-        "other": 21.4
-      },
-      "1": {
-        "resp": 14.4,
-        "mh": 4.7,
-        "gi": 25.1,
-        "injury": 10.0,
-        "fever": 8.7,
-        "ent": 2.7,
-        "other": 34.4
-      },
-      "2": {
-        "resp": 12.3,
-        "mh": 4.5,
-        "gi": 17.6,
-        "injury": 17.0,
-        "fever": 11.7,
-        "ent": 2.5,
-        "other": 34.4
-      },
-      "3": {
-        "resp": 12.4,
-        "mh": 4.9,
-        "gi": 17.9,
-        "injury": 16.4,
-        "fever": 12.7,
-        "ent": 3.4,
-        "other": 32.1
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 23.4,
-        "mh": 1.9,
-        "gi": 22.0,
-        "injury": 7.7,
-        "fever": 12.4,
-        "ent": 8.1,
-        "other": 24.4
-      },
-      "1": {
-        "resp": 16.3,
-        "mh": 2.8,
-        "gi": 26.2,
-        "injury": 10.6,
-        "fever": 8.2,
-        "ent": 1.8,
-        "other": 34.0
-      },
-      "2": {
-        "resp": 10.6,
-        "mh": 4.4,
-        "gi": 17.7,
-        "injury": 19.8,
-        "fever": 9.4,
-        "ent": 3.3,
-        "other": 34.8
-      },
-      "3": {
-        "resp": 13.5,
-        "mh": 3.0,
-        "gi": 15.2,
-        "injury": 18.2,
-        "fever": 12.0,
-        "ent": 3.4,
-        "other": 34.8
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 23.2,
-        "mh": 3.4,
-        "gi": 22.7,
-        "injury": 3.9,
-        "fever": 15.0,
-        "ent": 4.8,
-        "other": 27.1
-      },
-      "1": {
-        "resp": 17.4,
-        "mh": 0.0,
-        "gi": 14.3,
-        "injury": 12.0,
-        "fever": 12.0,
-        "ent": 3.9,
-        "other": 40.5
-      },
-      "2": {
-        "resp": 10.1,
-        "mh": 1.9,
-        "gi": 17.9,
-        "injury": 20.4,
-        "fever": 9.1,
-        "ent": 4.9,
-        "other": 35.7
-      },
-      "3": {
-        "resp": 11.5,
-        "mh": 3.7,
-        "gi": 18.1,
-        "injury": 16.6,
-        "fever": 12.7,
-        "ent": 4.3,
-        "other": 33.1
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 22.8,
-        "mh": 1.7,
-        "gi": 28.3,
-        "injury": 7.2,
-        "fever": 13.9,
-        "ent": 3.0,
-        "other": 23.2
-      },
-      "1": {
-        "resp": 16.6,
-        "mh": 1.7,
-        "gi": 20.3,
-        "injury": 14.6,
-        "fever": 9.3,
-        "ent": 4.0,
-        "other": 33.6
-      },
-      "2": {
-        "resp": 9.5,
-        "mh": 2.0,
-        "gi": 20.4,
-        "injury": 22.8,
-        "fever": 10.4,
-        "ent": 3.3,
-        "other": 31.7
-      },
-      "3": {
-        "resp": 13.5,
-        "mh": 3.6,
-        "gi": 17.1,
-        "injury": 18.5,
-        "fever": 9.6,
-        "ent": 4.0,
-        "other": 33.8
-      }
-    }
-  },
-  "7": {
-    "0": {
-      "0": {
-        "resp": 14.8,
-        "mh": 3.8,
-        "gi": 26.4,
-        "injury": 8.8,
-        "fever": 12.6,
-        "ent": 1.6,
-        "other": 31.9
-      },
-      "1": {
-        "resp": 9.1,
-        "mh": 1.5,
-        "gi": 20.1,
-        "injury": 13.3,
-        "fever": 17.0,
-        "ent": 3.4,
-        "other": 35.6
-      },
-      "2": {
-        "resp": 6.4,
-        "mh": 3.8,
-        "gi": 19.1,
-        "injury": 17.1,
-        "fever": 8.9,
-        "ent": 4.2,
-        "other": 40.4
-      },
-      "3": {
-        "resp": 6.4,
-        "mh": 3.5,
-        "gi": 20.6,
-        "injury": 15.4,
-        "fever": 12.4,
-        "ent": 2.7,
-        "other": 38.9
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 13.5,
-        "mh": 3.5,
-        "gi": 26.5,
-        "injury": 7.6,
-        "fever": 10.6,
-        "ent": 3.5,
-        "other": 34.7
-      },
-      "1": {
-        "resp": 12.1,
-        "mh": 1.3,
-        "gi": 24.1,
-        "injury": 9.4,
-        "fever": 13.8,
-        "ent": 4.5,
-        "other": 34.8
-      },
-      "2": {
-        "resp": 7.3,
-        "mh": 2.2,
-        "gi": 17.5,
-        "injury": 15.9,
-        "fever": 12.0,
-        "ent": 3.7,
-        "other": 41.5
-      },
-      "3": {
-        "resp": 7.6,
-        "mh": 3.4,
-        "gi": 15.3,
-        "injury": 25.9,
-        "fever": 10.6,
-        "ent": 3.4,
-        "other": 33.8
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 15.9,
-        "mh": 3.4,
-        "gi": 18.2,
-        "injury": 11.9,
-        "fever": 10.8,
-        "ent": 6.8,
-        "other": 33.0
-      },
-      "1": {
-        "resp": 12.5,
-        "mh": 2.3,
-        "gi": 17.6,
-        "injury": 14.5,
-        "fever": 10.9,
-        "ent": 3.9,
-        "other": 38.3
-      },
-      "2": {
-        "resp": 9.8,
-        "mh": 3.5,
-        "gi": 13.8,
-        "injury": 17.3,
-        "fever": 11.1,
-        "ent": 3.3,
-        "other": 41.2
-      },
-      "3": {
-        "resp": 7.2,
-        "mh": 2.5,
-        "gi": 13.5,
-        "injury": 21.1,
-        "fever": 14.5,
-        "ent": 4.3,
-        "other": 36.8
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 15.8,
-        "mh": 1.4,
-        "gi": 20.5,
-        "injury": 9.6,
-        "fever": 13.7,
-        "ent": 3.4,
-        "other": 35.6
-      },
-      "1": {
-        "resp": 11.3,
-        "mh": 1.5,
-        "gi": 16.7,
-        "injury": 12.7,
-        "fever": 8.3,
-        "ent": 5.4,
-        "other": 44.1
-      },
-      "2": {
-        "resp": 5.3,
-        "mh": 2.5,
-        "gi": 17.7,
-        "injury": 14.5,
-        "fever": 8.5,
-        "ent": 2.1,
-        "other": 49.3
-      },
-      "3": {
-        "resp": 6.6,
-        "mh": 4.0,
-        "gi": 17.2,
-        "injury": 19.4,
-        "fever": 10.8,
-        "ent": 3.9,
-        "other": 38.0
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 16.8,
-        "mh": 4.0,
-        "gi": 22.1,
-        "injury": 6.0,
-        "fever": 12.8,
-        "ent": 6.0,
-        "other": 32.2
-      },
-      "1": {
-        "resp": 5.3,
-        "mh": 0.9,
-        "gi": 19.8,
-        "injury": 8.8,
-        "fever": 7.5,
-        "ent": 5.7,
-        "other": 52.0
-      },
-      "2": {
-        "resp": 7.4,
-        "mh": 2.6,
-        "gi": 15.2,
-        "injury": 15.9,
-        "fever": 9.7,
-        "ent": 5.5,
-        "other": 43.7
-      },
-      "3": {
-        "resp": 7.8,
-        "mh": 1.4,
-        "gi": 17.3,
-        "injury": 18.9,
-        "fever": 10.4,
-        "ent": 4.4,
-        "other": 39.9
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 18.4,
-        "mh": 3.4,
-        "gi": 20.7,
-        "injury": 8.6,
-        "fever": 11.5,
-        "ent": 4.6,
-        "other": 32.8
-      },
-      "1": {
-        "resp": 8.3,
-        "mh": 2.3,
-        "gi": 22.2,
-        "injury": 12.0,
-        "fever": 9.7,
-        "ent": 5.1,
-        "other": 40.3
-      },
-      "2": {
-        "resp": 8.0,
-        "mh": 1.3,
-        "gi": 14.8,
-        "injury": 19.5,
-        "fever": 9.9,
-        "ent": 3.0,
-        "other": 43.6
-      },
-      "3": {
-        "resp": 6.6,
-        "mh": 2.5,
-        "gi": 16.0,
-        "injury": 22.8,
-        "fever": 10.6,
-        "ent": 4.2,
-        "other": 37.3
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 19.0,
-        "mh": 1.5,
-        "gi": 23.1,
-        "injury": 7.7,
-        "fever": 15.4,
-        "ent": 4.1,
-        "other": 29.2
-      },
-      "1": {
-        "resp": 14.7,
-        "mh": 1.6,
-        "gi": 18.3,
-        "injury": 11.6,
-        "fever": 11.6,
-        "ent": 6.0,
-        "other": 36.3
-      },
-      "2": {
-        "resp": 8.6,
-        "mh": 2.1,
-        "gi": 17.0,
-        "injury": 19.1,
-        "fever": 7.5,
-        "ent": 4.4,
-        "other": 41.3
-      },
-      "3": {
-        "resp": 8.6,
-        "mh": 4.5,
-        "gi": 18.5,
-        "injury": 16.9,
-        "fever": 12.1,
-        "ent": 4.1,
-        "other": 35.4
-      }
-    }
-  },
-  "8": {
-    "0": {
-      "0": {
-        "resp": 18.2,
-        "mh": 5.8,
-        "gi": 24.7,
-        "injury": 5.8,
-        "fever": 9.7,
-        "ent": 3.2,
-        "other": 32.5
-      },
-      "1": {
-        "resp": 8.0,
-        "mh": 1.5,
-        "gi": 26.4,
-        "injury": 10.0,
-        "fever": 10.4,
-        "ent": 3.5,
-        "other": 40.3
-      },
-      "2": {
-        "resp": 9.8,
-        "mh": 2.4,
-        "gi": 18.3,
-        "injury": 14.1,
-        "fever": 7.7,
-        "ent": 2.0,
-        "other": 45.6
-      },
-      "3": {
-        "resp": 8.1,
-        "mh": 4.3,
-        "gi": 19.1,
-        "injury": 19.8,
-        "fever": 10.0,
-        "ent": 3.5,
-        "other": 35.2
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 16.5,
-        "mh": 1.3,
-        "gi": 20.9,
-        "injury": 8.9,
-        "fever": 16.5,
-        "ent": 3.8,
-        "other": 32.3
-      },
-      "1": {
-        "resp": 11.2,
-        "mh": 1.2,
-        "gi": 22.9,
-        "injury": 12.5,
-        "fever": 11.2,
-        "ent": 4.2,
-        "other": 36.7
-      },
-      "2": {
-        "resp": 6.8,
-        "mh": 2.0,
-        "gi": 16.3,
-        "injury": 18.3,
-        "fever": 7.7,
-        "ent": 3.4,
-        "other": 45.5
-      },
-      "3": {
-        "resp": 7.3,
-        "mh": 2.2,
-        "gi": 13.9,
-        "injury": 20.8,
-        "fever": 13.7,
-        "ent": 3.0,
-        "other": 39.2
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 16.3,
-        "mh": 1.3,
-        "gi": 28.1,
-        "injury": 7.2,
-        "fever": 13.7,
-        "ent": 3.9,
-        "other": 29.4
-      },
-      "1": {
-        "resp": 13.4,
-        "mh": 3.0,
-        "gi": 20.4,
-        "injury": 12.4,
-        "fever": 11.4,
-        "ent": 4.5,
-        "other": 34.8
-      },
-      "2": {
-        "resp": 7.0,
-        "mh": 4.6,
-        "gi": 18.0,
-        "injury": 16.7,
-        "fever": 8.6,
-        "ent": 3.1,
-        "other": 42.0
-      },
-      "3": {
-        "resp": 8.3,
-        "mh": 3.8,
-        "gi": 16.2,
-        "injury": 19.4,
-        "fever": 11.5,
-        "ent": 1.9,
-        "other": 38.8
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 16.6,
-        "mh": 5.1,
-        "gi": 22.9,
-        "injury": 10.2,
-        "fever": 14.6,
-        "ent": 4.5,
-        "other": 26.1
-      },
-      "1": {
-        "resp": 13.1,
-        "mh": 1.6,
-        "gi": 18.7,
-        "injury": 11.1,
-        "fever": 8.7,
-        "ent": 4.8,
-        "other": 42.1
-      },
-      "2": {
-        "resp": 9.6,
-        "mh": 2.4,
-        "gi": 17.1,
-        "injury": 18.8,
-        "fever": 8.3,
-        "ent": 2.4,
-        "other": 41.5
-      },
-      "3": {
-        "resp": 8.2,
-        "mh": 2.6,
-        "gi": 16.4,
-        "injury": 20.6,
-        "fever": 11.7,
-        "ent": 3.8,
-        "other": 36.8
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 15.8,
-        "mh": 5.8,
-        "gi": 23.0,
-        "injury": 6.5,
-        "fever": 13.7,
-        "ent": 3.6,
-        "other": 31.7
-      },
-      "1": {
-        "resp": 11.0,
-        "mh": 2.1,
-        "gi": 16.2,
-        "injury": 14.1,
-        "fever": 11.5,
-        "ent": 4.2,
-        "other": 40.8
-      },
-      "2": {
-        "resp": 5.7,
-        "mh": 2.3,
-        "gi": 15.7,
-        "injury": 21.8,
-        "fever": 8.9,
-        "ent": 3.2,
-        "other": 42.5
-      },
-      "3": {
-        "resp": 7.6,
-        "mh": 2.4,
-        "gi": 14.3,
-        "injury": 19.4,
-        "fever": 9.8,
-        "ent": 3.9,
-        "other": 42.6
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 15.4,
-        "mh": 1.1,
-        "gi": 18.7,
-        "injury": 7.7,
-        "fever": 17.6,
-        "ent": 4.4,
-        "other": 35.2
-      },
-      "1": {
-        "resp": 6.4,
-        "mh": 0.5,
-        "gi": 18.7,
-        "injury": 14.2,
-        "fever": 9.1,
-        "ent": 3.2,
-        "other": 47.9
-      },
-      "2": {
-        "resp": 8.2,
-        "mh": 1.4,
-        "gi": 14.7,
-        "injury": 18.0,
-        "fever": 12.4,
-        "ent": 4.7,
-        "other": 40.7
-      },
-      "3": {
-        "resp": 6.4,
-        "mh": 2.3,
-        "gi": 13.2,
-        "injury": 24.5,
-        "fever": 11.3,
-        "ent": 3.3,
-        "other": 39.0
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 11.6,
-        "mh": 3.2,
-        "gi": 29.7,
-        "injury": 7.7,
-        "fever": 11.0,
-        "ent": 5.2,
-        "other": 31.6
-      },
-      "1": {
-        "resp": 10.3,
-        "mh": 2.2,
-        "gi": 17.9,
-        "injury": 13.8,
-        "fever": 12.1,
-        "ent": 5.8,
-        "other": 37.9
-      },
-      "2": {
-        "resp": 7.5,
-        "mh": 1.9,
-        "gi": 16.5,
-        "injury": 16.9,
-        "fever": 8.8,
-        "ent": 5.1,
-        "other": 43.4
-      },
-      "3": {
-        "resp": 8.3,
-        "mh": 3.4,
-        "gi": 15.9,
-        "injury": 20.5,
-        "fever": 11.9,
-        "ent": 2.2,
-        "other": 37.8
-      }
-    }
-  },
-  "9": {
-    "0": {
-      "0": {
-        "resp": 28.8,
-        "mh": 1.8,
-        "gi": 20.6,
-        "injury": 6.5,
-        "fever": 10.6,
-        "ent": 2.9,
-        "other": 28.8
-      },
-      "1": {
-        "resp": 17.0,
-        "mh": 3.1,
-        "gi": 20.9,
-        "injury": 11.9,
-        "fever": 5.7,
-        "ent": 5.2,
-        "other": 36.3
-      },
-      "2": {
-        "resp": 9.8,
-        "mh": 2.6,
-        "gi": 15.9,
-        "injury": 17.4,
-        "fever": 8.5,
-        "ent": 4.0,
-        "other": 41.7
-      },
-      "3": {
-        "resp": 12.7,
-        "mh": 3.7,
-        "gi": 14.9,
-        "injury": 20.4,
-        "fever": 9.6,
-        "ent": 3.4,
-        "other": 35.4
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 30.4,
-        "mh": 3.6,
-        "gi": 15.5,
-        "injury": 8.3,
-        "fever": 8.3,
-        "ent": 2.4,
-        "other": 31.5
-      },
-      "1": {
-        "resp": 17.4,
-        "mh": 5.0,
-        "gi": 18.2,
-        "injury": 12.4,
-        "fever": 6.9,
-        "ent": 3.0,
-        "other": 37.2
-      },
-      "2": {
-        "resp": 10.5,
-        "mh": 2.9,
-        "gi": 15.3,
-        "injury": 17.1,
-        "fever": 8.3,
-        "ent": 2.3,
-        "other": 43.5
-      },
-      "3": {
-        "resp": 14.4,
-        "mh": 4.3,
-        "gi": 16.2,
-        "injury": 18.0,
-        "fever": 9.7,
-        "ent": 3.3,
-        "other": 34.2
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 33.6,
-        "mh": 1.6,
-        "gi": 17.2,
-        "injury": 5.5,
-        "fever": 17.2,
-        "ent": 3.1,
-        "other": 21.9
-      },
-      "1": {
-        "resp": 14.7,
-        "mh": 3.1,
-        "gi": 18.1,
-        "injury": 15.4,
-        "fever": 8.5,
-        "ent": 4.1,
-        "other": 36.2
-      },
-      "2": {
-        "resp": 11.2,
-        "mh": 6.3,
-        "gi": 12.9,
-        "injury": 20.0,
-        "fever": 6.5,
-        "ent": 2.6,
-        "other": 40.5
-      },
-      "3": {
-        "resp": 10.9,
-        "mh": 4.8,
-        "gi": 12.9,
-        "injury": 19.8,
-        "fever": 10.0,
-        "ent": 2.2,
-        "other": 39.4
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 30.8,
-        "mh": 3.8,
-        "gi": 24.8,
-        "injury": 3.0,
-        "fever": 11.3,
-        "ent": 2.3,
-        "other": 24.1
-      },
-      "1": {
-        "resp": 19.2,
-        "mh": 3.4,
-        "gi": 17.5,
-        "injury": 15.2,
-        "fever": 10.4,
-        "ent": 2.4,
-        "other": 32.0
-      },
-      "2": {
-        "resp": 10.9,
-        "mh": 4.3,
-        "gi": 14.6,
-        "injury": 19.0,
-        "fever": 6.5,
-        "ent": 2.4,
-        "other": 42.3
-      },
-      "3": {
-        "resp": 10.9,
-        "mh": 4.8,
-        "gi": 14.8,
-        "injury": 19.2,
-        "fever": 10.6,
-        "ent": 3.8,
-        "other": 35.9
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 29.9,
-        "mh": 5.4,
-        "gi": 18.4,
-        "injury": 4.1,
-        "fever": 10.2,
-        "ent": 2.0,
-        "other": 29.9
-      },
-      "1": {
-        "resp": 15.3,
-        "mh": 2.2,
-        "gi": 20.1,
-        "injury": 7.6,
-        "fever": 8.9,
-        "ent": 3.8,
-        "other": 42.0
-      },
-      "2": {
-        "resp": 12.2,
-        "mh": 4.4,
-        "gi": 14.9,
-        "injury": 16.3,
-        "fever": 6.7,
-        "ent": 2.5,
-        "other": 43.0
-      },
-      "3": {
-        "resp": 12.8,
-        "mh": 2.8,
-        "gi": 12.5,
-        "injury": 21.9,
-        "fever": 7.9,
-        "ent": 3.8,
-        "other": 38.3
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 28.6,
-        "mh": 0.5,
-        "gi": 23.2,
-        "injury": 9.2,
-        "fever": 10.3,
-        "ent": 3.8,
-        "other": 24.3
-      },
-      "1": {
-        "resp": 16.5,
-        "mh": 2.5,
-        "gi": 13.1,
-        "injury": 11.4,
-        "fever": 9.3,
-        "ent": 5.9,
-        "other": 41.1
-      },
-      "2": {
-        "resp": 10.4,
-        "mh": 2.6,
-        "gi": 14.6,
-        "injury": 22.8,
-        "fever": 6.9,
-        "ent": 3.5,
-        "other": 39.2
-      },
-      "3": {
-        "resp": 15.1,
-        "mh": 3.8,
-        "gi": 11.3,
-        "injury": 20.5,
-        "fever": 11.3,
-        "ent": 2.7,
-        "other": 35.3
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 26.7,
-        "mh": 3.7,
-        "gi": 16.6,
-        "injury": 6.4,
-        "fever": 10.2,
-        "ent": 4.3,
-        "other": 32.1
-      },
-      "1": {
-        "resp": 22.0,
-        "mh": 2.0,
-        "gi": 14.6,
-        "injury": 15.4,
-        "fever": 11.4,
-        "ent": 2.8,
-        "other": 31.9
-      },
-      "2": {
-        "resp": 10.3,
-        "mh": 2.9,
-        "gi": 12.1,
-        "injury": 23.6,
-        "fever": 10.7,
-        "ent": 3.9,
-        "other": 36.5
-      },
-      "3": {
-        "resp": 16.5,
-        "mh": 2.2,
-        "gi": 13.2,
-        "injury": 16.3,
-        "fever": 9.5,
-        "ent": 3.7,
-        "other": 38.5
-      }
-    }
-  },
-  "10": {
-    "0": {
-      "0": {
-        "resp": 30.4,
-        "mh": 2.4,
-        "gi": 20.2,
-        "injury": 5.4,
-        "fever": 8.9,
-        "ent": 3.6,
-        "other": 29.2
-      },
-      "1": {
-        "resp": 20.0,
-        "mh": 4.1,
-        "gi": 17.0,
-        "injury": 8.9,
-        "fever": 6.2,
-        "ent": 1.9,
-        "other": 41.9
-      },
-      "2": {
-        "resp": 13.7,
-        "mh": 5.5,
-        "gi": 15.4,
-        "injury": 17.0,
-        "fever": 9.1,
-        "ent": 2.3,
-        "other": 36.9
-      },
-      "3": {
-        "resp": 14.4,
-        "mh": 5.0,
-        "gi": 17.1,
-        "injury": 19.8,
-        "fever": 7.3,
-        "ent": 3.6,
-        "other": 32.9
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 31.2,
-        "mh": 3.2,
-        "gi": 29.9,
-        "injury": 2.5,
-        "fever": 9.6,
-        "ent": 5.1,
-        "other": 18.5
-      },
-      "1": {
-        "resp": 23.7,
-        "mh": 4.7,
-        "gi": 17.7,
-        "injury": 11.1,
-        "fever": 6.3,
-        "ent": 4.5,
-        "other": 31.9
-      },
-      "2": {
-        "resp": 12.6,
-        "mh": 4.4,
-        "gi": 17.4,
-        "injury": 15.2,
-        "fever": 6.8,
-        "ent": 3.6,
-        "other": 40.0
-      },
-      "3": {
-        "resp": 12.9,
-        "mh": 5.0,
-        "gi": 16.7,
-        "injury": 16.5,
-        "fever": 9.4,
-        "ent": 3.2,
-        "other": 36.3
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 30.3,
-        "mh": 2.3,
-        "gi": 22.3,
-        "injury": 4.6,
-        "fever": 13.7,
-        "ent": 1.1,
-        "other": 25.7
-      },
-      "1": {
-        "resp": 17.4,
-        "mh": 3.2,
-        "gi": 16.9,
-        "injury": 14.2,
-        "fever": 9.2,
-        "ent": 3.2,
-        "other": 35.9
-      },
-      "2": {
-        "resp": 12.3,
-        "mh": 6.7,
-        "gi": 16.8,
-        "injury": 14.0,
-        "fever": 7.6,
-        "ent": 2.8,
-        "other": 39.8
-      },
-      "3": {
-        "resp": 16.5,
-        "mh": 5.4,
-        "gi": 16.2,
-        "injury": 15.7,
-        "fever": 8.9,
-        "ent": 2.8,
-        "other": 34.5
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 32.7,
-        "mh": 2.9,
-        "gi": 14.0,
-        "injury": 3.5,
-        "fever": 13.5,
-        "ent": 4.7,
-        "other": 28.7
-      },
-      "1": {
-        "resp": 16.8,
-        "mh": 4.6,
-        "gi": 16.8,
-        "injury": 10.4,
-        "fever": 7.0,
-        "ent": 2.6,
-        "other": 41.7
-      },
-      "2": {
-        "resp": 13.1,
-        "mh": 4.6,
-        "gi": 19.8,
-        "injury": 14.1,
-        "fever": 6.9,
-        "ent": 3.1,
-        "other": 38.5
-      },
-      "3": {
-        "resp": 13.6,
-        "mh": 4.7,
-        "gi": 15.8,
-        "injury": 19.1,
-        "fever": 11.4,
-        "ent": 3.1,
-        "other": 32.2
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 28.3,
-        "mh": 4.2,
-        "gi": 21.7,
-        "injury": 5.4,
-        "fever": 12.7,
-        "ent": 3.0,
-        "other": 24.7
-      },
-      "1": {
-        "resp": 14.8,
-        "mh": 3.4,
-        "gi": 16.8,
-        "injury": 14.4,
-        "fever": 8.6,
-        "ent": 3.1,
-        "other": 38.8
-      },
-      "2": {
-        "resp": 13.0,
-        "mh": 3.9,
-        "gi": 15.7,
-        "injury": 20.2,
-        "fever": 5.4,
-        "ent": 3.3,
-        "other": 38.6
-      },
-      "3": {
-        "resp": 13.9,
-        "mh": 4.5,
-        "gi": 13.9,
-        "injury": 19.0,
-        "fever": 9.2,
-        "ent": 4.0,
-        "other": 35.3
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 34.3,
-        "mh": 1.7,
-        "gi": 14.4,
-        "injury": 11.0,
-        "fever": 8.3,
-        "ent": 4.4,
-        "other": 26.0
-      },
-      "1": {
-        "resp": 17.9,
-        "mh": 2.0,
-        "gi": 19.4,
-        "injury": 9.9,
-        "fever": 9.9,
-        "ent": 6.3,
-        "other": 34.5
-      },
-      "2": {
-        "resp": 12.2,
-        "mh": 1.8,
-        "gi": 12.2,
-        "injury": 21.2,
-        "fever": 7.0,
-        "ent": 3.6,
-        "other": 42.1
-      },
-      "3": {
-        "resp": 15.7,
-        "mh": 4.0,
-        "gi": 14.6,
-        "injury": 20.8,
-        "fever": 6.9,
-        "ent": 0.9,
-        "other": 37.2
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 35.9,
-        "mh": 1.0,
-        "gi": 14.8,
-        "injury": 7.7,
-        "fever": 8.1,
-        "ent": 7.2,
-        "other": 25.4
-      },
-      "1": {
-        "resp": 21.3,
-        "mh": 2.6,
-        "gi": 14.3,
-        "injury": 10.3,
-        "fever": 7.4,
-        "ent": 5.9,
-        "other": 38.2
-      },
-      "2": {
-        "resp": 15.3,
-        "mh": 2.3,
-        "gi": 14.4,
-        "injury": 17.0,
-        "fever": 7.6,
-        "ent": 4.7,
-        "other": 38.6
-      },
-      "3": {
-        "resp": 16.1,
-        "mh": 3.8,
-        "gi": 18.6,
-        "injury": 17.1,
-        "fever": 7.3,
-        "ent": 4.1,
-        "other": 33.0
-      }
-    }
-  },
-  "11": {
-    "0": {
-      "0": {
-        "resp": 35.4,
-        "mh": 4.0,
-        "gi": 27.3,
-        "injury": 5.1,
-        "fever": 6.1,
-        "ent": 3.0,
-        "other": 19.2
-      },
-      "1": {
-        "resp": 30.7,
-        "mh": 2.0,
-        "gi": 17.8,
-        "injury": 6.6,
-        "fever": 4.9,
-        "ent": 5.1,
-        "other": 32.9
-      },
-      "2": {
-        "resp": 18.2,
-        "mh": 5.0,
-        "gi": 18.4,
-        "injury": 11.6,
-        "fever": 10.0,
-        "ent": 3.9,
-        "other": 32.9
-      },
-      "3": {
-        "resp": 20.9,
-        "mh": 3.7,
-        "gi": 16.8,
-        "injury": 12.2,
-        "fever": 12.1,
-        "ent": 3.6,
-        "other": 30.7
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 40.1,
-        "mh": 2.3,
-        "gi": 15.3,
-        "injury": 3.4,
-        "fever": 13.0,
-        "ent": 4.0,
-        "other": 22.0
-      },
-      "1": {
-        "resp": 26.5,
-        "mh": 3.2,
-        "gi": 16.5,
-        "injury": 8.2,
-        "fever": 8.2,
-        "ent": 5.8,
-        "other": 31.5
-      },
-      "2": {
-        "resp": 15.6,
-        "mh": 5.4,
-        "gi": 15.6,
-        "injury": 14.6,
-        "fever": 7.7,
-        "ent": 2.9,
-        "other": 38.1
-      },
-      "3": {
-        "resp": 16.7,
-        "mh": 3.8,
-        "gi": 17.0,
-        "injury": 14.7,
-        "fever": 9.4,
-        "ent": 4.9,
-        "other": 33.5
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 33.1,
-        "mh": 1.8,
-        "gi": 17.5,
-        "injury": 7.2,
-        "fever": 8.4,
-        "ent": 7.2,
-        "other": 24.7
-      },
-      "1": {
-        "resp": 24.3,
-        "mh": 4.2,
-        "gi": 17.6,
-        "injury": 9.4,
-        "fever": 6.7,
-        "ent": 2.5,
-        "other": 35.4
-      },
-      "2": {
-        "resp": 20.7,
-        "mh": 3.1,
-        "gi": 15.4,
-        "injury": 13.7,
-        "fever": 7.6,
-        "ent": 3.4,
-        "other": 35.9
-      },
-      "3": {
-        "resp": 23.8,
-        "mh": 5.0,
-        "gi": 12.3,
-        "injury": 12.3,
-        "fever": 9.3,
-        "ent": 3.5,
-        "other": 33.7
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 37.9,
-        "mh": 3.1,
-        "gi": 19.6,
-        "injury": 4.5,
-        "fever": 9.4,
-        "ent": 2.2,
-        "other": 23.2
-      },
-      "1": {
-        "resp": 22.7,
-        "mh": 3.4,
-        "gi": 16.0,
-        "injury": 10.4,
-        "fever": 9.0,
-        "ent": 3.4,
-        "other": 35.3
-      },
-      "2": {
-        "resp": 20.1,
-        "mh": 5.0,
-        "gi": 15.3,
-        "injury": 11.5,
-        "fever": 8.3,
-        "ent": 3.6,
-        "other": 36.2
-      },
-      "3": {
-        "resp": 20.7,
-        "mh": 2.8,
-        "gi": 16.3,
-        "injury": 13.3,
-        "fever": 10.4,
-        "ent": 3.6,
-        "other": 33.0
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 40.2,
-        "mh": 2.1,
-        "gi": 17.8,
-        "injury": 4.1,
-        "fever": 10.4,
-        "ent": 5.8,
-        "other": 19.5
-      },
-      "1": {
-        "resp": 24.2,
-        "mh": 2.0,
-        "gi": 22.2,
-        "injury": 7.9,
-        "fever": 4.7,
-        "ent": 5.0,
-        "other": 34.1
-      },
-      "2": {
-        "resp": 17.2,
-        "mh": 4.6,
-        "gi": 14.0,
-        "injury": 14.8,
-        "fever": 7.7,
-        "ent": 3.9,
-        "other": 37.8
-      },
-      "3": {
-        "resp": 20.4,
-        "mh": 4.4,
-        "gi": 14.0,
-        "injury": 14.5,
-        "fever": 10.9,
-        "ent": 3.6,
-        "other": 32.2
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 43.8,
-        "mh": 1.2,
-        "gi": 15.4,
-        "injury": 3.8,
-        "fever": 10.4,
-        "ent": 3.8,
-        "other": 21.5
-      },
-      "1": {
-        "resp": 24.4,
-        "mh": 2.6,
-        "gi": 13.5,
-        "injury": 10.6,
-        "fever": 9.8,
-        "ent": 4.0,
-        "other": 35.1
-      },
-      "2": {
-        "resp": 17.7,
-        "mh": 2.1,
-        "gi": 16.3,
-        "injury": 18.0,
-        "fever": 6.8,
-        "ent": 3.9,
-        "other": 35.3
-      },
-      "3": {
-        "resp": 19.9,
-        "mh": 1.7,
-        "gi": 14.6,
-        "injury": 13.3,
-        "fever": 10.5,
-        "ent": 5.1,
-        "other": 34.9
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 32.8,
-        "mh": 1.3,
-        "gi": 19.8,
-        "injury": 3.4,
-        "fever": 15.9,
-        "ent": 4.7,
-        "other": 22.0
-      },
-      "1": {
-        "resp": 26.8,
-        "mh": 0.6,
-        "gi": 17.6,
-        "injury": 10.9,
-        "fever": 8.9,
-        "ent": 4.5,
-        "other": 30.7
-      },
-      "2": {
-        "resp": 19.9,
-        "mh": 2.5,
-        "gi": 14.7,
-        "injury": 12.7,
-        "fever": 11.0,
-        "ent": 3.9,
-        "other": 35.2
-      },
-      "3": {
-        "resp": 24.3,
-        "mh": 3.9,
-        "gi": 15.1,
-        "injury": 13.7,
-        "fever": 10.5,
-        "ent": 3.9,
-        "other": 28.7
-      }
-    }
-  },
-  "12": {
-    "0": {
-      "0": {
-        "resp": 35.9,
-        "mh": 3.6,
-        "gi": 16.2,
-        "injury": 4.5,
-        "fever": 13.3,
-        "ent": 5.2,
-        "other": 21.4
-      },
-      "1": {
-        "resp": 31.6,
-        "mh": 2.5,
-        "gi": 16.7,
-        "injury": 6.6,
-        "fever": 10.5,
-        "ent": 5.2,
-        "other": 26.9
-      },
-      "2": {
-        "resp": 27.8,
-        "mh": 3.4,
-        "gi": 15.5,
-        "injury": 9.6,
-        "fever": 8.8,
-        "ent": 3.1,
-        "other": 31.9
-      },
-      "3": {
-        "resp": 26.6,
-        "mh": 3.5,
-        "gi": 15.2,
-        "injury": 11.5,
-        "fever": 10.9,
-        "ent": 4.5,
-        "other": 27.8
-      }
-    },
-    "1": {
-      "0": {
-        "resp": 37.0,
-        "mh": 2.1,
-        "gi": 18.0,
-        "injury": 2.5,
-        "fever": 16.5,
-        "ent": 4.9,
-        "other": 19.0
-      },
-      "1": {
-        "resp": 32.9,
-        "mh": 1.6,
-        "gi": 18.7,
-        "injury": 6.6,
-        "fever": 8.8,
-        "ent": 4.5,
-        "other": 26.9
-      },
-      "2": {
-        "resp": 23.9,
-        "mh": 3.7,
-        "gi": 16.3,
-        "injury": 12.1,
-        "fever": 11.2,
-        "ent": 3.7,
-        "other": 29.0
-      },
-      "3": {
-        "resp": 28.2,
-        "mh": 2.9,
-        "gi": 12.3,
-        "injury": 10.4,
-        "fever": 10.4,
-        "ent": 5.3,
-        "other": 30.6
-      }
-    },
-    "2": {
-      "0": {
-        "resp": 37.8,
-        "mh": 1.1,
-        "gi": 16.5,
-        "injury": 4.3,
-        "fever": 12.9,
-        "ent": 7.2,
-        "other": 20.1
-      },
-      "1": {
-        "resp": 32.6,
-        "mh": 1.5,
-        "gi": 16.2,
-        "injury": 5.3,
-        "fever": 10.1,
-        "ent": 4.5,
-        "other": 29.8
-      },
-      "2": {
-        "resp": 24.4,
-        "mh": 2.4,
-        "gi": 15.4,
-        "injury": 9.8,
-        "fever": 10.1,
-        "ent": 4.7,
-        "other": 33.2
-      },
-      "3": {
-        "resp": 27.6,
-        "mh": 3.2,
-        "gi": 15.9,
-        "injury": 11.8,
-        "fever": 10.3,
-        "ent": 3.8,
-        "other": 27.2
-      }
-    },
-    "3": {
-      "0": {
-        "resp": 32.6,
-        "mh": 1.4,
-        "gi": 23.9,
-        "injury": 4.1,
-        "fever": 14.2,
-        "ent": 5.5,
-        "other": 18.3
-      },
-      "1": {
-        "resp": 31.1,
-        "mh": 1.0,
-        "gi": 19.9,
-        "injury": 7.7,
-        "fever": 10.3,
-        "ent": 5.3,
-        "other": 24.9
-      },
-      "2": {
-        "resp": 24.0,
-        "mh": 4.6,
-        "gi": 11.4,
-        "injury": 11.0,
-        "fever": 10.8,
-        "ent": 4.0,
-        "other": 34.2
-      },
-      "3": {
-        "resp": 26.4,
-        "mh": 3.2,
-        "gi": 15.1,
-        "injury": 10.3,
-        "fever": 13.0,
-        "ent": 4.0,
-        "other": 28.0
-      }
-    },
-    "4": {
-      "0": {
-        "resp": 39.4,
-        "mh": 2.4,
-        "gi": 18.5,
-        "injury": 4.3,
-        "fever": 11.8,
-        "ent": 4.3,
-        "other": 19.3
-      },
-      "1": {
-        "resp": 32.9,
-        "mh": 1.6,
-        "gi": 16.5,
-        "injury": 6.6,
-        "fever": 10.1,
-        "ent": 4.9,
-        "other": 27.3
-      },
-      "2": {
-        "resp": 24.1,
-        "mh": 3.2,
-        "gi": 13.2,
-        "injury": 11.9,
-        "fever": 12.2,
-        "ent": 4.4,
-        "other": 31.1
-      },
-      "3": {
-        "resp": 26.3,
-        "mh": 2.2,
-        "gi": 14.9,
-        "injury": 10.9,
-        "fever": 12.5,
-        "ent": 3.5,
-        "other": 29.6
-      }
-    },
-    "5": {
-      "0": {
-        "resp": 35.9,
-        "mh": 1.1,
-        "gi": 19.9,
-        "injury": 2.8,
-        "fever": 11.4,
-        "ent": 6.8,
-        "other": 22.1
-      },
-      "1": {
-        "resp": 34.2,
-        "mh": 0.6,
-        "gi": 16.5,
-        "injury": 5.4,
-        "fever": 8.4,
-        "ent": 3.6,
-        "other": 31.2
-      },
-      "2": {
-        "resp": 27.6,
-        "mh": 1.7,
-        "gi": 13.3,
-        "injury": 10.4,
-        "fever": 11.0,
-        "ent": 5.1,
-        "other": 30.9
-      },
-      "3": {
-        "resp": 28.4,
-        "mh": 4.2,
-        "gi": 14.6,
-        "injury": 10.4,
-        "fever": 12.5,
-        "ent": 3.7,
-        "other": 26.2
-      }
-    },
-    "6": {
-      "0": {
-        "resp": 37.7,
-        "mh": 1.3,
-        "gi": 16.9,
-        "injury": 3.2,
-        "fever": 13.6,
-        "ent": 3.6,
-        "other": 23.7
-      },
-      "1": {
-        "resp": 32.4,
-        "mh": 0.5,
-        "gi": 12.9,
-        "injury": 6.6,
-        "fever": 14.4,
-        "ent": 4.4,
-        "other": 29.0
-      },
-      "2": {
-        "resp": 29.9,
-        "mh": 0.8,
-        "gi": 14.0,
-        "injury": 10.1,
-        "fever": 11.8,
-        "ent": 3.8,
-        "other": 29.5
-      },
-      "3": {
-        "resp": 28.2,
-        "mh": 2.8,
-        "gi": 18.1,
-        "injury": 12.7,
-        "fever": 9.9,
-        "ent": 5.9,
-        "other": 22.4
-      }
-    }
-  }
-};
-
-
 function setThreshold(t) {
   SURGE_THRESH = t;
   HEATMAP = HM_BY_THRESH[String(t)];
@@ -8460,7 +3095,9 @@ function onThreshChange(val) {
     calibNote.style.fontStyle = val < 12 ? 'normal' : 'italic';
   }
   // Re-render using cached API data — no network fetch needed
-  renderDashboard(_cachedIliData);
+  renderDashboard(_cachedIliData); // updates COMM_RATIO first
+  updateForecastBars();            // then uses updated COMM_RATIO with new SURGE_THRESH
+  render90DayCalendar();
 }
 
 function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, gradMod = 1.0, iliMod = 1.0, postEventMod = 1.0) {
@@ -8473,252 +3110,6 @@ function computeSurgeProb(hour, dow, month, schoolStatus, localEventMod = 1.0, g
   else if (schoolStatus.type === 'weekend') schoolMod = 0.85;
   if (schoolStatus.type === 'return' && dow === 0) schoolMod = 1.30;
   return Math.min(0.95, hBlend * schoolMod * localEventMod * gradMod * iliMod * postEventMod);
-}
-
-
-// ── ARRIVAL MODE TABLES (month × DOW × hour-block, 146K visits) ──
-// EMS = 911 ambulance (Fire Dept, BLS, ALS, Other). Transport = interfacility transfer teams.
-// [month][dow] = [overnight%, morning%, afternoon%, evening%]
-const SURGE_EMS_PCT = {
-  1: {0:[8.0,3.7,5.1,7.8],1:[9.0,6.9,7.3,6.6],2:[5.3,4.8,6.5,6.5],3:[6.2,4.4,4.4,5.1],4:[2.8,3.9,4.4,6.5],5:[9.2,4.4,3.9,5.4],6:[5.1,3.6,4.7,8.1]},
-  2: {0:[5.2,4.3,5.9,5.7],1:[10.3,4.9,6.5,6.4],2:[6.4,3.5,4.7,4.0],3:[9.1,3.9,4.9,5.0],4:[6.0,4.8,4.2,7.3],5:[10.0,4.6,8.5,5.4],6:[7.8,5.0,2.4,5.0]},
-  3: {0:[8.6,5.5,6.0,5.4],1:[10.7,5.0,7.2,6.0],2:[7.2,3.7,6.4,4.3],3:[9.1,4.5,3.9,5.4],4:[9.9,3.5,5.1,4.9],5:[9.0,2.3,4.0,6.0],6:[6.9,1.7,4.8,5.1]},
-  4: {0:[8.7,4.3,6.6,4.9],1:[8.3,4.0,8.5,4.5],2:[7.9,5.5,3.3,5.7],3:[11.2,4.6,6.2,7.1],4:[6.9,4.3,4.9,6.0],5:[9.2,4.4,3.5,6.5],6:[9.9,4.9,5.1,6.7]},
-  5: {0:[9.1,4.9,8.0,6.6],1:[11.0,4.3,8.3,6.4],2:[11.8,4.4,5.8,5.9],3:[9.6,5.2,5.3,5.6],4:[7.9,3.9,4.8,6.0],5:[10.5,3.3,5.6,5.4],6:[6.3,0.8,5.4,6.8]},
-  6: {0:[7.7,5.6,6.8,6.2],1:[7.9,9.0,5.7,4.1],2:[12.8,3.1,7.4,6.6],3:[11.2,6.4,6.6,6.7],4:[8.1,5.0,8.3,5.0],5:[7.7,3.1,6.0,6.3],6:[9.3,3.7,4.7,7.4]},
-  7: {0:[12.6,5.7,7.1,7.0],1:[7.6,7.1,8.7,5.0],2:[12.5,5.5,5.5,6.9],3:[11.0,3.4,6.7,8.4],4:[12.8,3.1,5.2,5.3],5:[12.6,4.2,5.9,7.7],6:[8.2,5.2,6.1,7.6]},
-  8: {0:[5.2,5.0,6.1,4.9],1:[6.3,4.2,3.6,4.6],2:[9.8,3.5,7.9,5.8],3:[10.2,2.8,5.1,6.9],4:[10.1,3.1,5.5,4.6],5:[11.0,5.9,5.8,4.7],6:[11.6,5.8,6.6,5.4]},
-  9: {0:[6.5,6.2,6.4,4.1],1:[8.3,6.3,7.6,5.7],2:[8.6,3.4,7.1,6.8],3:[11.3,7.4,5.7,7.9],4:[15.6,1.9,6.1,6.4],5:[8.6,3.4,7.3,9.1],6:[14.4,4.3,6.4,5.5]},
-  10:{0:[9.5,7.3,6.8,6.4],1:[8.9,7.1,6.1,6.2],2:[6.9,4.7,8.5,7.3],3:[11.1,6.7,6.6,7.5],4:[14.5,4.5,5.6,8.2],5:[13.3,4.8,4.1,7.1],6:[9.1,6.2,5.5,5.3]},
-  11:{0:[10.1,5.4,7.1,4.4],1:[9.0,3.2,5.3,5.8],2:[8.4,5.2,6.4,5.6],3:[13.8,4.2,4.8,6.3],4:[7.5,5.2,5.1,7.0],5:[7.3,5.2,6.1,5.1],6:[7.3,5.1,4.8,5.3]},
-  12:{0:[7.4,5.4,7.1,5.9],1:[5.6,4.9,6.4,7.0],2:[8.6,4.5,6.4,4.8],3:[7.3,5.3,5.3,7.7],4:[4.7,4.2,5.1,7.1],5:[5.3,2.7,5.3,5.5],6:[5.8,4.1,4.4,4.1]},
-};
-const SURGE_TRANSPORT_PCT = {
-  1: {0:[5.2,0.5,0.8,1.3],1:[5.2,0.5,1.0,1.4],2:[3.9,1.0,0.8,0.9],3:[4.0,1.0,0.7,1.2],4:[5.6,0.3,0.6,1.8],5:[3.9,0.7,0.7,1.4],6:[2.3,0.3,1.1,1.6]},
-  2: {0:[1.7,1.3,0.7,1.1],1:[3.9,0.8,0.9,1.8],2:[5.0,0.5,0.8,1.5],3:[7.0,0.5,0.3,1.5],4:[2.0,1.3,0.8,1.0],5:[2.8,2.1,0.9,2.4],6:[2.4,1.5,1.1,1.8]},
-  3: {0:[4.1,0.8,0.5,1.8],1:[6.3,0.5,0.8,0.9],2:[4.6,0.7,1.0,1.8],3:[3.0,0.5,0.7,1.7],4:[5.5,0.7,0.3,1.0],5:[3.3,0.3,1.7,1.8],6:[2.4,1.0,1.4,1.6]},
-  4: {0:[3.3,1.0,0.5,0.9],1:[4.6,1.2,1.1,1.8],2:[5.8,0.8,1.5,1.1],3:[2.1,0.9,0.7,0.9],4:[2.0,1.2,1.5,1.0],5:[2.9,0.4,0.5,1.7],6:[2.8,1.1,1.3,1.2]},
-  5: {0:[6.7,0.8,0.7,2.1],1:[3.8,0.8,0.7,1.6],2:[7.4,1.0,0.8,1.5],3:[6.4,1.2,0.9,1.7],4:[8.9,1.0,1.2,1.2],5:[6.2,0.7,1.2,1.6],6:[5.2,0.4,0.2,2.6]},
-  6: {0:[5.5,0.7,1.0,1.1],1:[3.7,0.4,1.4,1.5],2:[4.7,1.0,0.4,1.3],3:[6.6,0.7,0.9,1.5],4:[4.3,1.4,1.0,1.4],5:[1.4,2.7,1.2,2.2],6:[3.4,1.3,1.3,1.3]},
-  7: {0:[3.8,1.1,0.7,1.8],1:[5.9,1.3,1.0,2.5],2:[4.5,2.3,1.5,1.0],3:[3.4,0.5,0.9,1.1],4:[5.4,1.8,1.2,2.1],5:[3.4,0.5,0.8,1.9],6:[2.6,0.8,0.6,1.0]},
-  8: {0:[5.2,1.0,0.8,1.4],1:[4.4,1.2,1.6,2.0],2:[5.9,0.0,1.1,0.8],3:[3.8,1.6,0.9,0.9],4:[2.9,1.0,1.4,2.2],5:[3.8,1.4,0.9,1.9],6:[2.6,1.3,1.1,2.0]},
-  9: {0:[4.7,0.5,1.6,1.7],1:[5.4,0.3,1.8,1.1],2:[5.5,1.7,0.6,1.7],3:[3.8,1.7,1.6,1.9],4:[4.1,2.9,1.1,1.3],5:[4.3,0.4,1.5,1.8],6:[4.8,0.8,0.8,1.5]},
-  10:{0:[3.6,0.5,0.9,1.2],1:[5.7,0.3,0.9,2.0],2:[4.0,0.8,0.9,2.0],3:[4.1,1.4,1.0,1.6],4:[4.2,0.7,1.2,1.3],5:[2.8,3.6,0.9,2.7],6:[7.2,1.5,0.9,2.8]},
-  11:{0:[4.0,0.7,0.8,1.0],1:[5.6,1.0,1.0,1.3],2:[8.4,1.5,0.8,1.2],3:[4.0,0.6,1.1,2.0],4:[3.3,0.9,0.7,1.7],5:[3.8,0.9,1.6,1.7],6:[3.4,0.6,1.3,1.2]},
-  12:{0:[2.3,1.2,1.6,2.0],1:[3.5,1.4,1.0,2.1],2:[5.0,1.8,0.3,2.0],3:[6.0,0.7,0.7,1.4],4:[4.7,1.2,0.9,1.5],5:[3.9,1.8,0.5,2.4],6:[4.5,0.7,1.4,1.5]},
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SURGE PROFILE — age-band + CC mix forecast (zero staff input)
-// Hour-block aware: overnight(0-6), morning(7-11), afternoon(12-17), evening(18-23)
-// 6 CC categories + forward/back navigation
-// Derived from 146,164 visits (2023-2025).
-// ═══════════════════════════════════════════════════════════════════════════
-
-var _surgeProfileOffset = 0; // hours offset from now: 0=current, +6=6h ahead, -6=6h back
-
-function getHourBlock(h) {
-  if (h < 7) return 0;   // overnight
-  if (h < 12) return 1;  // morning
-  if (h < 18) return 2;  // afternoon
-  return 3;              // evening
-}
-
-const HOUR_BLOCK_LABELS = ['Overnight (00–06)', 'Morning (07–11)', 'Afternoon (12–17)', 'Evening (18–23)'];
-const HOUR_BLOCK_SHORT  = ['OVERNIGHT', 'MORNING', 'AFTERNOON', 'EVENING'];
-
-function stepSurgeProfile(delta) {
-  _surgeProfileOffset += delta;
-  // Clamp to -24h .. +24h
-  if (_surgeProfileOffset < -24) _surgeProfileOffset = -24;
-  if (_surgeProfileOffset > 24) _surgeProfileOffset = 24;
-  var el = document.getElementById('surge-profile-content');
-  if (el) {
-    var now = new Date();
-    var target = new Date(now.getTime() + _surgeProfileOffset * 3600000);
-    var m = target.getMonth() + 1;
-    var d = (target.getDay() + 6) % 7; // Mon=0
-    var h = target.getHours();
-    var result = getSurgeProfile(m, d, h, _surgeProfileOffset);
-    el.innerHTML = result.html;
-  }
-}
-
-function resetSurgeProfile() {
-  _surgeProfileOffset = 0;
-  stepSurgeProfile(0);
-}
-
-function getSurgeProfile(month, dow, hour, offsetHours) {
-  if (typeof hour === 'undefined') hour = new Date().getHours();
-  if (typeof offsetHours === 'undefined') offsetHours = 0;
-
-  var m = String(month), d = String(dow);
-  var hb = getHourBlock(hour);
-  var hbStr = String(hb);
-
-  var bandLabels = { infant: '< 1 yr', toddler: '1\u20134 yr', school: '5\u201312 yr', teen: '13\u201317 yr' };
-  var bandColors = { infant: '#ff4d6d', toddler: '#ff9a3c', school: '#60a5fa', teen: '#a78bfa' };
-  var ccLabels  = { resp: 'Respiratory', gi: 'GI', injury: 'Injury', mh: 'Mental Health', fever: 'Fever', ent: 'ENT', other: 'Other' };
-  var ccColors  = { resp: '#39d98a', gi: '#ffd166', injury: '#ff9a3c', mh: '#a78bfa', fever: '#ff4d6d', ent: '#60a5fa', other: '#2a2e42' };
-  var ccOrder   = ['resp', 'gi', 'injury', 'fever', 'ent', 'mh', 'other'];
-
-  var profile = (SURGE_PROFILE[m] && SURGE_PROFILE[m][d] && SURGE_PROFILE[m][d][hbStr]) || null;
-  var ccMix   = (SURGE_CC_MIX[m] && SURGE_CC_MIX[m][d] && SURGE_CC_MIX[m][d][hbStr]) || null;
-
-  // Arrival mode: EMS % and Transport % for this cell
-  var emsMi = parseInt(m), emsDi = parseInt(d);
-  var emsPct = 6.0; // overall mean fallback
-  var transPct = 1.6; // overall mean fallback
-  if (SURGE_EMS_PCT[emsMi] && SURGE_EMS_PCT[emsMi][emsDi]) {
-    emsPct = SURGE_EMS_PCT[emsMi][emsDi][hb] || 6.0;
-  }
-  if (SURGE_TRANSPORT_PCT[emsMi] && SURGE_TRANSPORT_PCT[emsMi][emsDi]) {
-    transPct = SURGE_TRANSPORT_PCT[emsMi][emsDi][hb] || 1.6;
-  }
-  var povPct = Math.round((100 - emsPct - transPct) * 10) / 10;
-  emsPct = Math.round(emsPct * 10) / 10;
-  transPct = Math.round(transPct * 10) / 10;
-
-  if (!profile || !ccMix) return { html: '<div style="font-size:11px;color:var(--muted);">Insufficient data for this time window.</div>', narrative: '' };
-
-  // ── Time label + navigation ──
-  var target = new Date(Date.now() + offsetHours * 3600000);
-  var dayLabel = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][target.getDay()];
-  var monthLabel = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][target.getMonth()+1];
-  var timeLabel = dayLabel + ' ' + monthLabel + ' ' + target.getDate() + ' \u00b7 ' + HOUR_BLOCK_LABELS[hb];
-  var isNow = (offsetHours === 0);
-
-  var navHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'
-    + '<button onclick="stepSurgeProfile(-6)" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-family:\'Space Mono\',monospace;font-size:11px;padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'">\u25C0 \u22126h</button>'
-    + '<div style="text-align:center;">'
-    + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + (isNow ? 'var(--accent)' : 'var(--text)') + ';font-weight:600;">' + (isNow ? '\u25CF NOW' : timeLabel) + '</div>'
-    + '<div style="font-size:9px;color:var(--muted);margin-top:2px;">' + HOUR_BLOCK_SHORT[hb] + ' SHIFT' + (isNow ? '' : ' \u00b7 <span style="cursor:pointer;color:var(--accent);text-decoration:underline;" onclick="resetSurgeProfile()">reset</span>') + '</div>'
-    + '</div>'
-    + '<button onclick="stepSurgeProfile(+6)" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-family:\'Space Mono\',monospace;font-size:11px;padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'">+6h \u25B6</button>'
-    + '</div>';
-
-  // ── Band stacked bar ──
-  var bandsArr = ['infant', 'toddler', 'school', 'teen'];
-  var bandBarHTML = '<div style="display:flex;height:18px;border-radius:3px;overflow:hidden;width:100%;">';
-  bandsArr.forEach(function(b) {
-    var pct = profile[b] || 0;
-    if (pct > 0) bandBarHTML += '<div style="width:'+pct+'%;background:'+bandColors[b]+';" title="'+bandLabels[b]+': '+pct+'%"></div>';
-  });
-  bandBarHTML += '</div>';
-
-  var bandLegend = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">';
-  bandsArr.forEach(function(b) {
-    var pct = profile[b] || 0;
-    bandLegend += '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
-      + '<div style="width:8px;height:8px;border-radius:2px;background:'+bandColors[b]+';"></div>'
-      + '<span style="color:var(--muted);">'+bandLabels[b]+'</span>'
-      + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+pct+'%</span>'
-      + '</div>';
-  });
-  bandLegend += '</div>';
-
-  // ── CC stacked bar ──
-  var ccBarHTML = '<div style="display:flex;height:18px;border-radius:3px;overflow:hidden;width:100%;">';
-  ccOrder.forEach(function(c) {
-    var pct = ccMix[c] || 0;
-    if (pct > 0) ccBarHTML += '<div style="width:'+pct+'%;background:'+ccColors[c]+';" title="'+ccLabels[c]+': '+pct+'%"></div>';
-  });
-  ccBarHTML += '</div>';
-
-  var ccLegend = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">';
-  ccOrder.forEach(function(c) {
-    var pct = ccMix[c] || 0;
-    if (pct >= 2.0) {
-      ccLegend += '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
-        + '<div style="width:8px;height:8px;border-radius:2px;background:'+ccColors[c]+';"></div>'
-        + '<span style="color:var(--muted);">'+ccLabels[c]+'</span>'
-        + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+pct+'%</span>'
-        + '</div>';
-    }
-  });
-  ccLegend += '</div>';
-
-  // ── Staffing narrative ──
-  var respPct = ccMix.resp || 0;
-  var mhPct = ccMix.mh || 0;
-  var feverPct = ccMix.fever || 0;
-  var injPct = ccMix.injury || 0;
-  var entPct = ccMix.ent || 0;
-  var infantPct = profile.infant || 0;
-
-  var signals = [];
-  if (respPct >= 20) signals.push('Respiratory-heavy (' + respPct + '%) \u2014 expect under-5 predominance. Nebulizer capacity, RSV isolation.');
-  if (feverPct >= 10 && infantPct >= 17) signals.push('Elevated febrile workups (' + feverPct + '%) with high infant share (' + infantPct + '%). Anticipate sepsis r/o, blood cultures, possible LPs.');
-  else if (feverPct >= 9) signals.push('Fever visits elevated (' + feverPct + '%). Plan for febrile workup volume.');
-  if (mhPct >= 8) signals.push('MH share elevated (' + mhPct + '%) \u2014 teen-driven. BH staffing, safe room availability, longer LOS expected.');
-  if (injPct >= 16) signals.push('Injury-heavy (' + injPct + '%) \u2014 ortho/suture capacity, imaging throughput.');
-  if (entPct >= 4) signals.push('ENT visits elevated (' + entPct + '%) \u2014 ear/throat complaints, anticipate rapid strep demand.');
-  if (emsPct >= 8) signals.push('EMS arrivals elevated (' + emsPct + '%) \u2014 reserve bay capacity for ambulance handoffs, expect higher acuity mix.');
-  else if (emsPct <= 3.5) signals.push('Low EMS volume expected (' + emsPct + '%) \u2014 walk-in dominant shift.');
-  if (transPct >= 4) signals.push('High transport team volume (' + transPct + '%) \u2014 expect interfacility transfers with handoff paperwork, likely higher acuity.');
-  else if (transPct >= 2.5) signals.push('Moderate transport team traffic (' + transPct + '%).');
-
-  var narrativeText;
-  if (signals.length === 0) {
-    narrativeText = 'Balanced visit mix. No single CC category dominates \u2014 standard staffing profile.';
-  } else {
-    narrativeText = signals.join(' ');
-  }
-
-  // ── Arrival mode bar (3 segments: EMS, Transport, Walk-in) ──
-  var emsColor = '#ff6b6b';
-  if (emsPct >= 8) { emsColor = '#ff4d6d'; } // hot red for elevated
-  else if (emsPct >= 6) { emsColor = '#ff9a3c'; } // orange for normal-high
-  else { emsColor = '#60a5fa'; } // blue for low/normal
-  var transColor = '#ffd166'; // amber for transport team
-  var povColor = '#2a2e42';
-
-  var arrivalBarHTML = '<div style="display:flex;height:18px;border-radius:3px;overflow:hidden;width:100%;">'
-    + '<div style="width:'+emsPct+'%;background:'+emsColor+';" title="EMS/Ambulance: '+emsPct+'%"></div>'
-    + '<div style="width:'+transPct+'%;background:'+transColor+';" title="Transport Team: '+transPct+'%"></div>'
-    + '<div style="width:'+povPct+'%;background:'+povColor+';" title="Walk-in/POV: '+povPct+'%"></div>'
-    + '</div>';
-
-  var arrivalLegend = '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px;">'
-    + '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
-    + '<div style="width:8px;height:8px;border-radius:2px;background:'+emsColor+';"></div>'
-    + '<span style="color:var(--muted);">EMS / Ambulance</span>'
-    + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+emsPct+'%</span>'
-    + '</div>'
-    + '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
-    + '<div style="width:8px;height:8px;border-radius:2px;background:'+transColor+';"></div>'
-    + '<span style="color:var(--muted);">Transport Team</span>'
-    + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+transPct+'%</span>'
-    + '</div>'
-    + '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
-    + '<div style="width:8px;height:8px;border-radius:2px;background:'+povColor+';"></div>'
-    + '<span style="color:var(--muted);">Walk-in / POV</span>'
-    + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+povPct+'%</span>'
-    + '</div>'
-    + '</div>';
-
-  var html = navHTML
-    + '<div class="surge-profile-grid">'
-    + '<div>'
-    + '<div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Expected Age Distribution</div>'
-    + bandBarHTML + bandLegend
-    + '</div>'
-    + '<div>'
-    + '<div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Expected Chief Complaint Mix</div>'
-    + ccBarHTML + ccLegend
-    + '</div>'
-    + '</div>'
-    + '<div style="margin-top:12px;">'
-    + '<div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Expected Arrival Method</div>'
-    + arrivalBarHTML + arrivalLegend
-    + '</div>'
-    + '<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:5px;">'
-    + '<div style="font-size:10px;color:var(--accent);font-family:\'Space Mono\',monospace;letter-spacing:1px;margin-bottom:3px;">STAFFING SIGNAL</div>'
-    + '<div style="font-size:12px;color:var(--text);line-height:1.5;">'+narrativeText+'</div>'
-    + '</div>';
-
-  return { html: html, narrative: narrativeText };
 }
 
 function surgeLevel(p) {
@@ -8800,6 +3191,172 @@ let iliData = null;
   
 }
 
+
+// ── 90-Day Forecast Calendar ─────────────────────────────────────────────
+const CENSUS_DOW_MONTH = {
+  0: {1:{m:148,s:24}, 2:{m:167,s:18}, 3:{m:174,s:13}, 4:{m:155,s:16}, 5:{m:167,s:17}, 6:{m:133,s:19}, 7:{m:114,s:8}, 8:{m:113,s:9}, 9:{m:131,s:21}, 10:{m:138,s:12}, 11:{m:151,s:15}, 12:{m:172,s:26}},
+  1: {1:{m:150,s:18}, 2:{m:158,s:23}, 3:{m:162,s:12}, 4:{m:152,s:13}, 5:{m:156,s:18}, 6:{m:129,s:17}, 7:{m:103,s:13}, 8:{m:104,s:8}, 9:{m:130,s:17}, 10:{m:126,s:12}, 11:{m:143,s:20}, 12:{m:165,s:21}},
+  2: {1:{m:146,s:27}, 2:{m:153,s:25}, 3:{m:156,s:14}, 4:{m:140,s:16}, 5:{m:148,s:16}, 6:{m:128,s:18}, 7:{m:113,s:11}, 8:{m:102,s:13}, 9:{m:125,s:16}, 10:{m:124,s:13}, 11:{m:144,s:17}, 12:{m:158,s:20}},
+  3: {1:{m:154,s:28}, 2:{m:148,s:18}, 3:{m:153,s:13}, 4:{m:146,s:12}, 5:{m:147,s:14}, 6:{m:131,s:17}, 7:{m:102,s:12}, 8:{m:102,s:13}, 9:{m:120,s:13}, 10:{m:123,s:14}, 11:{m:135,s:22}, 12:{m:163,s:25}},
+  4: {1:{m:140,s:32}, 2:{m:147,s:17}, 3:{m:148,s:14}, 4:{m:137,s:10}, 5:{m:146,s:19}, 6:{m:124,s:18}, 7:{m:103,s:12}, 8:{m:94,s:11}, 9:{m:116,s:13}, 10:{m:117,s:16}, 11:{m:135,s:16}, 12:{m:156,s:22}},
+  5: {1:{m:131,s:18}, 2:{m:131,s:22}, 3:{m:135,s:10}, 4:{m:120,s:12}, 5:{m:132,s:10}, 6:{m:117,s:11}, 7:{m:106,s:10}, 8:{m:94,s:12}, 9:{m:117,s:10}, 10:{m:111,s:13}, 11:{m:126,s:14}, 12:{m:145,s:18}},
+  6: {1:{m:132,s:17}, 2:{m:144,s:21}, 3:{m:143,s:14}, 4:{m:134,s:16}, 5:{m:137,s:15}, 6:{m:121,s:16}, 7:{m:110,s:10}, 8:{m:104,s:9}, 9:{m:115,s:14}, 10:{m:119,s:11}, 11:{m:128,s:12}, 12:{m:152,s:24}},
+};
+const ILI_SEASONAL = {
+  1:1.3424, 2:1.4085, 3:1.2000, 4:1.0754, 5:1.0441, 6:1.0187,
+  7:0.9697, 8:0.9661, 9:0.9975, 10:1.0161, 11:1.0727, 12:1.3964,
+};
+
+function render90DayCalendar() {
+  var el = document.getElementById('cal90-content');
+  if (!el) return;
+
+  var now   = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var DOW_HDR = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var MON_NAMES = ['January','February','March','April','May','June',
+                   'July','August','September','October','November','December'];
+
+  var html = '';
+
+  // Build 90 days starting from today, grouped by month
+  var days = [];
+  for (var i = 0; i < 90; i++) {
+    var d = new Date(today.getTime() + i * 86400000);
+    days.push(d);
+  }
+
+  // Group by month
+  var months = [];
+  var cur = null;
+  days.forEach(function(d) {
+    var key = d.getFullYear()*100 + d.getMonth();
+    if (!cur || cur.key !== key) {
+      cur = {key:key, year:d.getFullYear(), month:d.getMonth()+1, days:[]};
+      months.push(cur);
+    }
+    cur.days.push(d);
+  });
+
+  months.forEach(function(mo) {
+    html += '<div class="cal90-grid">';
+    html += '<div class="cal90-month-label">'+MON_NAMES[mo.month-1]+' '+mo.year+'</div>';
+    // Column headers repeated per month
+    DOW_HDR.forEach(function(d){ html += '<div class="cal90-header">'+d+'</div>'; });
+
+    // Pad start of month to correct DOW (Mon=0)
+    var firstDow = (mo.days[0].getDay() + 6) % 7; // convert Sun=0 to Mon=0
+    for (var p = 0; p < firstDow; p++) {
+      html += '<div class="cal90-day empty"></div>';
+    }
+
+    mo.days.forEach(function(d) {
+      var dow   = (d.getDay() + 6) % 7;
+      var month = d.getMonth() + 1;
+      var isToday = d.getTime() === today.getTime();
+      var dateStr = d.toISOString().slice(0,10);
+
+      // Census estimate
+      var cenRow = (CENSUS_DOW_MONTH[dow] || {})[month] || {m:134,s:22};
+      var iliMod = ILI_SEASONAL[month] || 1.0;
+      var school = getSchoolStatus(dateStr);
+      var schAdj = (school.type==='break'||school.type==='holiday') ? 0.939
+                  : school.type==='return' ? 1.08
+                  : school.type==='no-school' ? 0.980 : 1.0;
+      var evMod  = getLocalEventModifier(dateStr, 12).modifier;
+      var postMod= getPostEventModifier(dateStr, SURGE_THRESH).modifier;
+      var gradMod= getGraduationModifier(dateStr).modifier;
+
+      // Census: base × ILI seasonal × school adj × event
+      var censMult = iliMod * schAdj
+                   * (evMod < 0.95 ? 0.923 : evMod > 1.02 ? 0.983 : 1.0)
+                   * postMod * gradMod;
+      var census   = Math.round(cenRow.m * censMult);
+      var censLo   = Math.round((cenRow.m - cenRow.s) * censMult);
+      var censHi   = Math.round((cenRow.m + cenRow.s) * censMult);
+
+      // Surge probability: HM_BY_THRESH[thresh][hour][dow]
+      var hmTable    = HM_BY_THRESH[String(SURGE_THRESH)] || HM_BY_THRESH['10'];
+      var baseSurge  = (hmTable[19] || [])[dow] || 0.15;
+      var schoolMod  = school.type==='return'?1.15:school.type==='school-day'?1.06:0.85;
+      var surgePct   = Math.min(0.95, baseSurge * iliMod * schoolMod
+                       * evMod * postMod * gradMod);
+
+      // Risk tier
+      var riskClass = surgePct >= 0.55 ? 'risk-vhigh'
+                    : surgePct >= 0.35 ? 'risk-high'
+                    : surgePct >= 0.20 ? 'risk-mod'
+                    : 'risk-low';
+      var surgeCol  = surgePct >= 0.55 ? '#ff4d6d'
+                    : surgePct >= 0.35 ? '#ff9a3c'
+                    : surgePct >= 0.20 ? '#ffd166'
+                    : '#39d98a';
+
+      var flags = '';
+      if (school.type==='holiday') flags += '🎉';
+      else if (school.type==='break') flags += '🏖️';
+      else if (school.type==='return') flags += '⚠️';
+      var evInfo = getLocalEventModifier(dateStr, 12);
+      if (evInfo.activeEvents && evInfo.activeEvents.length) {
+        evInfo.activeEvents.slice(0,2).forEach(function(e){ flags += e.icon; });
+      }
+      // Holiday events (they come through as local events too)
+      var postInfo = getPostEventModifier(dateStr, SURGE_THRESH);
+      if (postInfo.activeEvents && postInfo.activeEvents.length) flags += '🔁';
+      if (getGraduationModifier(dateStr).isGraduation) flags += '🎓';
+
+      html += '<div class="cal90-day '+riskClass+(isToday?' today':'')+'">';
+      html += '<div class="cal-date" style="display:flex;justify-content:space-between;align-items:center;">'
+            + '<span>'+d.getDate()+'</span>'
+            + (flags?'<span style="font-size:9px;">'+flags+'</span>':'')
+            + '</div>';
+      html += '<div class="cal-surge" style="color:'+surgeCol+';">'+(surgePct*100).toFixed(0)+'%</div>';
+      html += '<div class="cal-census">'
+            + '<span style="font-weight:700;color:var(--text);">'+census+'</span>'
+            + '<br><span>'+censLo+'–'+censHi+'</span>'
+            + '</div>';
+      html += '</div>';
+    });
+
+    // Pad end of month
+    var lastDow = (mo.days[mo.days.length-1].getDay() + 6) % 7;
+    for (var p2 = lastDow+1; p2 < 7; p2++) {
+      html += '<div class="cal90-day empty"></div>';
+    }
+    html += '</div>';
+  });
+
+  // Legend
+  html += '<div class="cal90-legend">';
+  html += '<span><div class="dot" style="background:rgba(57,217,138,0.4);"></div>&lt;20% surge</span>';
+  html += '<span><div class="dot" style="background:rgba(255,209,102,0.5);"></div>20–35%</span>';
+  html += '<span><div class="dot" style="background:rgba(255,154,60,0.5);"></div>35–55%</span>';
+  html += '<span><div class="dot" style="background:rgba(255,77,109,0.5);"></div>≥55%</span>';
+  html += '</div>';
+  html += '<div class="cal90-legend" style="margin-top:4px;">';
+  html += '<span>🏖️ school break</span>';
+  html += '<span>⚠️ post-break return</span>';
+  html += '<span>🎓 graduation</span>';
+  html += '<span>🎡 fair / event</span>';
+  html += '<span>🌸 Spring Fair</span>';
+  html += '<span>🎄 Christmas</span>';
+  html += '<span>🎃 Halloween</span>';
+  html += '<span>🎆 July 4th / NYE</span>';
+  html += '<span>🦃 Thanksgiving</span>';
+  html += '<span>🐣 Easter</span>';
+  html += '<span>🇺🇸 Memorial Day</span>';
+  html += '<span>👷 Labor Day</span>';
+  html += '<span>🔁 post-event lag</span>';
+  html += '</div>';
+  html += '<div style="font-size:9px;color:#4a5568;margin-top:4px;">% = peak surge prob · N–N = est. daily arrivals ±1 SD · Calendar model only — school calendar, local events, seasonal ILI baseline. Live ILI and community trends not applied. Uncertainty grows with horizon.</div>';
+
+  el.innerHTML = html;
+}
+
+var COMMUNITY_ILL_MOD_ON = false; // community illness modifier
+var COMM_RATIO = 1.0; // cached community illness composite ratio — updated each renderDashboard call
+var COMM_P50 = {'norovirus': 6, 'child fever': 2, 'child cough': 2}; // re-derived by refresh_models.py
+
 function renderDashboard(iliData = null) {
   const now = new Date();
   const hour = now.getHours();
@@ -8859,6 +3416,15 @@ function renderDashboard(iliData = null) {
 
   // ── 24h hourly surge forecast ──────────────────────────────────────────
   const nextHours = [];
+  // Pre-compute community composite ratio (used in 24h bars, 7-day grid, and arrivals forecast)
+  const _commKws = ['norovirus', 'child fever', 'child cough'];
+  const _commLatest = (typeof TRENDS_BASELINE !== 'undefined' && TRENDS_BASELINE.latest) ? TRENDS_BASELINE.latest : {};
+  const _commRatios = _commKws.map(kw => {
+    const val = _commLatest[kw] || 0;
+    return val / (COMM_P50[kw] || 1);
+  });
+  COMM_RATIO = _commRatios.reduce((a,b) => a+b, 0) / _commRatios.length; // update module-level cache
+
   for (let i = 0; i < 24; i++) {
     const h = (hour + i) % 24;
     const futureDate = new Date(now.getTime() + i * 3600000);
@@ -8870,6 +3436,8 @@ function renderDashboard(iliData = null) {
     const fGradMod = getGraduationModifier(fd).modifier;
     const { modifier: fPostMod } = getPostEventModifier(fd, SURGE_THRESH);
     let fp = computeSurgeProb(h, fdow, fm, fSchool, fLocalMod, fGradMod, iliMod, fPostMod);
+    // Apply community illness modifier (same signal as 7-day grid, today only)
+    if (COMMUNITY_ILL_MOD_ON) fp = Math.min(0.95, fp * getCommunityIllnessMod());
     let isSurvival = false, isPersistence = false;
     if(!SURGE_FLAG_ACTIVE) {
       // Apply surge window multiplier if in/past surge window with no confirmed surge
@@ -8886,7 +3454,7 @@ function renderDashboard(iliData = null) {
       else if(effOffset<=6){ fp=getSurvivalProb(startH, effOffset); isPersistence=true; }
       else { fp=getSurvivalProb(startH, 6); isPersistence=true; }
     }
-    nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}:00`, isPersistence, isSurvival });
+    nextHours.push({ hour: h, prob: fp, label: `${String(h).padStart(2,'0')}`, isPersistence, isSurvival });
   }
 
   // ── 7-day daily surge forecast ─────────────────────────────────────────
@@ -8979,15 +3547,16 @@ function renderDashboard(iliData = null) {
   '9_5':{mean:116.8,std:9.7},
   '9_6':{mean:115.3,std:14.3},
 };
-  function getCensusEstimate(month, dow, schoolType, localMod, iliMod) {
+  function getCensusEstimate(month, dow, schoolType, localMod, iliMod, commRatio = 1.0) {
     const base = CENSUS_LOOKUP[`${month}_${dow}`] || {mean:134,std:22.7};
     let adj = 0;
     if (schoolType === 'break' || schoolType === 'holiday') adj += -7.1;
     else if (schoolType === 'no-school') adj += -2.7;
     if (localMod < 0.95) adj += -6.1;       // protective event (Spring Fair etc)
     else if (localMod > 1.02) adj += -2.3;  // State Fair (positive modifier but mild suppression)
-    const iliAdj = (iliMod - 1.0) * 47.1;   // empirical: +47 pts per unit ILI modifier
-    const mean = Math.round(base.mean + adj + iliAdj);
+    const iliAdj  = (iliMod - 1.0) * 47.1;     // empirical: +47 pts per unit ILI modifier
+    const commAdj = COMMUNITY_ILL_MOD_ON ? (commRatio - 1.0) * 6.4 : 0;  // +6.4 visits/day per unit ratio (r=+0.24, p=0.002)
+    const mean = Math.round(base.mean + adj + iliAdj + commAdj);
     const ci95 = Math.round(1.96 * base.std);
     return { mean, lo: mean - ci95, hi: mean + ci95, ci95 };
   }
@@ -9004,12 +3573,13 @@ function renderDashboard(iliData = null) {
     const fGradInfo7 = getGraduationModifier(fds);
     const fGradMod7 = fGradInfo7.modifier;
     const { modifier: fPostMod7 } = getPostEventModifier(fds, SURGE_THRESH);
-    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7));
+    const commMod7 = (d === 0) ? getCommunityIllnessMod() : 1.0; // only apply to today — future weeks unknown
+    const peakP = Math.min(0.95, computeSurgeProb(19, fdow, fm, fSchool, fLocalMod7, fGradMod7, iliMod, fPostMod7) * commMod7);
     const avgP  = [10,11,12,13,14,15,16,17,18,19,20].reduce((s,h) => {
       const { modifier: hMod } = getLocalEventModifier(fds, h);
-      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod, fPostMod7));
+      return s + Math.min(0.95, computeSurgeProb(h,fdow,fm,fSchool,hMod,fGradMod7,iliMod, fPostMod7) * commMod7);
     }, 0) / 11;
-    const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod);
+    const census = getCensusEstimate(fm, fdow, fSchool.type, fLocalMod7, iliMod, d === 0 ? COMM_RATIO : 1.0);
     days7.push({
       dowLabel: DOW_NAMES[fdow],
       dateLabel: `${MON_NAMES[fm-1]} ${fd.getDate()}`,
@@ -9155,7 +3725,8 @@ function renderDashboard(iliData = null) {
       }
     }
 
-    return Math.max(0, Math.round(base * iliAdj * schAdj * gradAdj * zooAdj * eventAdj * lagAdj));
+    const arrCommAdj = COMMUNITY_ILL_MOD_ON ? (1.0 + (COMM_RATIO - 1.0) * 0.048) : 1.0;
+    return Math.max(0, Math.round(base * iliAdj * schAdj * gradAdj * zooAdj * eventAdj * lagAdj * arrCommAdj));
   });
 
   const arrMaxVal = Math.max(...arrEstimates, 1);
@@ -9305,6 +3876,19 @@ function renderDashboard(iliData = null) {
     },
   ];
 
+  // Add community illness factor if toggle is ON
+  if (COMMUNITY_ILL_MOD_ON) {
+    const commMod = getCommunityIllnessMod();
+    factors.push({
+      icon: '🔍',
+      name: 'Community Illness Trends',
+      desc: `Norovirus · child fever · child cough (Pierce Co.) · composite ratio ${COMM_RATIO.toFixed(2)}× baseline`,
+      score: commMod > 1.0 ? Math.min(0.40, (commMod - 1.0) * 2) : 0.02,
+      maxScore: 0.40,
+      rawLabel: `×${commMod.toFixed(3)}`,
+    });
+  }
+
   const factorsHTML = factors.map(f => {
     const pct = Math.min(100, Math.round((f.score / f.maxScore) * 100));
     const scoreClass = pct > 65 ? 'score-high' : pct > 35 ? 'score-med' : pct > 15 ? 'score-low' : 'score-none';
@@ -9325,7 +3909,6 @@ function renderDashboard(iliData = null) {
   ).join('');
 
   // ─────────────────────────────────────────────────────────────────────────
-  _surgeProfileOffset = 0; // reset on full render
   document.getElementById('mainContent').innerHTML = `
     <!-- SURGE ALERT BAR -->
     <div class="surge-bar ${level}">
@@ -9460,16 +4043,6 @@ function renderDashboard(iliData = null) {
       </div>
     </div>
 
-
-    <!-- SURGE PROFILE -->
-    <div class="sdiv">Surge Profile</div>
-    <div class="panel">
-      <div class="ph"><div class="pt">Expected Visit Composition</div><div class="badge badge-p">AGE · CC MIX · ARRIVAL MODE · 146K VISITS</div></div>
-      <div class="pb" id="surge-profile-content">
-        ${getSurgeProfile(month, dow, hour, 0).html}
-      </div>
-    </div>
-
     <!-- 7-DAY FORECAST -->
     <!-- ROW 1: ILI + School + Factors -->
     <div class="row3">
@@ -9579,6 +4152,19 @@ function renderDashboard(iliData = null) {
           "pk %" = peak hour (19:00) surge probability for that day, incorporating school calendar + local events. Estimated arrivals = empirical (month × DOW) baseline adjusted for school status, local events, and ILI; 95% CI shown as range. MAE ±17 patients/day.
           🏫 school day · 🏖️ break · 🎉 holiday · ⚠️ post-break return
         </div>
+
+      </div>
+    </div>
+
+
+    <div class="sdiv">90-Day Forecast Calendar</div>
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">Surge Risk & Expected Census · 90 Days</div>
+        <div class="badge badge-b">CALENDAR MODEL · SEASONAL ILI BASELINE</div>
+      </div>
+      <div class="pb">
+        <div id="cal90-content" style="font-size:10px;color:var(--muted);">Loading…</div>
       </div>
     </div>
 
@@ -9666,6 +4252,8 @@ function renderDashboard(iliData = null) {
   setTimeout(renderSurgeDashboard, 60 * 60 * 1000);
   // Render community signal after DOM settles
   setTimeout(renderCommunitySignal, 100);
+  // Render 90-day calendar after DOM settles
+  setTimeout(render90DayCalendar, 50);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -9768,6 +4356,7 @@ function saveSettings() {
 
   // Re-render dashboard with updated settings
   renderSurgeDashboard();
+  render90DayCalendar();
   closeSettings();
 }
 
@@ -9807,7 +4396,7 @@ var MP8_SEL=100;
 var S={in_mpedocs:60,in_arrivals:0,in_hour:new Date().getHours(),in_mh_load:0};
 var SURGE_FLAG_ACTIVE = false;
 var SURGE_START_OFFSET = 0;
-var SURGE_WINDOW_REDUCTION_ON = true; // can be disabled in Settings // hours before now surge started (0=now, 1=1h ago, etc.)
+var SURGE_WINDOW_REDUCTION_ON = true; // can be disabled in Settings
 
 function updateSurgeBacktimeUI() {
   var row  = document.getElementById('surge-backtime-row');
@@ -9833,6 +4422,41 @@ function adjustSurgeStartHour(delta) {
   updateSurgeBacktimeUI();
   updateForecastBars();
   renderDashboard(_cachedIliData);
+}
+
+const COMMUNITY_ILL_SCALE = {
+  6: 0.0665, 7: 0.0898, 8: 0.1208, 9: 0.1551, 10: 0.1998,
+  11: 0.2773, 12: 0.3695, 13: 0.4067, 14: 0.5142, 15: 0.5802,
+};
+
+function getCommunityIllnessMod() {
+  if (!COMMUNITY_ILL_MOD_ON) return 1.0;
+  try {
+    var scale = COMMUNITY_ILL_SCALE[SURGE_THRESH] || 0.15;
+    // P50 baselines — module-level COMM_P50, re-derived by refresh_models.py
+    // P90 caps — modifier at p90 composite ratio from training data
+    var COMM_CAP = {6:1.0510,7:1.0688,8:1.0926,9:1.1189,10:1.1532,11:1.2126,12:1.2833,13:1.3118,14:1.3942,15:1.4448};
+    var cap = COMM_CAP[SURGE_THRESH] || 1.20;
+    return Math.min(cap, 1.0 + (COMM_RATIO - 1.0) * scale);
+  } catch(e) { return 1.0; }
+}
+
+function toggleCommunityIllMod() {
+  COMMUNITY_ILL_MOD_ON = !COMMUNITY_ILL_MOD_ON;
+  var btn = document.getElementById('community-ill-toggle');
+  if (btn) {
+    btn.textContent = COMMUNITY_ILL_MOD_ON ? 'ON' : 'OFF';
+    if (COMMUNITY_ILL_MOD_ON) btn.classList.add('on');
+    else btn.classList.remove('on');
+  }
+  var status = document.getElementById('community-ill-status');
+  if (status) {
+    status.textContent = COMMUNITY_ILL_MOD_ON
+      ? 'Modifier active · weekly signal · accuracy declines with data age · Pierce Co. DMA 819'
+      : 'Modifier inactive · toggle ON to apply community illness signal';
+  }
+  renderDashboard(_cachedIliData);
+  updateForecastBars();
 }
 
 function toggleSurgeWindowReduction() {
@@ -9914,6 +4538,7 @@ function updateForecastBars(){
     var school=getSchoolStatus(ds),ev=getLocalEventModifier(ds,h),grad=getGraduationModifier(ds);
     var postEv=getPostEventModifier(ds, SURGE_THRESH);
     var fp=computeSurgeProb(h,dw,mo,school,ev.modifier,grad.modifier,iliMod,postEv.modifier);
+    if(COMMUNITY_ILL_MOD_ON) fp=Math.min(0.95, fp*getCommunityIllnessMod());
     var isSurv=false,isPers=false;
     if(!SURGE_FLAG_ACTIVE){
       if(h>=15&&h<=21&&SURGE_WINDOW_REDUCTION_ON){
@@ -10246,11 +4871,16 @@ var _tbSettings=document.getElementById('tb-settings');
 
 // ── Save as My Default ───────────────────────────────────────────────────
 function captureMyDefault(){
+  var mhThresh = parseInt(document.getElementById('mh-thresh-slider')?.value || 8);
   return {
     gradSettings: {events:GRADUATION_EVENTS, seasonStart:GRAD_SEASON_START, seasonEnd:GRAD_SEASON_END},
     shifts: {dayStart:SHIFT_DAY_START, eveStart:SHIFT_EVE_START, nightStart:SHIFT_NIGHT_START,
              dayBeds:MP_DAY_BEDS, eveBeds:MP_EVE_BEDS, nightBeds:MP_NIGHT_BEDS},
     mp8Sel: MP8_SEL,
+    surgeThresh: SURGE_THRESH,
+    surgeWindowOn: SURGE_WINDOW_REDUCTION_ON,
+    communityIllOn: COMMUNITY_ILL_MOD_ON,
+    mhThresh: mhThresh,
   };
 }
 function applyMyDefault(snap){
@@ -10287,6 +4917,29 @@ function applyMyDefault(snap){
     document.querySelectorAll('.tbtn[data-m]').forEach(function(b){b.classList.remove('on');});
     document.querySelectorAll('.tbtn[data-m="'+MP8_SEL+'"]').forEach(function(b){b.classList.add('on');});
     updateMpTick(); renderMpedocs();
+  }
+  // Surge threshold slider
+  if(snap.surgeThresh != null){
+    setThreshold(snap.surgeThresh);
+    var sl=document.getElementById('thresh-slider');
+    if(sl) sl.value=snap.surgeThresh;
+    var tv=document.getElementById('thresh-val');
+    if(tv) tv.textContent='>'+snap.surgeThresh+'/hr';
+    var td=document.getElementById('thresh-display');
+    if(td) td.textContent=snap.surgeThresh;
+  }
+  // Surge window reduction toggle
+  if(snap.surgeWindowOn != null && snap.surgeWindowOn !== SURGE_WINDOW_REDUCTION_ON){
+    toggleSurgeWindowReduction();
+  }
+  // Community illness modifier toggle
+  if(snap.communityIllOn != null && snap.communityIllOn !== COMMUNITY_ILL_MOD_ON){
+    toggleCommunityIllMod();
+  }
+  // MH threshold slider
+  if(snap.mhThresh != null){
+    var mhSl=document.getElementById('mh-thresh-slider');
+    if(mhSl){ mhSl.value=snap.mhThresh; mhSl.dispatchEvent(new Event('input')); }
   }
   renderSurgeDashboard();
 }
@@ -10481,59 +5134,70 @@ const TRENDS_BASELINE = {
     'suicide': {p25:48, p50:51, p75:55},
     'crisis hotline': {p25:0, p50:0, p75:0},
     'overdose symptoms': {p25:0, p50:0, p75:58},
+    'anxiety attack': {p25:49, p50:59, p75:69},
     'teen suicide': {p25:0, p50:0, p75:0},
     'how to commit suicide': {p25:0, p50:0, p75:0},
     'fentanyl overdose': {p25:0, p50:0, p75:0},
     'melatonin overdose': {p25:0, p50:0, p75:0},
     'Tylenol overdose': {p25:0, p50:0, p75:0},
     'MultiCare behavioral health': {p25:0, p50:0, p75:0},
-    'anxiety attack': {p25:49, p50:59, p75:69},
     'youth crisis line': {p25:0, p50:0, p75:23},
   },
+  // Embedded snapshot: week of 2026-03-28 — auto-updated weekly
   latest: {
-    'norovirus': 34,
-    'child cough': 4,
-    'Mary Bridge': 36,
-    'kids sick': 6,
-    'child fever': 9,
-    'urgent care near me': 17,
-    'croup': 5,
-    'mass shooting': 2,
-    'suicide': 47,
-    'crisis hotline': 1,
-    'overdose symptoms': 34,
-    'anxiety attack': 76,
-    'teen suicide': 27,
-    'how to commit suicide': 22,
-    'fentanyl overdose': 29,
-    'melatonin overdose': 16,
-    'Tylenol overdose': 22,
-    'MultiCare behavioral health': 5,
-    'youth crisis line': 5,
+    'norovirus':42.0,
+    'child cough':4.0,
+    'Mary Bridge':44.0,
+    'kids sick':6.0,
+    'child fever':11.0,
+    'urgent care near me':16.0,
+    'croup':5.0,
+    'mass shooting':2.0,
+    'suicide':47.0,
+    'crisis hotline':1.0,
+    'overdose symptoms':12.0,
+    'anxiety attack':26.0,
+    'teen suicide':30.0,
+    'how to commit suicide':24.0,
+    'fentanyl overdose':33.0,
+    'melatonin overdose':19.0,
+    'Tylenol overdose':25.0,
+    'MultiCare behavioral health':46.0,
+    'youth crisis line':31.0,
   },
   sparklines: {
-    'norovirus': [17, 21, 24, 30, 40, 43, 19, 28, 30, 55, 44, 34],
-    'child cough': [0, 0, 5, 0, 0, 0, 0, 5, 0, 0, 3, 4],
-    'Mary Bridge': [23, 21, 24, 30, 38, 18, 29, 24, 20, 37, 34, 36],
-    'kids sick': [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 6],
-    'child fever': [0, 0, 10, 0, 0, 0, 0, 0, 0, 1, 7, 9],
-    'urgent care near me': [13, 17, 16, 20, 16, 20, 18, 18, 14, 17, 16, 17],
-    'croup': [2, 0, 0, 2, 0, 1, 0, 0, 2, 1, 5, 5],
-    'mass shooting': [0, 0, 2, 0, 0, 5, 3, 2, 9, 0, 2, 2],
-    'suicide': [66, 51, 55, 56, 71, 71, 68, 75, 73, 62, 47, 47],
-    'crisis hotline': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-    'overdose symptoms': [0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 34, 34],
-    'anxiety attack': [0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 81, 76],
-    'teen suicide': [29, 22, 21, 36, 46, 54, 43, 42, 41, 40, 27, 27],
-    'how to commit suicide': [12, 8, 19, 24, 31, 24, 24, 23, 21, 27, 22, 22],
-    'fentanyl overdose': [44, 38, 50, 45, 45, 45, 54, 50, 54, 47, 31, 29],
-    'melatonin overdose': [19, 12, 16, 13, 22, 11, 15, 12, 12, 18, 18, 16],
-    'Tylenol overdose': [23, 26, 19, 19, 29, 24, 22, 28, 19, 26, 21, 22],
-    'MultiCare behavioral health': [0, 0, 0, 0, 0, 0, 0, 0, 14, 1, 6, 5],
-    'youth crisis line': [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 5],
+    'norovirus':          [27.0, 26.0, 31.0, 37.0, 37.0, 39.0, 37.0, 31.0, 42.0, 69.0, 53.0, 42.0],
+    'child cough':          [0.0, 0.0, 0.0, 0.0, 0.0, 7.0, 9.0, 0.0, 0.0, 1.0, 5.0, 4.0],
+    'Mary Bridge':          [35.0, 32.0, 33.0, 42.0, 32.0, 18.0, 35.0, 28.0, 46.0, 28.0, 45.0, 44.0],
+    'kids sick':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 6.0],
+    'child fever':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 10.0, 11.0],
+    'urgent care near me':          [16.0, 15.0, 12.0, 16.0, 13.0, 18.0, 20.0, 16.0, 13.0, 15.0, 15.0, 16.0],
+    'croup':          [4.0, 1.0, 0.0, 0.0, 0.0, 2.0, 2.0, 2.0, 2.0, 2.0, 5.0, 5.0],
+    'mass shooting':          [2.0, 0.0, 0.0, 0.0, 0.0, 6.0, 1.0, 0.0, 9.0, 0.0, 2.0, 2.0],
+    'suicide':          [53.0, 51.0, 57.0, 61.0, 72.0, 63.0, 66.0, 78.0, 67.0, 62.0, 46.0, 47.0],
+    'crisis hotline':          [0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+    'overdose symptoms':          [0.0, 0.0, 0.0, 0.0, 0.0, 14.0, 0.0, 0.0, 0.0, 2.0, 12.0, 12.0],
+    'anxiety attack':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.0, 26.0, 26.0],
+    'teen suicide':          [34.0, 26.0, 25.0, 38.0, 53.0, 59.0, 51.0, 40.0, 49.0, 42.0, 30.0, 30.0],
+    'how to commit suicide':          [14.0, 14.0, 26.0, 26.0, 26.0, 20.0, 21.0, 27.0, 21.0, 22.0, 24.0, 24.0],
+    'fentanyl overdose':          [54.0, 45.0, 57.0, 48.0, 52.0, 54.0, 61.0, 63.0, 61.0, 54.0, 34.0, 33.0],
+    'melatonin overdose':          [22.0, 7.0, 23.0, 19.0, 12.0, 18.0, 8.0, 17.0, 17.0, 12.0, 19.0, 19.0],
+    'Tylenol overdose':          [24.0, 31.0, 29.0, 29.0, 31.0, 27.0, 23.0, 27.0, 21.0, 25.0, 24.0, 25.0],
+    'MultiCare behavioral health':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 53.0, 46.0],
+    'youth crisis line':          [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 42.0, 31.0],
   },
-  fetched: '2026-03-25',
+  fetched: '2026-03-28',
 };
+
+
+
+
+
+
+
+
+
+
 
 
 const TRENDS_META = {
@@ -10581,7 +5245,7 @@ function renderCommunitySignal() {
   var fetched = data.fetched || TRENDS_BASELINE.fetched;
 
   // Days since last update
-  var daysSince = Math.floor((new Date() - new Date(fetched)) / 86400000);
+  var daysSince = Math.floor((new Date(new Date().toDateString()) - new Date(fetched + 'T00:00:00')) / 86400000);
   var staleBadge = daysSince > 30
     ? '<span style="color:#ff4d6d;font-size:9px;font-family:\'Space Mono\',monospace;">⚠️ '+daysSince+'d old — refresh in Settings</span>'
     : '<span style="color:#8892b0;font-size:9px;font-family:\'Space Mono\',monospace;">updated '+daysSince+'d ago</span>';
@@ -10773,7 +5437,7 @@ function renderMHTrends() {
   var sparks = data.sparklines || TRENDS_BASELINE.sparklines;
   var fetched = data.fetched || TRENDS_BASELINE.fetched;
 
-  var daysSince = Math.floor((new Date() - new Date(fetched)) / 86400000);
+  var daysSince = Math.floor((new Date(new Date().toDateString()) - new Date(fetched + 'T00:00:00')) / 86400000);
   var staleNote = daysSince > 30 ? ' · <span style="color:#ff4d6d;">⚠ '+daysSince+'d old</span>' : '';
 
   var groups = [
