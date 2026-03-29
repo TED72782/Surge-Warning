@@ -1275,6 +1275,50 @@ to { opacity:1; transform:translateY(0); }
 
   <!-- Late Night Surge Risk -->
 
+  <!-- Surge Profile -->
+  <div class="sdiv">Surge Profile · Expected Visit Composition</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Provides an hour-block-aware forecast of the expected patient mix during a surge window — including age distribution, chief complaint breakdown, and arrival method — without requiring any staff input.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Training data:</span> N=146,164 ED visits, 2023–2025, Mary Bridge Children's ED. All percentages are empirically derived from observed visit composition within each cell.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Key structure:</span> Three lookup tables keyed by <code>[month][day-of-week][hour-block]</code>. Hour blocks: Overnight (00–06), Morning (07–11), Afternoon (12–17), Evening (18–23). This 4-block scheme captures the dominant within-day variation in case mix while remaining robust to low cell counts at individual hours.</div>
+
+      <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Age Distribution · SURGE_PROFILE</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#ff4d6d;">Infant</span><span>&lt;1 yr — febrile neonates, RSV, sepsis r/o; highest overnight share</span>
+        <span style="color:#ff9a3c;">Toddler</span><span>1–4 yr — largest single band; respiratory, GI, febrile illness dominant</span>
+        <span style="color:#60a5fa;">School-age</span><span>5–12 yr — peaks afternoon/evening; injury and ENT shift up</span>
+        <span style="color:#a78bfa;">Teen</span><span>13–17 yr — MH share highest; evening predominance; lowest in overnight</span>
+      </div>
+
+      <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Chief Complaint Mix · SURGE_CC_MIX</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#39d98a;">Respiratory</span><span>Peaks Jan–Mar overnight; declines sharply in summer months</span>
+        <span style="color:#ffd166;">GI</span><span>Relatively stable year-round; modest overnight elevation</span>
+        <span style="color:#ff9a3c;">Injury</span><span>Peaks afternoon/evening and summer; low overnight</span>
+        <span style="color:#ff4d6d;">Fever</span><span>Tracks respiratory season; high infant correlation</span>
+        <span style="color:#60a5fa;">ENT</span><span>Ear and throat complaints; moderate elevation Sep–Feb</span>
+        <span style="color:#a78bfa;">Mental Health</span><span>Teen-driven; evening predominance; weekly rhythm (Mon/Fri peaks)</span>
+        <span style="color:#2a2e42;border:1px solid var(--border);border-radius:2px;padding:0 3px;">Other</span><span>Residual — urologic, dermatologic, neurology, other undifferentiated</span>
+      </div>
+
+      <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Arrival Method · SURGE_EMS_PCT · SURGE_TRANSPORT_PCT</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:9px;font-family:'Space Mono',monospace;">
+        <span style="color:#ff4d6d;">EMS / Ambulance</span><span>911 response (BLS, ALS, fire). Mean 5.9%. Elevated overnight and in winter. Signals higher-acuity mix and bay reservation need.</span>
+        <span style="color:#ffd166;">Transport Team</span><span>Interfacility transfers. Mean 1.6%. Spikes are month × DOW specific. Expect handoff paperwork and higher baseline acuity.</span>
+        <span style="color:#2a2e42;border:1px solid var(--border);border-radius:2px;padding:0 3px;">Walk-in / POV</span><span>Private vehicle or walk-in. Comprises ~92% of arrivals. Dominant during daytime and summer months.</span>
+      </div>
+
+      <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Navigation &amp; Staffing Signal</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.7;">
+        <div>The ±6h navigation buttons step the profile forward or backward in 6-hour increments, allowing staff to preview the expected composition of the next shift block before it arrives.</div>
+        <div style="margin-top:4px;">The <span style="color:var(--accent);font-family:'Space Mono',monospace;font-size:9px;">STAFFING SIGNAL</span> narrative is generated from threshold rules on the displayed CC and arrival mode percentages — e.g. respiratory ≥20% triggers nebulizer/isolation advisory; MH ≥8% triggers BH staffing note; EMS ≥8% triggers bay reservation advisory. Thresholds are fixed empirical cutoffs, not model outputs.</div>
+      </div>
+
+      <div style="margin-top:8px;font-size:9px;color:#4a5568;">All three tables derived from 146,164 visits stratified by month × DOW × hour-block (4 blocks × 7 DOW × 12 months = 336 cells per table). Minimum cell N ≈ 45 visits; cells with insufficient data fall back to a displayed notice. Tables are static — refresh requires re-running the derivation script against updated Throughput.csv.</div>
+    </div>
+  </div>
+
   <!-- Model Decisions -->
   <!-- 24h Arrivals Forecast -->
   <div class="sdiv">24-Hour Arrivals Forecast</div>
@@ -2548,6 +2592,5681 @@ let SURGE_BY_MONTH = SBM_BY_THRESH['10'];
 
 // Day-of-week marginal surge rates (constant — not threshold-dependent in display)
 const SURGE_BY_DOW = [0.22, 0.175, 0.178, 0.167, 0.142, 0.11, 0.136];
+
+// ── SURGE PROFILE TABLES v3 (hour-block aware, 6 CC categories, 146K visits) ──
+// Keys: [month][dow][hblock]  hblock: 0=overnight(0-6), 1=morning(7-11), 2=afternoon(12-17), 3=evening(18-23)
+const SURGE_PROFILE = {
+  "1": {
+    "0": {
+      "0": {
+        "infant": 23.3,
+        "toddler": 35.3,
+        "school": 23.7,
+        "teen": 17.7
+      },
+      "1": {
+        "infant": 15.3,
+        "toddler": 33.6,
+        "school": 36.1,
+        "teen": 15.0
+      },
+      "2": {
+        "infant": 19.3,
+        "toddler": 34.2,
+        "school": 29.5,
+        "teen": 17.0
+      },
+      "3": {
+        "infant": 17.2,
+        "toddler": 36.4,
+        "school": 28.9,
+        "teen": 17.5
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 19.9,
+        "toddler": 44.1,
+        "school": 20.9,
+        "teen": 15.2
+      },
+      "1": {
+        "infant": 14.7,
+        "toddler": 29.5,
+        "school": 34.5,
+        "teen": 21.3
+      },
+      "2": {
+        "infant": 14.1,
+        "toddler": 30.5,
+        "school": 35.7,
+        "teen": 19.7
+      },
+      "3": {
+        "infant": 22.3,
+        "toddler": 30.2,
+        "school": 33.3,
+        "teen": 14.2
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 22.0,
+        "toddler": 35.2,
+        "school": 29.5,
+        "teen": 13.2
+      },
+      "1": {
+        "infant": 15.2,
+        "toddler": 32.6,
+        "school": 34.5,
+        "teen": 17.6
+      },
+      "2": {
+        "infant": 16.0,
+        "toddler": 30.7,
+        "school": 34.6,
+        "teen": 18.7
+      },
+      "3": {
+        "infant": 17.8,
+        "toddler": 35.3,
+        "school": 27.7,
+        "teen": 19.1
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 22.3,
+        "toddler": 35.7,
+        "school": 27.2,
+        "teen": 14.7
+      },
+      "1": {
+        "infant": 13.0,
+        "toddler": 32.6,
+        "school": 33.7,
+        "teen": 20.7
+      },
+      "2": {
+        "infant": 17.4,
+        "toddler": 31.9,
+        "school": 33.3,
+        "teen": 17.4
+      },
+      "3": {
+        "infant": 17.7,
+        "toddler": 36.4,
+        "school": 28.3,
+        "teen": 17.7
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 23.3,
+        "toddler": 35.8,
+        "school": 28.8,
+        "teen": 12.1
+      },
+      "1": {
+        "infant": 13.9,
+        "toddler": 32.5,
+        "school": 34.1,
+        "teen": 19.4
+      },
+      "2": {
+        "infant": 16.6,
+        "toddler": 30.6,
+        "school": 32.1,
+        "teen": 20.7
+      },
+      "3": {
+        "infant": 19.4,
+        "toddler": 34.0,
+        "school": 27.6,
+        "teen": 19.0
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 22.2,
+        "toddler": 42.4,
+        "school": 20.7,
+        "teen": 14.8
+      },
+      "1": {
+        "infant": 18.2,
+        "toddler": 35.0,
+        "school": 32.8,
+        "teen": 13.9
+      },
+      "2": {
+        "infant": 19.5,
+        "toddler": 35.0,
+        "school": 29.9,
+        "teen": 15.7
+      },
+      "3": {
+        "infant": 13.7,
+        "toddler": 39.6,
+        "school": 32.8,
+        "teen": 13.9
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 22.0,
+        "toddler": 40.7,
+        "school": 21.5,
+        "teen": 15.9
+      },
+      "1": {
+        "infant": 17.7,
+        "toddler": 37.3,
+        "school": 30.0,
+        "teen": 15.0
+      },
+      "2": {
+        "infant": 17.6,
+        "toddler": 36.2,
+        "school": 33.5,
+        "teen": 12.7
+      },
+      "3": {
+        "infant": 18.7,
+        "toddler": 35.4,
+        "school": 29.7,
+        "teen": 16.2
+      }
+    }
+  },
+  "2": {
+    "0": {
+      "0": {
+        "infant": 21.3,
+        "toddler": 38.3,
+        "school": 27.8,
+        "teen": 12.6
+      },
+      "1": {
+        "infant": 13.3,
+        "toddler": 30.5,
+        "school": 40.3,
+        "teen": 15.9
+      },
+      "2": {
+        "infant": 14.9,
+        "toddler": 34.0,
+        "school": 33.9,
+        "teen": 17.2
+      },
+      "3": {
+        "infant": 14.5,
+        "toddler": 34.5,
+        "school": 35.4,
+        "teen": 15.6
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 18.3,
+        "toddler": 36.6,
+        "school": 30.2,
+        "teen": 14.9
+      },
+      "1": {
+        "infant": 12.4,
+        "toddler": 33.0,
+        "school": 38.8,
+        "teen": 15.8
+      },
+      "2": {
+        "infant": 14.1,
+        "toddler": 34.1,
+        "school": 35.0,
+        "teen": 16.7
+      },
+      "3": {
+        "infant": 17.5,
+        "toddler": 30.3,
+        "school": 34.7,
+        "teen": 17.5
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 19.5,
+        "toddler": 35.0,
+        "school": 33.0,
+        "teen": 12.5
+      },
+      "1": {
+        "infant": 14.0,
+        "toddler": 34.8,
+        "school": 34.8,
+        "teen": 16.5
+      },
+      "2": {
+        "infant": 14.6,
+        "toddler": 28.3,
+        "school": 38.1,
+        "teen": 18.9
+      },
+      "3": {
+        "infant": 15.6,
+        "toddler": 32.4,
+        "school": 35.8,
+        "teen": 16.3
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 15.5,
+        "toddler": 34.2,
+        "school": 34.8,
+        "teen": 15.5
+      },
+      "1": {
+        "infant": 11.6,
+        "toddler": 29.6,
+        "school": 42.7,
+        "teen": 16.1
+      },
+      "2": {
+        "infant": 12.7,
+        "toddler": 33.4,
+        "school": 34.8,
+        "teen": 19.1
+      },
+      "3": {
+        "infant": 16.8,
+        "toddler": 30.6,
+        "school": 35.5,
+        "teen": 17.1
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 24.2,
+        "toddler": 39.9,
+        "school": 22.2,
+        "teen": 13.6
+      },
+      "1": {
+        "infant": 14.2,
+        "toddler": 30.8,
+        "school": 36.2,
+        "teen": 18.8
+      },
+      "2": {
+        "infant": 15.2,
+        "toddler": 31.8,
+        "school": 37.2,
+        "teen": 15.9
+      },
+      "3": {
+        "infant": 19.4,
+        "toddler": 31.6,
+        "school": 33.0,
+        "teen": 16.0
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 19.9,
+        "toddler": 42.0,
+        "school": 25.0,
+        "teen": 13.1
+      },
+      "1": {
+        "infant": 16.1,
+        "toddler": 36.1,
+        "school": 33.6,
+        "teen": 14.3
+      },
+      "2": {
+        "infant": 14.1,
+        "toddler": 36.2,
+        "school": 34.3,
+        "teen": 15.3
+      },
+      "3": {
+        "infant": 13.6,
+        "toddler": 41.4,
+        "school": 31.4,
+        "teen": 13.6
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 17.5,
+        "toddler": 39.3,
+        "school": 34.0,
+        "teen": 9.2
+      },
+      "1": {
+        "infant": 11.7,
+        "toddler": 38.0,
+        "school": 38.6,
+        "teen": 11.7
+      },
+      "2": {
+        "infant": 16.2,
+        "toddler": 37.0,
+        "school": 32.5,
+        "teen": 14.4
+      },
+      "3": {
+        "infant": 14.8,
+        "toddler": 37.3,
+        "school": 30.5,
+        "teen": 17.5
+      }
+    }
+  },
+  "3": {
+    "0": {
+      "0": {
+        "infant": 14.5,
+        "toddler": 40.0,
+        "school": 31.8,
+        "teen": 13.6
+      },
+      "1": {
+        "infant": 12.9,
+        "toddler": 36.3,
+        "school": 32.6,
+        "teen": 18.1
+      },
+      "2": {
+        "infant": 15.8,
+        "toddler": 27.7,
+        "school": 37.1,
+        "teen": 19.4
+      },
+      "3": {
+        "infant": 17.0,
+        "toddler": 31.0,
+        "school": 35.6,
+        "teen": 16.4
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 16.7,
+        "toddler": 40.2,
+        "school": 28.9,
+        "teen": 14.2
+      },
+      "1": {
+        "infant": 12.9,
+        "toddler": 32.3,
+        "school": 38.1,
+        "teen": 16.7
+      },
+      "2": {
+        "infant": 13.9,
+        "toddler": 29.6,
+        "school": 35.9,
+        "teen": 20.7
+      },
+      "3": {
+        "infant": 15.1,
+        "toddler": 33.9,
+        "school": 34.5,
+        "teen": 16.5
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 17.6,
+        "toddler": 42.0,
+        "school": 26.9,
+        "teen": 13.5
+      },
+      "1": {
+        "infant": 12.5,
+        "toddler": 35.3,
+        "school": 35.8,
+        "teen": 16.4
+      },
+      "2": {
+        "infant": 15.0,
+        "toddler": 30.7,
+        "school": 34.6,
+        "teen": 19.7
+      },
+      "3": {
+        "infant": 17.1,
+        "toddler": 31.6,
+        "school": 32.7,
+        "teen": 18.6
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 21.2,
+        "toddler": 36.8,
+        "school": 30.7,
+        "teen": 11.3
+      },
+      "1": {
+        "infant": 15.3,
+        "toddler": 23.9,
+        "school": 42.5,
+        "teen": 18.3
+      },
+      "2": {
+        "infant": 14.6,
+        "toddler": 29.3,
+        "school": 36.3,
+        "teen": 19.7
+      },
+      "3": {
+        "infant": 15.8,
+        "toddler": 36.1,
+        "school": 31.9,
+        "teen": 16.2
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 19.3,
+        "toddler": 42.5,
+        "school": 26.5,
+        "teen": 11.6
+      },
+      "1": {
+        "infant": 11.7,
+        "toddler": 34.1,
+        "school": 36.6,
+        "teen": 17.6
+      },
+      "2": {
+        "infant": 16.3,
+        "toddler": 30.0,
+        "school": 34.9,
+        "teen": 18.8
+      },
+      "3": {
+        "infant": 14.2,
+        "toddler": 37.0,
+        "school": 31.8,
+        "teen": 16.9
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 19.5,
+        "toddler": 35.2,
+        "school": 32.4,
+        "teen": 12.9
+      },
+      "1": {
+        "infant": 15.7,
+        "toddler": 32.6,
+        "school": 38.1,
+        "teen": 13.7
+      },
+      "2": {
+        "infant": 14.8,
+        "toddler": 34.5,
+        "school": 35.6,
+        "teen": 15.2
+      },
+      "3": {
+        "infant": 14.8,
+        "toddler": 36.3,
+        "school": 34.1,
+        "teen": 14.8
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 17.7,
+        "toddler": 39.9,
+        "school": 31.9,
+        "teen": 10.5
+      },
+      "1": {
+        "infant": 15.1,
+        "toddler": 40.0,
+        "school": 35.5,
+        "teen": 9.4
+      },
+      "2": {
+        "infant": 16.3,
+        "toddler": 33.4,
+        "school": 34.9,
+        "teen": 15.4
+      },
+      "3": {
+        "infant": 13.0,
+        "toddler": 39.3,
+        "school": 32.0,
+        "teen": 15.8
+      }
+    }
+  },
+  "4": {
+    "0": {
+      "0": {
+        "infant": 19.8,
+        "toddler": 34.6,
+        "school": 30.8,
+        "teen": 14.8
+      },
+      "1": {
+        "infant": 13.9,
+        "toddler": 31.6,
+        "school": 36.8,
+        "teen": 17.7
+      },
+      "2": {
+        "infant": 14.4,
+        "toddler": 31.8,
+        "school": 34.6,
+        "teen": 19.2
+      },
+      "3": {
+        "infant": 13.7,
+        "toddler": 35.9,
+        "school": 34.9,
+        "teen": 15.4
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 19.0,
+        "toddler": 36.0,
+        "school": 29.4,
+        "teen": 15.6
+      },
+      "1": {
+        "infant": 12.8,
+        "toddler": 33.1,
+        "school": 37.6,
+        "teen": 16.5
+      },
+      "2": {
+        "infant": 12.1,
+        "toddler": 30.4,
+        "school": 36.4,
+        "teen": 21.1
+      },
+      "3": {
+        "infant": 15.1,
+        "toddler": 34.6,
+        "school": 34.3,
+        "teen": 16.0
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 16.0,
+        "toddler": 42.0,
+        "school": 28.2,
+        "teen": 13.8
+      },
+      "1": {
+        "infant": 16.4,
+        "toddler": 34.7,
+        "school": 30.6,
+        "teen": 18.3
+      },
+      "2": {
+        "infant": 14.1,
+        "toddler": 34.2,
+        "school": 31.3,
+        "teen": 20.4
+      },
+      "3": {
+        "infant": 15.3,
+        "toddler": 31.8,
+        "school": 35.3,
+        "teen": 17.7
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 16.8,
+        "toddler": 38.4,
+        "school": 30.3,
+        "teen": 14.6
+      },
+      "1": {
+        "infant": 15.9,
+        "toddler": 33.0,
+        "school": 33.0,
+        "teen": 18.0
+      },
+      "2": {
+        "infant": 13.9,
+        "toddler": 31.6,
+        "school": 38.2,
+        "teen": 16.3
+      },
+      "3": {
+        "infant": 19.0,
+        "toddler": 32.7,
+        "school": 29.8,
+        "teen": 18.4
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 18.7,
+        "toddler": 43.3,
+        "school": 24.1,
+        "teen": 13.8
+      },
+      "1": {
+        "infant": 13.6,
+        "toddler": 34.6,
+        "school": 34.0,
+        "teen": 17.9
+      },
+      "2": {
+        "infant": 13.0,
+        "toddler": 35.3,
+        "school": 34.3,
+        "teen": 17.4
+      },
+      "3": {
+        "infant": 15.8,
+        "toddler": 36.3,
+        "school": 32.0,
+        "teen": 15.8
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 22.4,
+        "toddler": 34.3,
+        "school": 26.9,
+        "teen": 16.4
+      },
+      "1": {
+        "infant": 18.2,
+        "toddler": 43.5,
+        "school": 26.8,
+        "teen": 11.5
+      },
+      "2": {
+        "infant": 14.9,
+        "toddler": 37.1,
+        "school": 34.7,
+        "teen": 13.3
+      },
+      "3": {
+        "infant": 16.8,
+        "toddler": 37.2,
+        "school": 32.7,
+        "teen": 13.3
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 21.8,
+        "toddler": 38.9,
+        "school": 23.2,
+        "teen": 16.1
+      },
+      "1": {
+        "infant": 13.6,
+        "toddler": 37.5,
+        "school": 33.6,
+        "teen": 15.4
+      },
+      "2": {
+        "infant": 13.8,
+        "toddler": 38.3,
+        "school": 33.5,
+        "teen": 14.4
+      },
+      "3": {
+        "infant": 11.8,
+        "toddler": 37.3,
+        "school": 35.6,
+        "teen": 15.3
+      }
+    }
+  },
+  "5": {
+    "0": {
+      "0": {
+        "infant": 21.4,
+        "toddler": 37.9,
+        "school": 27.2,
+        "teen": 13.6
+      },
+      "1": {
+        "infant": 11.6,
+        "toddler": 34.5,
+        "school": 38.0,
+        "teen": 15.9
+      },
+      "2": {
+        "infant": 14.1,
+        "toddler": 30.7,
+        "school": 34.0,
+        "teen": 21.2
+      },
+      "3": {
+        "infant": 15.0,
+        "toddler": 33.0,
+        "school": 37.5,
+        "teen": 14.6
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 13.4,
+        "toddler": 39.2,
+        "school": 27.3,
+        "teen": 20.1
+      },
+      "1": {
+        "infant": 13.4,
+        "toddler": 29.5,
+        "school": 37.4,
+        "teen": 19.7
+      },
+      "2": {
+        "infant": 13.6,
+        "toddler": 30.0,
+        "school": 36.1,
+        "teen": 20.2
+      },
+      "3": {
+        "infant": 16.0,
+        "toddler": 32.2,
+        "school": 36.9,
+        "teen": 14.8
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 15.7,
+        "toddler": 38.2,
+        "school": 31.4,
+        "teen": 14.7
+      },
+      "1": {
+        "infant": 11.1,
+        "toddler": 31.7,
+        "school": 35.4,
+        "teen": 21.9
+      },
+      "2": {
+        "infant": 12.6,
+        "toddler": 31.5,
+        "school": 34.6,
+        "teen": 21.2
+      },
+      "3": {
+        "infant": 15.3,
+        "toddler": 32.3,
+        "school": 35.5,
+        "teen": 16.9
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 20.0,
+        "toddler": 34.0,
+        "school": 28.8,
+        "teen": 17.2
+      },
+      "1": {
+        "infant": 12.4,
+        "toddler": 34.3,
+        "school": 34.0,
+        "teen": 19.3
+      },
+      "2": {
+        "infant": 13.4,
+        "toddler": 28.6,
+        "school": 38.4,
+        "teen": 19.6
+      },
+      "3": {
+        "infant": 16.5,
+        "toddler": 34.6,
+        "school": 33.6,
+        "teen": 15.4
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 18.3,
+        "toddler": 33.3,
+        "school": 31.5,
+        "teen": 16.9
+      },
+      "1": {
+        "infant": 12.3,
+        "toddler": 32.6,
+        "school": 37.3,
+        "teen": 17.8
+      },
+      "2": {
+        "infant": 13.2,
+        "toddler": 29.3,
+        "school": 36.2,
+        "teen": 21.3
+      },
+      "3": {
+        "infant": 14.7,
+        "toddler": 35.4,
+        "school": 36.2,
+        "teen": 13.6
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 21.1,
+        "toddler": 31.1,
+        "school": 30.1,
+        "teen": 17.7
+      },
+      "1": {
+        "infant": 15.7,
+        "toddler": 36.1,
+        "school": 35.1,
+        "teen": 13.1
+      },
+      "2": {
+        "infant": 16.1,
+        "toddler": 31.9,
+        "school": 37.7,
+        "teen": 14.4
+      },
+      "3": {
+        "infant": 14.8,
+        "toddler": 36.1,
+        "school": 33.8,
+        "teen": 15.3
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 12.7,
+        "toddler": 38.1,
+        "school": 33.9,
+        "teen": 15.3
+      },
+      "1": {
+        "infant": 16.1,
+        "toddler": 37.2,
+        "school": 35.6,
+        "teen": 11.1
+      },
+      "2": {
+        "infant": 15.4,
+        "toddler": 37.4,
+        "school": 31.8,
+        "teen": 15.4
+      },
+      "3": {
+        "infant": 14.6,
+        "toddler": 33.9,
+        "school": 38.4,
+        "teen": 13.1
+      }
+    }
+  },
+  "6": {
+    "0": {
+      "0": {
+        "infant": 18.8,
+        "toddler": 32.6,
+        "school": 32.6,
+        "teen": 16.0
+      },
+      "1": {
+        "infant": 16.5,
+        "toddler": 38.6,
+        "school": 30.0,
+        "teen": 14.9
+      },
+      "2": {
+        "infant": 16.7,
+        "toddler": 29.1,
+        "school": 39.5,
+        "teen": 14.8
+      },
+      "3": {
+        "infant": 14.0,
+        "toddler": 35.4,
+        "school": 33.9,
+        "teen": 16.6
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 19.0,
+        "toddler": 36.5,
+        "school": 28.6,
+        "teen": 15.9
+      },
+      "1": {
+        "infant": 14.7,
+        "toddler": 32.3,
+        "school": 32.7,
+        "teen": 20.3
+      },
+      "2": {
+        "infant": 15.8,
+        "toddler": 33.8,
+        "school": 34.2,
+        "teen": 16.2
+      },
+      "3": {
+        "infant": 16.8,
+        "toddler": 33.8,
+        "school": 32.8,
+        "teen": 16.6
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 20.3,
+        "toddler": 28.5,
+        "school": 37.2,
+        "teen": 14.0
+      },
+      "1": {
+        "infant": 10.4,
+        "toddler": 33.9,
+        "school": 35.6,
+        "teen": 20.1
+      },
+      "2": {
+        "infant": 12.9,
+        "toddler": 32.8,
+        "school": 36.9,
+        "teen": 17.5
+      },
+      "3": {
+        "infant": 17.3,
+        "toddler": 33.6,
+        "school": 33.4,
+        "teen": 15.8
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 16.6,
+        "toddler": 33.7,
+        "school": 36.8,
+        "teen": 13.0
+      },
+      "1": {
+        "infant": 12.6,
+        "toddler": 31.6,
+        "school": 35.7,
+        "teen": 20.1
+      },
+      "2": {
+        "infant": 14.5,
+        "toddler": 31.3,
+        "school": 35.7,
+        "teen": 18.5
+      },
+      "3": {
+        "infant": 16.5,
+        "toddler": 33.2,
+        "school": 33.4,
+        "teen": 16.9
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 19.5,
+        "toddler": 33.7,
+        "school": 32.7,
+        "teen": 14.1
+      },
+      "1": {
+        "infant": 15.7,
+        "toddler": 32.0,
+        "school": 35.9,
+        "teen": 16.4
+      },
+      "2": {
+        "infant": 15.9,
+        "toddler": 33.1,
+        "school": 33.3,
+        "teen": 17.6
+      },
+      "3": {
+        "infant": 17.0,
+        "toddler": 33.0,
+        "school": 34.2,
+        "teen": 15.8
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 14.0,
+        "toddler": 42.0,
+        "school": 30.9,
+        "teen": 13.0
+      },
+      "1": {
+        "infant": 16.4,
+        "toddler": 40.6,
+        "school": 29.7,
+        "teen": 13.3
+      },
+      "2": {
+        "infant": 15.0,
+        "toddler": 35.8,
+        "school": 36.2,
+        "teen": 13.0
+      },
+      "3": {
+        "infant": 13.3,
+        "toddler": 32.6,
+        "school": 38.3,
+        "teen": 15.8
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 22.5,
+        "toddler": 33.9,
+        "school": 28.0,
+        "teen": 15.7
+      },
+      "1": {
+        "infant": 15.5,
+        "toddler": 36.0,
+        "school": 33.7,
+        "teen": 14.8
+      },
+      "2": {
+        "infant": 14.3,
+        "toddler": 32.5,
+        "school": 35.0,
+        "teen": 18.2
+      },
+      "3": {
+        "infant": 13.4,
+        "toddler": 36.2,
+        "school": 35.0,
+        "teen": 15.4
+      }
+    }
+  },
+  "7": {
+    "0": {
+      "0": {
+        "infant": 23.8,
+        "toddler": 30.4,
+        "school": 27.6,
+        "teen": 18.2
+      },
+      "1": {
+        "infant": 16.7,
+        "toddler": 38.0,
+        "school": 31.2,
+        "teen": 14.1
+      },
+      "2": {
+        "infant": 17.1,
+        "toddler": 34.6,
+        "school": 29.8,
+        "teen": 18.4
+      },
+      "3": {
+        "infant": 16.4,
+        "toddler": 32.9,
+        "school": 33.7,
+        "teen": 17.0
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 17.8,
+        "toddler": 37.9,
+        "school": 23.7,
+        "teen": 20.7
+      },
+      "1": {
+        "infant": 16.7,
+        "toddler": 34.2,
+        "school": 32.4,
+        "teen": 16.7
+      },
+      "2": {
+        "infant": 16.8,
+        "toddler": 36.8,
+        "school": 31.1,
+        "teen": 15.3
+      },
+      "3": {
+        "infant": 13.2,
+        "toddler": 35.4,
+        "school": 34.3,
+        "teen": 17.1
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 17.0,
+        "toddler": 33.0,
+        "school": 28.4,
+        "teen": 21.6
+      },
+      "1": {
+        "infant": 19.8,
+        "toddler": 37.7,
+        "school": 29.8,
+        "teen": 12.7
+      },
+      "2": {
+        "infant": 18.8,
+        "toddler": 34.9,
+        "school": 30.3,
+        "teen": 16.0
+      },
+      "3": {
+        "infant": 14.2,
+        "toddler": 35.2,
+        "school": 35.5,
+        "teen": 15.1
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 21.8,
+        "toddler": 37.3,
+        "school": 23.2,
+        "teen": 17.6
+      },
+      "1": {
+        "infant": 16.3,
+        "toddler": 36.1,
+        "school": 32.7,
+        "teen": 14.9
+      },
+      "2": {
+        "infant": 16.9,
+        "toddler": 32.5,
+        "school": 33.4,
+        "teen": 17.2
+      },
+      "3": {
+        "infant": 14.8,
+        "toddler": 34.0,
+        "school": 33.1,
+        "teen": 18.1
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 18.1,
+        "toddler": 30.2,
+        "school": 34.9,
+        "teen": 16.8
+      },
+      "1": {
+        "infant": 18.3,
+        "toddler": 42.0,
+        "school": 26.3,
+        "teen": 13.4
+      },
+      "2": {
+        "infant": 17.7,
+        "toddler": 32.9,
+        "school": 33.3,
+        "teen": 16.1
+      },
+      "3": {
+        "infant": 17.1,
+        "toddler": 30.1,
+        "school": 35.0,
+        "teen": 17.8
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 20.9,
+        "toddler": 31.4,
+        "school": 30.2,
+        "teen": 17.4
+      },
+      "1": {
+        "infant": 16.4,
+        "toddler": 33.8,
+        "school": 35.7,
+        "teen": 14.1
+      },
+      "2": {
+        "infant": 14.6,
+        "toddler": 37.4,
+        "school": 31.4,
+        "teen": 16.6
+      },
+      "3": {
+        "infant": 16.0,
+        "toddler": 34.2,
+        "school": 31.9,
+        "teen": 17.9
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 21.6,
+        "toddler": 27.8,
+        "school": 32.5,
+        "teen": 18.0
+      },
+      "1": {
+        "infant": 16.8,
+        "toddler": 31.2,
+        "school": 35.2,
+        "teen": 16.8
+      },
+      "2": {
+        "infant": 16.3,
+        "toddler": 34.7,
+        "school": 33.3,
+        "teen": 15.7
+      },
+      "3": {
+        "infant": 15.9,
+        "toddler": 33.5,
+        "school": 34.2,
+        "teen": 16.4
+      }
+    }
+  },
+  "8": {
+    "0": {
+      "0": {
+        "infant": 21.3,
+        "toddler": 32.0,
+        "school": 24.7,
+        "teen": 22.0
+      },
+      "1": {
+        "infant": 14.4,
+        "toddler": 34.3,
+        "school": 39.3,
+        "teen": 11.9
+      },
+      "2": {
+        "infant": 20.7,
+        "toddler": 32.4,
+        "school": 28.1,
+        "teen": 18.9
+      },
+      "3": {
+        "infant": 17.3,
+        "toddler": 29.6,
+        "school": 33.6,
+        "teen": 19.5
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 22.9,
+        "toddler": 32.5,
+        "school": 28.7,
+        "teen": 15.9
+      },
+      "1": {
+        "infant": 17.6,
+        "toddler": 38.2,
+        "school": 29.0,
+        "teen": 15.1
+      },
+      "2": {
+        "infant": 17.1,
+        "toddler": 29.4,
+        "school": 33.9,
+        "teen": 19.6
+      },
+      "3": {
+        "infant": 15.9,
+        "toddler": 33.4,
+        "school": 33.4,
+        "teen": 17.3
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 20.5,
+        "toddler": 45.0,
+        "school": 25.2,
+        "teen": 9.3
+      },
+      "1": {
+        "infant": 18.1,
+        "toddler": 35.2,
+        "school": 30.7,
+        "teen": 16.1
+      },
+      "2": {
+        "infant": 17.2,
+        "toddler": 36.4,
+        "school": 28.9,
+        "teen": 17.4
+      },
+      "3": {
+        "infant": 19.8,
+        "toddler": 32.2,
+        "school": 32.0,
+        "teen": 15.9
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 20.8,
+        "toddler": 30.5,
+        "school": 26.0,
+        "teen": 22.7
+      },
+      "1": {
+        "infant": 15.9,
+        "toddler": 39.4,
+        "school": 30.7,
+        "teen": 13.9
+      },
+      "2": {
+        "infant": 18.6,
+        "toddler": 35.5,
+        "school": 30.7,
+        "teen": 15.2
+      },
+      "3": {
+        "infant": 14.4,
+        "toddler": 32.4,
+        "school": 31.4,
+        "teen": 21.8
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 18.1,
+        "toddler": 34.1,
+        "school": 29.0,
+        "teen": 18.8
+      },
+      "1": {
+        "infant": 18.9,
+        "toddler": 39.5,
+        "school": 30.5,
+        "teen": 11.1
+      },
+      "2": {
+        "infant": 18.1,
+        "toddler": 33.9,
+        "school": 29.1,
+        "teen": 18.8
+      },
+      "3": {
+        "infant": 17.0,
+        "toddler": 36.6,
+        "school": 28.2,
+        "teen": 18.3
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 24.3,
+        "toddler": 30.9,
+        "school": 33.1,
+        "teen": 11.6
+      },
+      "1": {
+        "infant": 18.7,
+        "toddler": 36.9,
+        "school": 28.0,
+        "teen": 16.4
+      },
+      "2": {
+        "infant": 18.1,
+        "toddler": 34.4,
+        "school": 28.0,
+        "teen": 19.5
+      },
+      "3": {
+        "infant": 15.3,
+        "toddler": 31.8,
+        "school": 36.4,
+        "teen": 16.5
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 20.1,
+        "toddler": 33.8,
+        "school": 26.6,
+        "teen": 19.5
+      },
+      "1": {
+        "infant": 21.9,
+        "toddler": 36.2,
+        "school": 29.9,
+        "teen": 12.1
+      },
+      "2": {
+        "infant": 15.7,
+        "toddler": 33.7,
+        "school": 35.0,
+        "teen": 15.7
+      },
+      "3": {
+        "infant": 19.2,
+        "toddler": 30.8,
+        "school": 33.0,
+        "teen": 17.0
+      }
+    }
+  },
+  "9": {
+    "0": {
+      "0": {
+        "infant": 20.2,
+        "toddler": 40.5,
+        "school": 25.6,
+        "teen": 13.7
+      },
+      "1": {
+        "infant": 10.0,
+        "toddler": 26.2,
+        "school": 41.2,
+        "teen": 22.6
+      },
+      "2": {
+        "infant": 16.9,
+        "toddler": 28.8,
+        "school": 32.3,
+        "teen": 22.0
+      },
+      "3": {
+        "infant": 16.4,
+        "toddler": 32.0,
+        "school": 32.0,
+        "teen": 19.6
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 20.6,
+        "toddler": 40.0,
+        "school": 23.6,
+        "teen": 15.8
+      },
+      "1": {
+        "infant": 12.3,
+        "toddler": 29.1,
+        "school": 33.9,
+        "teen": 24.6
+      },
+      "2": {
+        "infant": 16.9,
+        "toddler": 27.6,
+        "school": 34.0,
+        "teen": 21.5
+      },
+      "3": {
+        "infant": 17.2,
+        "toddler": 30.1,
+        "school": 32.5,
+        "teen": 20.2
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 31.5,
+        "toddler": 30.7,
+        "school": 27.6,
+        "teen": 10.2
+      },
+      "1": {
+        "infant": 12.2,
+        "toddler": 30.9,
+        "school": 29.5,
+        "teen": 27.4
+      },
+      "2": {
+        "infant": 17.6,
+        "toddler": 26.1,
+        "school": 36.8,
+        "teen": 19.5
+      },
+      "3": {
+        "infant": 15.6,
+        "toddler": 32.3,
+        "school": 32.9,
+        "teen": 19.1
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 27.3,
+        "toddler": 31.8,
+        "school": 25.0,
+        "teen": 15.9
+      },
+      "1": {
+        "infant": 19.3,
+        "toddler": 26.8,
+        "school": 35.3,
+        "teen": 18.6
+      },
+      "2": {
+        "infant": 14.1,
+        "toddler": 29.8,
+        "school": 34.5,
+        "teen": 21.6
+      },
+      "3": {
+        "infant": 13.3,
+        "toddler": 30.8,
+        "school": 36.3,
+        "teen": 19.7
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 25.2,
+        "toddler": 28.6,
+        "school": 23.1,
+        "teen": 23.1
+      },
+      "1": {
+        "infant": 12.2,
+        "toddler": 34.7,
+        "school": 34.1,
+        "teen": 19.0
+      },
+      "2": {
+        "infant": 16.3,
+        "toddler": 25.8,
+        "school": 34.5,
+        "teen": 23.4
+      },
+      "3": {
+        "infant": 17.6,
+        "toddler": 29.9,
+        "school": 33.8,
+        "teen": 18.7
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 20.1,
+        "toddler": 33.7,
+        "school": 26.1,
+        "teen": 20.1
+      },
+      "1": {
+        "infant": 20.2,
+        "toddler": 30.9,
+        "school": 32.2,
+        "teen": 16.7
+      },
+      "2": {
+        "infant": 18.0,
+        "toddler": 31.9,
+        "school": 31.7,
+        "teen": 18.4
+      },
+      "3": {
+        "infant": 16.6,
+        "toddler": 32.5,
+        "school": 33.6,
+        "teen": 17.3
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 18.9,
+        "toddler": 31.4,
+        "school": 34.1,
+        "teen": 15.7
+      },
+      "1": {
+        "infant": 20.6,
+        "toddler": 34.1,
+        "school": 31.3,
+        "teen": 13.9
+      },
+      "2": {
+        "infant": 13.1,
+        "toddler": 33.9,
+        "school": 34.8,
+        "teen": 18.2
+      },
+      "3": {
+        "infant": 18.4,
+        "toddler": 29.4,
+        "school": 34.9,
+        "teen": 17.3
+      }
+    }
+  },
+  "10": {
+    "0": {
+      "0": {
+        "infant": 22.8,
+        "toddler": 29.9,
+        "school": 33.5,
+        "teen": 13.8
+      },
+      "1": {
+        "infant": 12.5,
+        "toddler": 29.6,
+        "school": 33.4,
+        "teen": 24.5
+      },
+      "2": {
+        "infant": 15.3,
+        "toddler": 30.4,
+        "school": 32.3,
+        "teen": 22.0
+      },
+      "3": {
+        "infant": 15.2,
+        "toddler": 31.6,
+        "school": 30.9,
+        "teen": 22.3
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 19.7,
+        "toddler": 28.0,
+        "school": 28.7,
+        "teen": 23.6
+      },
+      "1": {
+        "infant": 13.8,
+        "toddler": 27.9,
+        "school": 36.6,
+        "teen": 21.8
+      },
+      "2": {
+        "infant": 16.9,
+        "toddler": 26.9,
+        "school": 33.3,
+        "teen": 22.9
+      },
+      "3": {
+        "infant": 14.6,
+        "toddler": 26.2,
+        "school": 37.1,
+        "teen": 22.1
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 20.7,
+        "toddler": 39.1,
+        "school": 26.4,
+        "teen": 13.8
+      },
+      "1": {
+        "infant": 12.0,
+        "toddler": 31.1,
+        "school": 35.4,
+        "teen": 21.5
+      },
+      "2": {
+        "infant": 15.1,
+        "toddler": 26.7,
+        "school": 34.0,
+        "teen": 24.3
+      },
+      "3": {
+        "infant": 16.2,
+        "toddler": 32.3,
+        "school": 30.7,
+        "teen": 20.8
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 19.0,
+        "toddler": 39.3,
+        "school": 26.2,
+        "teen": 15.5
+      },
+      "1": {
+        "infant": 15.5,
+        "toddler": 26.9,
+        "school": 32.7,
+        "teen": 24.9
+      },
+      "2": {
+        "infant": 13.9,
+        "toddler": 25.3,
+        "school": 38.0,
+        "teen": 22.8
+      },
+      "3": {
+        "infant": 12.9,
+        "toddler": 33.9,
+        "school": 33.6,
+        "teen": 19.6
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 21.3,
+        "toddler": 37.8,
+        "school": 23.8,
+        "teen": 17.1
+      },
+      "1": {
+        "infant": 16.3,
+        "toddler": 27.7,
+        "school": 36.7,
+        "teen": 19.4
+      },
+      "2": {
+        "infant": 14.6,
+        "toddler": 27.6,
+        "school": 37.3,
+        "teen": 20.5
+      },
+      "3": {
+        "infant": 18.3,
+        "toddler": 31.7,
+        "school": 29.0,
+        "teen": 21.0
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 24.3,
+        "toddler": 37.6,
+        "school": 26.0,
+        "teen": 12.2
+      },
+      "1": {
+        "infant": 11.6,
+        "toddler": 38.2,
+        "school": 36.5,
+        "teen": 13.7
+      },
+      "2": {
+        "infant": 16.2,
+        "toddler": 35.6,
+        "school": 32.0,
+        "teen": 16.2
+      },
+      "3": {
+        "infant": 15.1,
+        "toddler": 36.9,
+        "school": 31.3,
+        "teen": 16.7
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 22.8,
+        "toddler": 33.0,
+        "school": 31.6,
+        "teen": 12.6
+      },
+      "1": {
+        "infant": 18.8,
+        "toddler": 32.5,
+        "school": 33.9,
+        "teen": 14.8
+      },
+      "2": {
+        "infant": 18.8,
+        "toddler": 30.2,
+        "school": 31.3,
+        "teen": 19.6
+      },
+      "3": {
+        "infant": 15.3,
+        "toddler": 34.1,
+        "school": 31.8,
+        "teen": 18.8
+      }
+    }
+  },
+  "11": {
+    "0": {
+      "0": {
+        "infant": 16.2,
+        "toddler": 41.6,
+        "school": 25.9,
+        "teen": 16.2
+      },
+      "1": {
+        "infant": 14.5,
+        "toddler": 35.1,
+        "school": 30.2,
+        "teen": 20.1
+      },
+      "2": {
+        "infant": 17.5,
+        "toddler": 30.3,
+        "school": 33.2,
+        "teen": 19.0
+      },
+      "3": {
+        "infant": 16.8,
+        "toddler": 32.4,
+        "school": 32.2,
+        "teen": 18.7
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 23.0,
+        "toddler": 42.5,
+        "school": 23.0,
+        "teen": 11.5
+      },
+      "1": {
+        "infant": 14.3,
+        "toddler": 31.1,
+        "school": 34.3,
+        "teen": 20.3
+      },
+      "2": {
+        "infant": 16.1,
+        "toddler": 31.4,
+        "school": 33.7,
+        "teen": 18.8
+      },
+      "3": {
+        "infant": 13.0,
+        "toddler": 39.4,
+        "school": 30.8,
+        "teen": 16.7
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 23.2,
+        "toddler": 42.1,
+        "school": 22.6,
+        "teen": 12.2
+      },
+      "1": {
+        "infant": 14.7,
+        "toddler": 28.7,
+        "school": 36.4,
+        "teen": 20.2
+      },
+      "2": {
+        "infant": 14.6,
+        "toddler": 34.1,
+        "school": 32.7,
+        "teen": 18.7
+      },
+      "3": {
+        "infant": 16.4,
+        "toddler": 33.0,
+        "school": 31.5,
+        "teen": 19.1
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 18.8,
+        "toddler": 45.3,
+        "school": 21.5,
+        "teen": 14.3
+      },
+      "1": {
+        "infant": 14.6,
+        "toddler": 36.3,
+        "school": 29.9,
+        "teen": 19.2
+      },
+      "2": {
+        "infant": 14.8,
+        "toddler": 32.7,
+        "school": 32.5,
+        "teen": 20.0
+      },
+      "3": {
+        "infant": 20.0,
+        "toddler": 30.6,
+        "school": 34.5,
+        "teen": 14.9
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 19.7,
+        "toddler": 47.5,
+        "school": 21.8,
+        "teen": 10.9
+      },
+      "1": {
+        "infant": 15.0,
+        "toddler": 32.3,
+        "school": 34.3,
+        "teen": 18.5
+      },
+      "2": {
+        "infant": 17.5,
+        "toddler": 31.6,
+        "school": 32.8,
+        "teen": 18.0
+      },
+      "3": {
+        "infant": 17.6,
+        "toddler": 34.4,
+        "school": 30.8,
+        "teen": 17.2
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 17.9,
+        "toddler": 45.5,
+        "school": 23.3,
+        "teen": 13.2
+      },
+      "1": {
+        "infant": 17.3,
+        "toddler": 38.7,
+        "school": 31.2,
+        "teen": 12.7
+      },
+      "2": {
+        "infant": 16.3,
+        "toddler": 36.0,
+        "school": 30.9,
+        "teen": 16.8
+      },
+      "3": {
+        "infant": 22.0,
+        "toddler": 35.0,
+        "school": 28.4,
+        "teen": 14.6
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 26.1,
+        "toddler": 35.7,
+        "school": 27.8,
+        "teen": 10.4
+      },
+      "1": {
+        "infant": 20.9,
+        "toddler": 37.6,
+        "school": 30.2,
+        "teen": 11.3
+      },
+      "2": {
+        "infant": 17.2,
+        "toddler": 38.9,
+        "school": 26.9,
+        "teen": 17.0
+      },
+      "3": {
+        "infant": 15.7,
+        "toddler": 37.4,
+        "school": 30.9,
+        "teen": 15.9
+      }
+    }
+  },
+  "12": {
+    "0": {
+      "0": {
+        "infant": 23.1,
+        "toddler": 40.1,
+        "school": 25.1,
+        "teen": 11.7
+      },
+      "1": {
+        "infant": 16.6,
+        "toddler": 33.2,
+        "school": 35.0,
+        "teen": 15.2
+      },
+      "2": {
+        "infant": 20.4,
+        "toddler": 33.1,
+        "school": 30.5,
+        "teen": 16.1
+      },
+      "3": {
+        "infant": 18.9,
+        "toddler": 36.3,
+        "school": 30.5,
+        "teen": 14.4
+      }
+    },
+    "1": {
+      "0": {
+        "infant": 21.4,
+        "toddler": 39.9,
+        "school": 25.3,
+        "teen": 13.5
+      },
+      "1": {
+        "infant": 14.3,
+        "toddler": 36.6,
+        "school": 36.2,
+        "teen": 12.9
+      },
+      "2": {
+        "infant": 15.5,
+        "toddler": 36.0,
+        "school": 31.9,
+        "teen": 16.5
+      },
+      "3": {
+        "infant": 19.6,
+        "toddler": 36.5,
+        "school": 30.0,
+        "teen": 13.9
+      }
+    },
+    "2": {
+      "0": {
+        "infant": 26.4,
+        "toddler": 35.4,
+        "school": 22.0,
+        "teen": 16.2
+      },
+      "1": {
+        "infant": 21.0,
+        "toddler": 34.3,
+        "school": 31.5,
+        "teen": 13.3
+      },
+      "2": {
+        "infant": 16.5,
+        "toddler": 34.0,
+        "school": 34.6,
+        "teen": 14.9
+      },
+      "3": {
+        "infant": 20.1,
+        "toddler": 38.7,
+        "school": 27.1,
+        "teen": 14.0
+      }
+    },
+    "3": {
+      "0": {
+        "infant": 15.7,
+        "toddler": 41.7,
+        "school": 27.3,
+        "teen": 15.3
+      },
+      "1": {
+        "infant": 13.6,
+        "toddler": 38.2,
+        "school": 32.4,
+        "teen": 15.8
+      },
+      "2": {
+        "infant": 19.2,
+        "toddler": 34.9,
+        "school": 29.1,
+        "teen": 16.7
+      },
+      "3": {
+        "infant": 20.1,
+        "toddler": 34.1,
+        "school": 33.0,
+        "teen": 12.9
+      }
+    },
+    "4": {
+      "0": {
+        "infant": 26.6,
+        "toddler": 38.5,
+        "school": 23.4,
+        "teen": 11.5
+      },
+      "1": {
+        "infant": 19.1,
+        "toddler": 34.2,
+        "school": 33.5,
+        "teen": 13.2
+      },
+      "2": {
+        "infant": 18.8,
+        "toddler": 34.3,
+        "school": 32.4,
+        "teen": 14.5
+      },
+      "3": {
+        "infant": 22.0,
+        "toddler": 33.2,
+        "school": 31.9,
+        "teen": 12.9
+      }
+    },
+    "5": {
+      "0": {
+        "infant": 22.0,
+        "toddler": 39.0,
+        "school": 22.7,
+        "teen": 16.2
+      },
+      "1": {
+        "infant": 19.6,
+        "toddler": 35.3,
+        "school": 35.0,
+        "teen": 10.0
+      },
+      "2": {
+        "infant": 19.8,
+        "toddler": 35.8,
+        "school": 31.2,
+        "teen": 13.2
+      },
+      "3": {
+        "infant": 19.5,
+        "toddler": 34.6,
+        "school": 31.7,
+        "teen": 14.2
+      }
+    },
+    "6": {
+      "0": {
+        "infant": 24.3,
+        "toddler": 36.5,
+        "school": 27.0,
+        "teen": 12.2
+      },
+      "1": {
+        "infant": 20.6,
+        "toddler": 36.4,
+        "school": 32.9,
+        "teen": 10.1
+      },
+      "2": {
+        "infant": 19.4,
+        "toddler": 38.2,
+        "school": 31.7,
+        "teen": 10.8
+      },
+      "3": {
+        "infant": 20.1,
+        "toddler": 36.2,
+        "school": 32.9,
+        "teen": 10.7
+      }
+    }
+  }
+};
+
+const SURGE_CC_MIX = {
+  "1": {
+    "0": {
+      "0": {
+        "resp": 37.2,
+        "mh": 4.0,
+        "gi": 18.4,
+        "injury": 2.8,
+        "fever": 15.6,
+        "ent": 4.4,
+        "other": 17.6
+      },
+      "1": {
+        "resp": 25.0,
+        "mh": 2.7,
+        "gi": 20.0,
+        "injury": 9.7,
+        "fever": 12.9,
+        "ent": 4.7,
+        "other": 25.0
+      },
+      "2": {
+        "resp": 23.6,
+        "mh": 3.9,
+        "gi": 18.8,
+        "injury": 11.4,
+        "fever": 9.7,
+        "ent": 3.8,
+        "other": 28.9
+      },
+      "3": {
+        "resp": 22.0,
+        "mh": 5.2,
+        "gi": 17.6,
+        "injury": 10.5,
+        "fever": 10.1,
+        "ent": 3.6,
+        "other": 30.9
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 36.0,
+        "mh": 4.3,
+        "gi": 17.1,
+        "injury": 2.8,
+        "fever": 14.7,
+        "ent": 3.3,
+        "other": 21.8
+      },
+      "1": {
+        "resp": 25.2,
+        "mh": 3.6,
+        "gi": 16.9,
+        "injury": 7.6,
+        "fever": 6.7,
+        "ent": 4.3,
+        "other": 35.7
+      },
+      "2": {
+        "resp": 18.4,
+        "mh": 4.9,
+        "gi": 19.1,
+        "injury": 12.2,
+        "fever": 8.5,
+        "ent": 4.3,
+        "other": 32.6
+      },
+      "3": {
+        "resp": 24.8,
+        "mh": 3.9,
+        "gi": 17.0,
+        "injury": 10.9,
+        "fever": 9.4,
+        "ent": 3.8,
+        "other": 30.2
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 31.6,
+        "mh": 3.5,
+        "gi": 21.5,
+        "injury": 4.4,
+        "fever": 14.0,
+        "ent": 5.3,
+        "other": 19.7
+      },
+      "1": {
+        "resp": 26.4,
+        "mh": 2.6,
+        "gi": 20.9,
+        "injury": 9.1,
+        "fever": 8.9,
+        "ent": 2.6,
+        "other": 29.3
+      },
+      "2": {
+        "resp": 26.9,
+        "mh": 4.6,
+        "gi": 18.1,
+        "injury": 11.5,
+        "fever": 7.5,
+        "ent": 3.4,
+        "other": 28.0
+      },
+      "3": {
+        "resp": 22.1,
+        "mh": 4.8,
+        "gi": 16.2,
+        "injury": 13.0,
+        "fever": 10.7,
+        "ent": 4.3,
+        "other": 29.0
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 34.8,
+        "mh": 2.7,
+        "gi": 18.8,
+        "injury": 4.0,
+        "fever": 17.0,
+        "ent": 4.9,
+        "other": 17.9
+      },
+      "1": {
+        "resp": 21.9,
+        "mh": 1.0,
+        "gi": 19.1,
+        "injury": 9.5,
+        "fever": 12.9,
+        "ent": 4.1,
+        "other": 31.4
+      },
+      "2": {
+        "resp": 20.9,
+        "mh": 4.4,
+        "gi": 15.8,
+        "injury": 13.5,
+        "fever": 9.9,
+        "ent": 3.4,
+        "other": 32.1
+      },
+      "3": {
+        "resp": 20.0,
+        "mh": 3.8,
+        "gi": 14.5,
+        "injury": 12.6,
+        "fever": 11.8,
+        "ent": 2.8,
+        "other": 34.5
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 43.7,
+        "mh": 0.9,
+        "gi": 22.8,
+        "injury": 2.3,
+        "fever": 12.6,
+        "ent": 3.3,
+        "other": 14.4
+      },
+      "1": {
+        "resp": 18.0,
+        "mh": 2.1,
+        "gi": 26.0,
+        "injury": 8.1,
+        "fever": 9.6,
+        "ent": 2.3,
+        "other": 33.9
+      },
+      "2": {
+        "resp": 19.9,
+        "mh": 7.1,
+        "gi": 14.9,
+        "injury": 12.1,
+        "fever": 10.2,
+        "ent": 2.8,
+        "other": 33.0
+      },
+      "3": {
+        "resp": 20.6,
+        "mh": 3.3,
+        "gi": 13.6,
+        "injury": 13.0,
+        "fever": 14.0,
+        "ent": 3.7,
+        "other": 31.8
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 28.6,
+        "mh": 1.9,
+        "gi": 21.4,
+        "injury": 3.4,
+        "fever": 18.4,
+        "ent": 2.4,
+        "other": 23.8
+      },
+      "1": {
+        "resp": 23.7,
+        "mh": 1.5,
+        "gi": 21.2,
+        "injury": 8.4,
+        "fever": 11.3,
+        "ent": 3.3,
+        "other": 30.7
+      },
+      "2": {
+        "resp": 20.1,
+        "mh": 2.4,
+        "gi": 17.4,
+        "injury": 14.3,
+        "fever": 10.2,
+        "ent": 3.7,
+        "other": 31.9
+      },
+      "3": {
+        "resp": 23.0,
+        "mh": 2.0,
+        "gi": 17.4,
+        "injury": 13.4,
+        "fever": 9.8,
+        "ent": 4.6,
+        "other": 29.8
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 34.3,
+        "mh": 0.0,
+        "gi": 20.4,
+        "injury": 6.9,
+        "fever": 11.6,
+        "ent": 7.9,
+        "other": 19.0
+      },
+      "1": {
+        "resp": 25.1,
+        "mh": 1.7,
+        "gi": 21.8,
+        "injury": 8.6,
+        "fever": 8.9,
+        "ent": 5.3,
+        "other": 28.7
+      },
+      "2": {
+        "resp": 22.4,
+        "mh": 2.0,
+        "gi": 17.9,
+        "injury": 12.2,
+        "fever": 11.9,
+        "ent": 3.1,
+        "other": 30.3
+      },
+      "3": {
+        "resp": 23.3,
+        "mh": 4.8,
+        "gi": 18.9,
+        "injury": 11.3,
+        "fever": 9.9,
+        "ent": 5.2,
+        "other": 26.6
+      }
+    }
+  },
+  "2": {
+    "0": {
+      "0": {
+        "resp": 29.6,
+        "mh": 2.6,
+        "gi": 28.3,
+        "injury": 2.1,
+        "fever": 12.9,
+        "ent": 3.0,
+        "other": 21.5
+      },
+      "1": {
+        "resp": 25.7,
+        "mh": 2.5,
+        "gi": 27.5,
+        "injury": 5.3,
+        "fever": 10.2,
+        "ent": 4.3,
+        "other": 24.4
+      },
+      "2": {
+        "resp": 21.2,
+        "mh": 4.0,
+        "gi": 19.2,
+        "injury": 10.3,
+        "fever": 8.9,
+        "ent": 3.8,
+        "other": 32.6
+      },
+      "3": {
+        "resp": 20.7,
+        "mh": 3.1,
+        "gi": 23.5,
+        "injury": 10.3,
+        "fever": 11.7,
+        "ent": 4.3,
+        "other": 26.4
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 25.5,
+        "mh": 2.0,
+        "gi": 26.0,
+        "injury": 2.9,
+        "fever": 15.7,
+        "ent": 6.9,
+        "other": 21.1
+      },
+      "1": {
+        "resp": 22.7,
+        "mh": 2.1,
+        "gi": 23.4,
+        "injury": 6.8,
+        "fever": 8.9,
+        "ent": 2.1,
+        "other": 34.1
+      },
+      "2": {
+        "resp": 17.0,
+        "mh": 4.1,
+        "gi": 19.7,
+        "injury": 12.1,
+        "fever": 8.8,
+        "ent": 3.9,
+        "other": 34.4
+      },
+      "3": {
+        "resp": 22.0,
+        "mh": 3.4,
+        "gi": 19.6,
+        "injury": 10.4,
+        "fever": 13.4,
+        "ent": 5.4,
+        "other": 25.9
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 28.7,
+        "mh": 0.5,
+        "gi": 27.7,
+        "injury": 3.5,
+        "fever": 12.4,
+        "ent": 7.4,
+        "other": 19.8
+      },
+      "1": {
+        "resp": 23.3,
+        "mh": 3.5,
+        "gi": 24.1,
+        "injury": 7.5,
+        "fever": 11.0,
+        "ent": 2.8,
+        "other": 27.8
+      },
+      "2": {
+        "resp": 17.9,
+        "mh": 4.1,
+        "gi": 22.4,
+        "injury": 12.4,
+        "fever": 8.9,
+        "ent": 1.9,
+        "other": 32.3
+      },
+      "3": {
+        "resp": 21.2,
+        "mh": 4.4,
+        "gi": 19.8,
+        "injury": 12.3,
+        "fever": 13.1,
+        "ent": 4.4,
+        "other": 24.9
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 20.3,
+        "mh": 2.7,
+        "gi": 29.4,
+        "injury": 5.9,
+        "fever": 16.6,
+        "ent": 4.8,
+        "other": 20.3
+      },
+      "1": {
+        "resp": 21.9,
+        "mh": 4.4,
+        "gi": 20.4,
+        "injury": 8.1,
+        "fever": 9.1,
+        "ent": 4.2,
+        "other": 31.9
+      },
+      "2": {
+        "resp": 15.0,
+        "mh": 5.1,
+        "gi": 18.7,
+        "injury": 11.7,
+        "fever": 13.1,
+        "ent": 3.0,
+        "other": 33.5
+      },
+      "3": {
+        "resp": 15.2,
+        "mh": 3.7,
+        "gi": 19.7,
+        "injury": 12.1,
+        "fever": 13.3,
+        "ent": 4.5,
+        "other": 31.6
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 25.6,
+        "mh": 1.5,
+        "gi": 27.1,
+        "injury": 3.0,
+        "fever": 15.1,
+        "ent": 6.0,
+        "other": 21.6
+      },
+      "1": {
+        "resp": 21.7,
+        "mh": 2.9,
+        "gi": 24.6,
+        "injury": 8.8,
+        "fever": 9.4,
+        "ent": 5.3,
+        "other": 27.3
+      },
+      "2": {
+        "resp": 18.5,
+        "mh": 3.5,
+        "gi": 18.7,
+        "injury": 16.0,
+        "fever": 10.4,
+        "ent": 2.4,
+        "other": 30.6
+      },
+      "3": {
+        "resp": 20.8,
+        "mh": 4.0,
+        "gi": 17.5,
+        "injury": 11.3,
+        "fever": 10.3,
+        "ent": 5.7,
+        "other": 30.3
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 28.9,
+        "mh": 1.7,
+        "gi": 20.0,
+        "injury": 2.8,
+        "fever": 16.7,
+        "ent": 6.1,
+        "other": 23.9
+      },
+      "1": {
+        "resp": 26.4,
+        "mh": 1.1,
+        "gi": 20.7,
+        "injury": 9.3,
+        "fever": 11.4,
+        "ent": 3.6,
+        "other": 27.5
+      },
+      "2": {
+        "resp": 15.1,
+        "mh": 1.7,
+        "gi": 18.5,
+        "injury": 16.3,
+        "fever": 12.5,
+        "ent": 4.3,
+        "other": 31.5
+      },
+      "3": {
+        "resp": 18.6,
+        "mh": 2.1,
+        "gi": 23.1,
+        "injury": 12.2,
+        "fever": 14.3,
+        "ent": 3.8,
+        "other": 26.1
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 26.2,
+        "mh": 0.5,
+        "gi": 25.7,
+        "injury": 6.3,
+        "fever": 18.4,
+        "ent": 2.4,
+        "other": 20.4
+      },
+      "1": {
+        "resp": 21.9,
+        "mh": 1.2,
+        "gi": 23.0,
+        "injury": 9.3,
+        "fever": 11.4,
+        "ent": 3.8,
+        "other": 29.4
+      },
+      "2": {
+        "resp": 19.5,
+        "mh": 2.4,
+        "gi": 20.8,
+        "injury": 10.6,
+        "fever": 10.6,
+        "ent": 4.2,
+        "other": 32.0
+      },
+      "3": {
+        "resp": 22.0,
+        "mh": 3.2,
+        "gi": 17.9,
+        "injury": 12.7,
+        "fever": 13.9,
+        "ent": 3.2,
+        "other": 27.1
+      }
+    }
+  },
+  "3": {
+    "0": {
+      "0": {
+        "resp": 34.8,
+        "mh": 0.9,
+        "gi": 24.4,
+        "injury": 2.3,
+        "fever": 11.3,
+        "ent": 5.9,
+        "other": 20.4
+      },
+      "1": {
+        "resp": 20.6,
+        "mh": 3.3,
+        "gi": 22.2,
+        "injury": 8.6,
+        "fever": 9.6,
+        "ent": 3.9,
+        "other": 31.8
+      },
+      "2": {
+        "resp": 14.9,
+        "mh": 5.1,
+        "gi": 20.1,
+        "injury": 10.5,
+        "fever": 8.0,
+        "ent": 3.8,
+        "other": 37.5
+      },
+      "3": {
+        "resp": 21.4,
+        "mh": 4.8,
+        "gi": 22.3,
+        "injury": 11.1,
+        "fever": 9.4,
+        "ent": 3.0,
+        "other": 27.9
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 35.1,
+        "mh": 1.5,
+        "gi": 28.3,
+        "injury": 2.0,
+        "fever": 12.7,
+        "ent": 2.0,
+        "other": 18.5
+      },
+      "1": {
+        "resp": 21.2,
+        "mh": 4.5,
+        "gi": 23.4,
+        "injury": 7.7,
+        "fever": 7.2,
+        "ent": 3.7,
+        "other": 32.2
+      },
+      "2": {
+        "resp": 15.4,
+        "mh": 5.7,
+        "gi": 19.4,
+        "injury": 15.4,
+        "fever": 6.9,
+        "ent": 3.1,
+        "other": 34.0
+      },
+      "3": {
+        "resp": 17.2,
+        "mh": 4.2,
+        "gi": 20.4,
+        "injury": 16.5,
+        "fever": 10.8,
+        "ent": 3.3,
+        "other": 27.6
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 27.8,
+        "mh": 2.1,
+        "gi": 23.7,
+        "injury": 4.6,
+        "fever": 13.4,
+        "ent": 3.6,
+        "other": 24.7
+      },
+      "1": {
+        "resp": 26.8,
+        "mh": 3.2,
+        "gi": 23.1,
+        "injury": 9.0,
+        "fever": 7.4,
+        "ent": 4.2,
+        "other": 26.3
+      },
+      "2": {
+        "resp": 17.8,
+        "mh": 4.3,
+        "gi": 18.8,
+        "injury": 12.4,
+        "fever": 10.4,
+        "ent": 1.8,
+        "other": 34.5
+      },
+      "3": {
+        "resp": 17.8,
+        "mh": 4.0,
+        "gi": 20.2,
+        "injury": 13.5,
+        "fever": 10.5,
+        "ent": 4.0,
+        "other": 30.0
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 31.9,
+        "mh": 1.3,
+        "gi": 26.7,
+        "injury": 3.0,
+        "fever": 12.9,
+        "ent": 6.5,
+        "other": 17.7
+      },
+      "1": {
+        "resp": 17.6,
+        "mh": 2.8,
+        "gi": 25.9,
+        "injury": 9.3,
+        "fever": 10.1,
+        "ent": 4.5,
+        "other": 29.9
+      },
+      "2": {
+        "resp": 14.2,
+        "mh": 5.8,
+        "gi": 19.3,
+        "injury": 14.8,
+        "fever": 8.0,
+        "ent": 3.9,
+        "other": 34.0
+      },
+      "3": {
+        "resp": 18.1,
+        "mh": 4.1,
+        "gi": 21.4,
+        "injury": 14.2,
+        "fever": 10.6,
+        "ent": 3.9,
+        "other": 27.7
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 34.6,
+        "mh": 1.1,
+        "gi": 22.0,
+        "injury": 3.8,
+        "fever": 12.1,
+        "ent": 3.3,
+        "other": 23.1
+      },
+      "1": {
+        "resp": 19.7,
+        "mh": 3.7,
+        "gi": 24.7,
+        "injury": 10.0,
+        "fever": 8.5,
+        "ent": 4.5,
+        "other": 28.9
+      },
+      "2": {
+        "resp": 17.3,
+        "mh": 5.2,
+        "gi": 21.0,
+        "injury": 14.0,
+        "fever": 6.7,
+        "ent": 1.5,
+        "other": 34.4
+      },
+      "3": {
+        "resp": 15.7,
+        "mh": 2.2,
+        "gi": 21.9,
+        "injury": 13.2,
+        "fever": 11.9,
+        "ent": 5.2,
+        "other": 29.9
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 29.2,
+        "mh": 4.7,
+        "gi": 21.2,
+        "injury": 5.7,
+        "fever": 10.4,
+        "ent": 4.2,
+        "other": 24.5
+      },
+      "1": {
+        "resp": 22.9,
+        "mh": 0.6,
+        "gi": 22.6,
+        "injury": 8.3,
+        "fever": 9.5,
+        "ent": 5.7,
+        "other": 30.4
+      },
+      "2": {
+        "resp": 14.6,
+        "mh": 2.5,
+        "gi": 21.3,
+        "injury": 15.3,
+        "fever": 10.5,
+        "ent": 4.3,
+        "other": 31.6
+      },
+      "3": {
+        "resp": 18.6,
+        "mh": 2.2,
+        "gi": 21.9,
+        "injury": 13.1,
+        "fever": 11.2,
+        "ent": 4.0,
+        "other": 29.1
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 32.7,
+        "mh": 1.6,
+        "gi": 21.4,
+        "injury": 4.8,
+        "fever": 12.9,
+        "ent": 4.0,
+        "other": 22.6
+      },
+      "1": {
+        "resp": 23.9,
+        "mh": 1.0,
+        "gi": 24.9,
+        "injury": 10.6,
+        "fever": 11.6,
+        "ent": 5.4,
+        "other": 22.7
+      },
+      "2": {
+        "resp": 18.1,
+        "mh": 2.1,
+        "gi": 19.5,
+        "injury": 15.4,
+        "fever": 9.2,
+        "ent": 3.6,
+        "other": 32.1
+      },
+      "3": {
+        "resp": 19.4,
+        "mh": 3.4,
+        "gi": 22.5,
+        "injury": 13.2,
+        "fever": 8.5,
+        "ent": 3.8,
+        "other": 29.2
+      }
+    }
+  },
+  "4": {
+    "0": {
+      "0": {
+        "resp": 33.2,
+        "mh": 1.6,
+        "gi": 20.1,
+        "injury": 3.8,
+        "fever": 15.8,
+        "ent": 3.8,
+        "other": 21.7
+      },
+      "1": {
+        "resp": 19.1,
+        "mh": 4.8,
+        "gi": 24.2,
+        "injury": 9.7,
+        "fever": 9.4,
+        "ent": 4.1,
+        "other": 28.6
+      },
+      "2": {
+        "resp": 12.7,
+        "mh": 5.1,
+        "gi": 21.4,
+        "injury": 14.4,
+        "fever": 7.9,
+        "ent": 3.1,
+        "other": 35.4
+      },
+      "3": {
+        "resp": 14.8,
+        "mh": 3.4,
+        "gi": 20.5,
+        "injury": 15.2,
+        "fever": 11.2,
+        "ent": 4.2,
+        "other": 30.6
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 28.7,
+        "mh": 3.2,
+        "gi": 25.9,
+        "injury": 3.2,
+        "fever": 13.0,
+        "ent": 5.1,
+        "other": 20.8
+      },
+      "1": {
+        "resp": 17.6,
+        "mh": 4.4,
+        "gi": 23.7,
+        "injury": 8.4,
+        "fever": 8.4,
+        "ent": 4.7,
+        "other": 32.8
+      },
+      "2": {
+        "resp": 16.0,
+        "mh": 5.4,
+        "gi": 18.5,
+        "injury": 14.6,
+        "fever": 7.6,
+        "ent": 4.2,
+        "other": 33.7
+      },
+      "3": {
+        "resp": 17.2,
+        "mh": 3.8,
+        "gi": 18.1,
+        "injury": 14.1,
+        "fever": 11.0,
+        "ent": 4.4,
+        "other": 31.3
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 25.7,
+        "mh": 1.0,
+        "gi": 27.7,
+        "injury": 4.7,
+        "fever": 9.4,
+        "ent": 5.2,
+        "other": 26.2
+      },
+      "1": {
+        "resp": 21.6,
+        "mh": 3.6,
+        "gi": 22.4,
+        "injury": 10.5,
+        "fever": 6.9,
+        "ent": 3.3,
+        "other": 31.6
+      },
+      "2": {
+        "resp": 14.3,
+        "mh": 5.8,
+        "gi": 21.3,
+        "injury": 16.7,
+        "fever": 9.0,
+        "ent": 3.0,
+        "other": 29.8
+      },
+      "3": {
+        "resp": 13.9,
+        "mh": 4.7,
+        "gi": 19.8,
+        "injury": 17.4,
+        "fever": 9.2,
+        "ent": 3.5,
+        "other": 31.5
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 29.4,
+        "mh": 1.1,
+        "gi": 20.9,
+        "injury": 2.7,
+        "fever": 15.5,
+        "ent": 4.8,
+        "other": 25.7
+      },
+      "1": {
+        "resp": 19.1,
+        "mh": 3.8,
+        "gi": 23.1,
+        "injury": 10.7,
+        "fever": 5.8,
+        "ent": 3.2,
+        "other": 34.4
+      },
+      "2": {
+        "resp": 14.1,
+        "mh": 5.2,
+        "gi": 20.0,
+        "injury": 17.0,
+        "fever": 8.6,
+        "ent": 2.2,
+        "other": 32.9
+      },
+      "3": {
+        "resp": 17.9,
+        "mh": 5.6,
+        "gi": 19.0,
+        "injury": 14.3,
+        "fever": 10.3,
+        "ent": 3.8,
+        "other": 29.2
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 25.5,
+        "mh": 1.5,
+        "gi": 23.0,
+        "injury": 3.9,
+        "fever": 15.2,
+        "ent": 5.4,
+        "other": 25.5
+      },
+      "1": {
+        "resp": 16.6,
+        "mh": 1.8,
+        "gi": 20.9,
+        "injury": 9.2,
+        "fever": 10.1,
+        "ent": 4.9,
+        "other": 36.5
+      },
+      "2": {
+        "resp": 14.4,
+        "mh": 4.9,
+        "gi": 17.4,
+        "injury": 15.2,
+        "fever": 10.5,
+        "ent": 3.2,
+        "other": 34.5
+      },
+      "3": {
+        "resp": 16.3,
+        "mh": 2.6,
+        "gi": 16.5,
+        "injury": 16.5,
+        "fever": 11.5,
+        "ent": 4.5,
+        "other": 32.2
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 29.5,
+        "mh": 3.4,
+        "gi": 17.4,
+        "injury": 5.3,
+        "fever": 14.0,
+        "ent": 8.7,
+        "other": 21.7
+      },
+      "1": {
+        "resp": 17.2,
+        "mh": 1.8,
+        "gi": 20.1,
+        "injury": 8.1,
+        "fever": 14.3,
+        "ent": 5.9,
+        "other": 32.6
+      },
+      "2": {
+        "resp": 13.1,
+        "mh": 3.3,
+        "gi": 20.2,
+        "injury": 14.7,
+        "fever": 11.3,
+        "ent": 4.0,
+        "other": 33.5
+      },
+      "3": {
+        "resp": 16.8,
+        "mh": 2.8,
+        "gi": 19.0,
+        "injury": 15.5,
+        "fever": 12.3,
+        "ent": 3.4,
+        "other": 30.2
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 28.2,
+        "mh": 2.8,
+        "gi": 18.8,
+        "injury": 4.7,
+        "fever": 15.0,
+        "ent": 5.2,
+        "other": 25.4
+      },
+      "1": {
+        "resp": 18.0,
+        "mh": 1.1,
+        "gi": 24.4,
+        "injury": 8.5,
+        "fever": 8.5,
+        "ent": 4.6,
+        "other": 35.0
+      },
+      "2": {
+        "resp": 17.5,
+        "mh": 3.8,
+        "gi": 16.5,
+        "injury": 14.8,
+        "fever": 10.7,
+        "ent": 4.7,
+        "other": 32.0
+      },
+      "3": {
+        "resp": 18.1,
+        "mh": 3.3,
+        "gi": 18.3,
+        "injury": 16.0,
+        "fever": 10.7,
+        "ent": 3.4,
+        "other": 30.2
+      }
+    }
+  },
+  "5": {
+    "0": {
+      "0": {
+        "resp": 29.8,
+        "mh": 2.9,
+        "gi": 18.8,
+        "injury": 5.8,
+        "fever": 12.0,
+        "ent": 3.8,
+        "other": 26.9
+      },
+      "1": {
+        "resp": 19.9,
+        "mh": 3.6,
+        "gi": 23.9,
+        "injury": 8.3,
+        "fever": 8.1,
+        "ent": 5.1,
+        "other": 31.1
+      },
+      "2": {
+        "resp": 14.5,
+        "mh": 6.7,
+        "gi": 17.9,
+        "injury": 14.8,
+        "fever": 8.0,
+        "ent": 4.6,
+        "other": 33.4
+      },
+      "3": {
+        "resp": 17.1,
+        "mh": 4.4,
+        "gi": 20.4,
+        "injury": 12.9,
+        "fever": 10.3,
+        "ent": 4.5,
+        "other": 30.4
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 29.7,
+        "mh": 4.8,
+        "gi": 23.9,
+        "injury": 3.3,
+        "fever": 10.0,
+        "ent": 3.8,
+        "other": 24.4
+      },
+      "1": {
+        "resp": 18.5,
+        "mh": 2.8,
+        "gi": 23.1,
+        "injury": 9.5,
+        "fever": 6.8,
+        "ent": 5.5,
+        "other": 33.8
+      },
+      "2": {
+        "resp": 11.9,
+        "mh": 5.5,
+        "gi": 17.7,
+        "injury": 16.2,
+        "fever": 7.7,
+        "ent": 3.8,
+        "other": 37.2
+      },
+      "3": {
+        "resp": 14.4,
+        "mh": 5.2,
+        "gi": 17.3,
+        "injury": 16.1,
+        "fever": 9.8,
+        "ent": 4.6,
+        "other": 32.6
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 28.4,
+        "mh": 2.9,
+        "gi": 29.4,
+        "injury": 6.9,
+        "fever": 7.4,
+        "ent": 3.9,
+        "other": 21.1
+      },
+      "1": {
+        "resp": 20.1,
+        "mh": 4.4,
+        "gi": 20.1,
+        "injury": 10.2,
+        "fever": 13.3,
+        "ent": 6.3,
+        "other": 25.6
+      },
+      "2": {
+        "resp": 12.6,
+        "mh": 5.2,
+        "gi": 17.4,
+        "injury": 17.5,
+        "fever": 7.8,
+        "ent": 4.0,
+        "other": 35.4
+      },
+      "3": {
+        "resp": 15.6,
+        "mh": 5.6,
+        "gi": 21.7,
+        "injury": 15.7,
+        "fever": 10.6,
+        "ent": 3.8,
+        "other": 27.0
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 28.0,
+        "mh": 3.7,
+        "gi": 24.3,
+        "injury": 4.1,
+        "fever": 10.6,
+        "ent": 5.0,
+        "other": 24.3
+      },
+      "1": {
+        "resp": 14.9,
+        "mh": 4.0,
+        "gi": 23.9,
+        "injury": 10.9,
+        "fever": 8.8,
+        "ent": 3.6,
+        "other": 33.9
+      },
+      "2": {
+        "resp": 12.3,
+        "mh": 6.2,
+        "gi": 16.7,
+        "injury": 17.5,
+        "fever": 9.9,
+        "ent": 3.6,
+        "other": 33.9
+      },
+      "3": {
+        "resp": 18.8,
+        "mh": 3.2,
+        "gi": 18.0,
+        "injury": 17.5,
+        "fever": 9.7,
+        "ent": 3.1,
+        "other": 29.7
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 26.6,
+        "mh": 3.7,
+        "gi": 27.6,
+        "injury": 4.7,
+        "fever": 10.7,
+        "ent": 5.6,
+        "other": 21.0
+      },
+      "1": {
+        "resp": 17.6,
+        "mh": 4.1,
+        "gi": 21.8,
+        "injury": 10.4,
+        "fever": 7.3,
+        "ent": 3.4,
+        "other": 35.5
+      },
+      "2": {
+        "resp": 12.6,
+        "mh": 5.8,
+        "gi": 19.6,
+        "injury": 18.0,
+        "fever": 7.6,
+        "ent": 2.5,
+        "other": 34.0
+      },
+      "3": {
+        "resp": 16.3,
+        "mh": 2.7,
+        "gi": 15.9,
+        "injury": 17.0,
+        "fever": 10.7,
+        "ent": 3.8,
+        "other": 33.6
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 27.6,
+        "mh": 2.4,
+        "gi": 24.3,
+        "injury": 5.7,
+        "fever": 11.4,
+        "ent": 5.7,
+        "other": 22.9
+      },
+      "1": {
+        "resp": 20.8,
+        "mh": 2.3,
+        "gi": 22.8,
+        "injury": 8.5,
+        "fever": 9.4,
+        "ent": 4.2,
+        "other": 31.9
+      },
+      "2": {
+        "resp": 15.7,
+        "mh": 2.3,
+        "gi": 17.7,
+        "injury": 20.0,
+        "fever": 9.2,
+        "ent": 4.9,
+        "other": 30.3
+      },
+      "3": {
+        "resp": 16.5,
+        "mh": 1.4,
+        "gi": 20.3,
+        "injury": 16.0,
+        "fever": 10.8,
+        "ent": 6.7,
+        "other": 28.4
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 27.7,
+        "mh": 2.6,
+        "gi": 18.3,
+        "injury": 5.8,
+        "fever": 12.0,
+        "ent": 4.7,
+        "other": 28.8
+      },
+      "1": {
+        "resp": 18.6,
+        "mh": 0.8,
+        "gi": 21.7,
+        "injury": 14.1,
+        "fever": 13.7,
+        "ent": 3.8,
+        "other": 27.4
+      },
+      "2": {
+        "resp": 15.6,
+        "mh": 2.4,
+        "gi": 17.9,
+        "injury": 15.9,
+        "fever": 10.4,
+        "ent": 4.9,
+        "other": 32.9
+      },
+      "3": {
+        "resp": 17.7,
+        "mh": 1.8,
+        "gi": 21.6,
+        "injury": 16.7,
+        "fever": 10.7,
+        "ent": 4.5,
+        "other": 26.9
+      }
+    }
+  },
+  "6": {
+    "0": {
+      "0": {
+        "resp": 22.1,
+        "mh": 3.9,
+        "gi": 21.5,
+        "injury": 4.4,
+        "fever": 18.2,
+        "ent": 5.0,
+        "other": 24.9
+      },
+      "1": {
+        "resp": 17.8,
+        "mh": 1.6,
+        "gi": 19.7,
+        "injury": 11.2,
+        "fever": 10.9,
+        "ent": 5.9,
+        "other": 32.9
+      },
+      "2": {
+        "resp": 12.0,
+        "mh": 3.8,
+        "gi": 19.0,
+        "injury": 16.8,
+        "fever": 9.0,
+        "ent": 3.0,
+        "other": 36.3
+      },
+      "3": {
+        "resp": 12.0,
+        "mh": 2.8,
+        "gi": 19.0,
+        "injury": 18.2,
+        "fever": 11.0,
+        "ent": 4.1,
+        "other": 33.1
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 24.3,
+        "mh": 2.6,
+        "gi": 27.0,
+        "injury": 5.3,
+        "fever": 11.6,
+        "ent": 3.7,
+        "other": 25.4
+      },
+      "1": {
+        "resp": 15.4,
+        "mh": 4.9,
+        "gi": 21.4,
+        "injury": 10.2,
+        "fever": 7.1,
+        "ent": 3.8,
+        "other": 37.2
+      },
+      "2": {
+        "resp": 9.6,
+        "mh": 4.1,
+        "gi": 19.4,
+        "injury": 14.7,
+        "fever": 8.4,
+        "ent": 2.6,
+        "other": 41.1
+      },
+      "3": {
+        "resp": 11.4,
+        "mh": 2.1,
+        "gi": 20.3,
+        "injury": 16.7,
+        "fever": 11.9,
+        "ent": 4.6,
+        "other": 33.0
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 20.3,
+        "mh": 2.9,
+        "gi": 22.1,
+        "injury": 4.7,
+        "fever": 14.0,
+        "ent": 9.9,
+        "other": 26.2
+      },
+      "1": {
+        "resp": 14.4,
+        "mh": 1.4,
+        "gi": 22.6,
+        "injury": 13.4,
+        "fever": 9.9,
+        "ent": 3.4,
+        "other": 34.9
+      },
+      "2": {
+        "resp": 8.9,
+        "mh": 4.7,
+        "gi": 18.3,
+        "injury": 15.9,
+        "fever": 8.9,
+        "ent": 3.4,
+        "other": 39.9
+      },
+      "3": {
+        "resp": 12.4,
+        "mh": 2.5,
+        "gi": 14.5,
+        "injury": 20.3,
+        "fever": 10.6,
+        "ent": 4.7,
+        "other": 35.0
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 32.7,
+        "mh": 2.6,
+        "gi": 20.4,
+        "injury": 5.1,
+        "fever": 15.8,
+        "ent": 2.0,
+        "other": 21.4
+      },
+      "1": {
+        "resp": 14.4,
+        "mh": 4.7,
+        "gi": 25.1,
+        "injury": 10.0,
+        "fever": 8.7,
+        "ent": 2.7,
+        "other": 34.4
+      },
+      "2": {
+        "resp": 12.3,
+        "mh": 4.5,
+        "gi": 17.6,
+        "injury": 17.0,
+        "fever": 11.7,
+        "ent": 2.5,
+        "other": 34.4
+      },
+      "3": {
+        "resp": 12.4,
+        "mh": 4.9,
+        "gi": 17.9,
+        "injury": 16.4,
+        "fever": 12.7,
+        "ent": 3.4,
+        "other": 32.1
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 23.4,
+        "mh": 1.9,
+        "gi": 22.0,
+        "injury": 7.7,
+        "fever": 12.4,
+        "ent": 8.1,
+        "other": 24.4
+      },
+      "1": {
+        "resp": 16.3,
+        "mh": 2.8,
+        "gi": 26.2,
+        "injury": 10.6,
+        "fever": 8.2,
+        "ent": 1.8,
+        "other": 34.0
+      },
+      "2": {
+        "resp": 10.6,
+        "mh": 4.4,
+        "gi": 17.7,
+        "injury": 19.8,
+        "fever": 9.4,
+        "ent": 3.3,
+        "other": 34.8
+      },
+      "3": {
+        "resp": 13.5,
+        "mh": 3.0,
+        "gi": 15.2,
+        "injury": 18.2,
+        "fever": 12.0,
+        "ent": 3.4,
+        "other": 34.8
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 23.2,
+        "mh": 3.4,
+        "gi": 22.7,
+        "injury": 3.9,
+        "fever": 15.0,
+        "ent": 4.8,
+        "other": 27.1
+      },
+      "1": {
+        "resp": 17.4,
+        "mh": 0.0,
+        "gi": 14.3,
+        "injury": 12.0,
+        "fever": 12.0,
+        "ent": 3.9,
+        "other": 40.5
+      },
+      "2": {
+        "resp": 10.1,
+        "mh": 1.9,
+        "gi": 17.9,
+        "injury": 20.4,
+        "fever": 9.1,
+        "ent": 4.9,
+        "other": 35.7
+      },
+      "3": {
+        "resp": 11.5,
+        "mh": 3.7,
+        "gi": 18.1,
+        "injury": 16.6,
+        "fever": 12.7,
+        "ent": 4.3,
+        "other": 33.1
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 22.8,
+        "mh": 1.7,
+        "gi": 28.3,
+        "injury": 7.2,
+        "fever": 13.9,
+        "ent": 3.0,
+        "other": 23.2
+      },
+      "1": {
+        "resp": 16.6,
+        "mh": 1.7,
+        "gi": 20.3,
+        "injury": 14.6,
+        "fever": 9.3,
+        "ent": 4.0,
+        "other": 33.6
+      },
+      "2": {
+        "resp": 9.5,
+        "mh": 2.0,
+        "gi": 20.4,
+        "injury": 22.8,
+        "fever": 10.4,
+        "ent": 3.3,
+        "other": 31.7
+      },
+      "3": {
+        "resp": 13.5,
+        "mh": 3.6,
+        "gi": 17.1,
+        "injury": 18.5,
+        "fever": 9.6,
+        "ent": 4.0,
+        "other": 33.8
+      }
+    }
+  },
+  "7": {
+    "0": {
+      "0": {
+        "resp": 14.8,
+        "mh": 3.8,
+        "gi": 26.4,
+        "injury": 8.8,
+        "fever": 12.6,
+        "ent": 1.6,
+        "other": 31.9
+      },
+      "1": {
+        "resp": 9.1,
+        "mh": 1.5,
+        "gi": 20.1,
+        "injury": 13.3,
+        "fever": 17.0,
+        "ent": 3.4,
+        "other": 35.6
+      },
+      "2": {
+        "resp": 6.4,
+        "mh": 3.8,
+        "gi": 19.1,
+        "injury": 17.1,
+        "fever": 8.9,
+        "ent": 4.2,
+        "other": 40.4
+      },
+      "3": {
+        "resp": 6.4,
+        "mh": 3.5,
+        "gi": 20.6,
+        "injury": 15.4,
+        "fever": 12.4,
+        "ent": 2.7,
+        "other": 38.9
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 13.5,
+        "mh": 3.5,
+        "gi": 26.5,
+        "injury": 7.6,
+        "fever": 10.6,
+        "ent": 3.5,
+        "other": 34.7
+      },
+      "1": {
+        "resp": 12.1,
+        "mh": 1.3,
+        "gi": 24.1,
+        "injury": 9.4,
+        "fever": 13.8,
+        "ent": 4.5,
+        "other": 34.8
+      },
+      "2": {
+        "resp": 7.3,
+        "mh": 2.2,
+        "gi": 17.5,
+        "injury": 15.9,
+        "fever": 12.0,
+        "ent": 3.7,
+        "other": 41.5
+      },
+      "3": {
+        "resp": 7.6,
+        "mh": 3.4,
+        "gi": 15.3,
+        "injury": 25.9,
+        "fever": 10.6,
+        "ent": 3.4,
+        "other": 33.8
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 15.9,
+        "mh": 3.4,
+        "gi": 18.2,
+        "injury": 11.9,
+        "fever": 10.8,
+        "ent": 6.8,
+        "other": 33.0
+      },
+      "1": {
+        "resp": 12.5,
+        "mh": 2.3,
+        "gi": 17.6,
+        "injury": 14.5,
+        "fever": 10.9,
+        "ent": 3.9,
+        "other": 38.3
+      },
+      "2": {
+        "resp": 9.8,
+        "mh": 3.5,
+        "gi": 13.8,
+        "injury": 17.3,
+        "fever": 11.1,
+        "ent": 3.3,
+        "other": 41.2
+      },
+      "3": {
+        "resp": 7.2,
+        "mh": 2.5,
+        "gi": 13.5,
+        "injury": 21.1,
+        "fever": 14.5,
+        "ent": 4.3,
+        "other": 36.8
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 15.8,
+        "mh": 1.4,
+        "gi": 20.5,
+        "injury": 9.6,
+        "fever": 13.7,
+        "ent": 3.4,
+        "other": 35.6
+      },
+      "1": {
+        "resp": 11.3,
+        "mh": 1.5,
+        "gi": 16.7,
+        "injury": 12.7,
+        "fever": 8.3,
+        "ent": 5.4,
+        "other": 44.1
+      },
+      "2": {
+        "resp": 5.3,
+        "mh": 2.5,
+        "gi": 17.7,
+        "injury": 14.5,
+        "fever": 8.5,
+        "ent": 2.1,
+        "other": 49.3
+      },
+      "3": {
+        "resp": 6.6,
+        "mh": 4.0,
+        "gi": 17.2,
+        "injury": 19.4,
+        "fever": 10.8,
+        "ent": 3.9,
+        "other": 38.0
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 16.8,
+        "mh": 4.0,
+        "gi": 22.1,
+        "injury": 6.0,
+        "fever": 12.8,
+        "ent": 6.0,
+        "other": 32.2
+      },
+      "1": {
+        "resp": 5.3,
+        "mh": 0.9,
+        "gi": 19.8,
+        "injury": 8.8,
+        "fever": 7.5,
+        "ent": 5.7,
+        "other": 52.0
+      },
+      "2": {
+        "resp": 7.4,
+        "mh": 2.6,
+        "gi": 15.2,
+        "injury": 15.9,
+        "fever": 9.7,
+        "ent": 5.5,
+        "other": 43.7
+      },
+      "3": {
+        "resp": 7.8,
+        "mh": 1.4,
+        "gi": 17.3,
+        "injury": 18.9,
+        "fever": 10.4,
+        "ent": 4.4,
+        "other": 39.9
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 18.4,
+        "mh": 3.4,
+        "gi": 20.7,
+        "injury": 8.6,
+        "fever": 11.5,
+        "ent": 4.6,
+        "other": 32.8
+      },
+      "1": {
+        "resp": 8.3,
+        "mh": 2.3,
+        "gi": 22.2,
+        "injury": 12.0,
+        "fever": 9.7,
+        "ent": 5.1,
+        "other": 40.3
+      },
+      "2": {
+        "resp": 8.0,
+        "mh": 1.3,
+        "gi": 14.8,
+        "injury": 19.5,
+        "fever": 9.9,
+        "ent": 3.0,
+        "other": 43.6
+      },
+      "3": {
+        "resp": 6.6,
+        "mh": 2.5,
+        "gi": 16.0,
+        "injury": 22.8,
+        "fever": 10.6,
+        "ent": 4.2,
+        "other": 37.3
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 19.0,
+        "mh": 1.5,
+        "gi": 23.1,
+        "injury": 7.7,
+        "fever": 15.4,
+        "ent": 4.1,
+        "other": 29.2
+      },
+      "1": {
+        "resp": 14.7,
+        "mh": 1.6,
+        "gi": 18.3,
+        "injury": 11.6,
+        "fever": 11.6,
+        "ent": 6.0,
+        "other": 36.3
+      },
+      "2": {
+        "resp": 8.6,
+        "mh": 2.1,
+        "gi": 17.0,
+        "injury": 19.1,
+        "fever": 7.5,
+        "ent": 4.4,
+        "other": 41.3
+      },
+      "3": {
+        "resp": 8.6,
+        "mh": 4.5,
+        "gi": 18.5,
+        "injury": 16.9,
+        "fever": 12.1,
+        "ent": 4.1,
+        "other": 35.4
+      }
+    }
+  },
+  "8": {
+    "0": {
+      "0": {
+        "resp": 18.2,
+        "mh": 5.8,
+        "gi": 24.7,
+        "injury": 5.8,
+        "fever": 9.7,
+        "ent": 3.2,
+        "other": 32.5
+      },
+      "1": {
+        "resp": 8.0,
+        "mh": 1.5,
+        "gi": 26.4,
+        "injury": 10.0,
+        "fever": 10.4,
+        "ent": 3.5,
+        "other": 40.3
+      },
+      "2": {
+        "resp": 9.8,
+        "mh": 2.4,
+        "gi": 18.3,
+        "injury": 14.1,
+        "fever": 7.7,
+        "ent": 2.0,
+        "other": 45.6
+      },
+      "3": {
+        "resp": 8.1,
+        "mh": 4.3,
+        "gi": 19.1,
+        "injury": 19.8,
+        "fever": 10.0,
+        "ent": 3.5,
+        "other": 35.2
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 16.5,
+        "mh": 1.3,
+        "gi": 20.9,
+        "injury": 8.9,
+        "fever": 16.5,
+        "ent": 3.8,
+        "other": 32.3
+      },
+      "1": {
+        "resp": 11.2,
+        "mh": 1.2,
+        "gi": 22.9,
+        "injury": 12.5,
+        "fever": 11.2,
+        "ent": 4.2,
+        "other": 36.7
+      },
+      "2": {
+        "resp": 6.8,
+        "mh": 2.0,
+        "gi": 16.3,
+        "injury": 18.3,
+        "fever": 7.7,
+        "ent": 3.4,
+        "other": 45.5
+      },
+      "3": {
+        "resp": 7.3,
+        "mh": 2.2,
+        "gi": 13.9,
+        "injury": 20.8,
+        "fever": 13.7,
+        "ent": 3.0,
+        "other": 39.2
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 16.3,
+        "mh": 1.3,
+        "gi": 28.1,
+        "injury": 7.2,
+        "fever": 13.7,
+        "ent": 3.9,
+        "other": 29.4
+      },
+      "1": {
+        "resp": 13.4,
+        "mh": 3.0,
+        "gi": 20.4,
+        "injury": 12.4,
+        "fever": 11.4,
+        "ent": 4.5,
+        "other": 34.8
+      },
+      "2": {
+        "resp": 7.0,
+        "mh": 4.6,
+        "gi": 18.0,
+        "injury": 16.7,
+        "fever": 8.6,
+        "ent": 3.1,
+        "other": 42.0
+      },
+      "3": {
+        "resp": 8.3,
+        "mh": 3.8,
+        "gi": 16.2,
+        "injury": 19.4,
+        "fever": 11.5,
+        "ent": 1.9,
+        "other": 38.8
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 16.6,
+        "mh": 5.1,
+        "gi": 22.9,
+        "injury": 10.2,
+        "fever": 14.6,
+        "ent": 4.5,
+        "other": 26.1
+      },
+      "1": {
+        "resp": 13.1,
+        "mh": 1.6,
+        "gi": 18.7,
+        "injury": 11.1,
+        "fever": 8.7,
+        "ent": 4.8,
+        "other": 42.1
+      },
+      "2": {
+        "resp": 9.6,
+        "mh": 2.4,
+        "gi": 17.1,
+        "injury": 18.8,
+        "fever": 8.3,
+        "ent": 2.4,
+        "other": 41.5
+      },
+      "3": {
+        "resp": 8.2,
+        "mh": 2.6,
+        "gi": 16.4,
+        "injury": 20.6,
+        "fever": 11.7,
+        "ent": 3.8,
+        "other": 36.8
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 15.8,
+        "mh": 5.8,
+        "gi": 23.0,
+        "injury": 6.5,
+        "fever": 13.7,
+        "ent": 3.6,
+        "other": 31.7
+      },
+      "1": {
+        "resp": 11.0,
+        "mh": 2.1,
+        "gi": 16.2,
+        "injury": 14.1,
+        "fever": 11.5,
+        "ent": 4.2,
+        "other": 40.8
+      },
+      "2": {
+        "resp": 5.7,
+        "mh": 2.3,
+        "gi": 15.7,
+        "injury": 21.8,
+        "fever": 8.9,
+        "ent": 3.2,
+        "other": 42.5
+      },
+      "3": {
+        "resp": 7.6,
+        "mh": 2.4,
+        "gi": 14.3,
+        "injury": 19.4,
+        "fever": 9.8,
+        "ent": 3.9,
+        "other": 42.6
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 15.4,
+        "mh": 1.1,
+        "gi": 18.7,
+        "injury": 7.7,
+        "fever": 17.6,
+        "ent": 4.4,
+        "other": 35.2
+      },
+      "1": {
+        "resp": 6.4,
+        "mh": 0.5,
+        "gi": 18.7,
+        "injury": 14.2,
+        "fever": 9.1,
+        "ent": 3.2,
+        "other": 47.9
+      },
+      "2": {
+        "resp": 8.2,
+        "mh": 1.4,
+        "gi": 14.7,
+        "injury": 18.0,
+        "fever": 12.4,
+        "ent": 4.7,
+        "other": 40.7
+      },
+      "3": {
+        "resp": 6.4,
+        "mh": 2.3,
+        "gi": 13.2,
+        "injury": 24.5,
+        "fever": 11.3,
+        "ent": 3.3,
+        "other": 39.0
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 11.6,
+        "mh": 3.2,
+        "gi": 29.7,
+        "injury": 7.7,
+        "fever": 11.0,
+        "ent": 5.2,
+        "other": 31.6
+      },
+      "1": {
+        "resp": 10.3,
+        "mh": 2.2,
+        "gi": 17.9,
+        "injury": 13.8,
+        "fever": 12.1,
+        "ent": 5.8,
+        "other": 37.9
+      },
+      "2": {
+        "resp": 7.5,
+        "mh": 1.9,
+        "gi": 16.5,
+        "injury": 16.9,
+        "fever": 8.8,
+        "ent": 5.1,
+        "other": 43.4
+      },
+      "3": {
+        "resp": 8.3,
+        "mh": 3.4,
+        "gi": 15.9,
+        "injury": 20.5,
+        "fever": 11.9,
+        "ent": 2.2,
+        "other": 37.8
+      }
+    }
+  },
+  "9": {
+    "0": {
+      "0": {
+        "resp": 28.8,
+        "mh": 1.8,
+        "gi": 20.6,
+        "injury": 6.5,
+        "fever": 10.6,
+        "ent": 2.9,
+        "other": 28.8
+      },
+      "1": {
+        "resp": 17.0,
+        "mh": 3.1,
+        "gi": 20.9,
+        "injury": 11.9,
+        "fever": 5.7,
+        "ent": 5.2,
+        "other": 36.3
+      },
+      "2": {
+        "resp": 9.8,
+        "mh": 2.6,
+        "gi": 15.9,
+        "injury": 17.4,
+        "fever": 8.5,
+        "ent": 4.0,
+        "other": 41.7
+      },
+      "3": {
+        "resp": 12.7,
+        "mh": 3.7,
+        "gi": 14.9,
+        "injury": 20.4,
+        "fever": 9.6,
+        "ent": 3.4,
+        "other": 35.4
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 30.4,
+        "mh": 3.6,
+        "gi": 15.5,
+        "injury": 8.3,
+        "fever": 8.3,
+        "ent": 2.4,
+        "other": 31.5
+      },
+      "1": {
+        "resp": 17.4,
+        "mh": 5.0,
+        "gi": 18.2,
+        "injury": 12.4,
+        "fever": 6.9,
+        "ent": 3.0,
+        "other": 37.2
+      },
+      "2": {
+        "resp": 10.5,
+        "mh": 2.9,
+        "gi": 15.3,
+        "injury": 17.1,
+        "fever": 8.3,
+        "ent": 2.3,
+        "other": 43.5
+      },
+      "3": {
+        "resp": 14.4,
+        "mh": 4.3,
+        "gi": 16.2,
+        "injury": 18.0,
+        "fever": 9.7,
+        "ent": 3.3,
+        "other": 34.2
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 33.6,
+        "mh": 1.6,
+        "gi": 17.2,
+        "injury": 5.5,
+        "fever": 17.2,
+        "ent": 3.1,
+        "other": 21.9
+      },
+      "1": {
+        "resp": 14.7,
+        "mh": 3.1,
+        "gi": 18.1,
+        "injury": 15.4,
+        "fever": 8.5,
+        "ent": 4.1,
+        "other": 36.2
+      },
+      "2": {
+        "resp": 11.2,
+        "mh": 6.3,
+        "gi": 12.9,
+        "injury": 20.0,
+        "fever": 6.5,
+        "ent": 2.6,
+        "other": 40.5
+      },
+      "3": {
+        "resp": 10.9,
+        "mh": 4.8,
+        "gi": 12.9,
+        "injury": 19.8,
+        "fever": 10.0,
+        "ent": 2.2,
+        "other": 39.4
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 30.8,
+        "mh": 3.8,
+        "gi": 24.8,
+        "injury": 3.0,
+        "fever": 11.3,
+        "ent": 2.3,
+        "other": 24.1
+      },
+      "1": {
+        "resp": 19.2,
+        "mh": 3.4,
+        "gi": 17.5,
+        "injury": 15.2,
+        "fever": 10.4,
+        "ent": 2.4,
+        "other": 32.0
+      },
+      "2": {
+        "resp": 10.9,
+        "mh": 4.3,
+        "gi": 14.6,
+        "injury": 19.0,
+        "fever": 6.5,
+        "ent": 2.4,
+        "other": 42.3
+      },
+      "3": {
+        "resp": 10.9,
+        "mh": 4.8,
+        "gi": 14.8,
+        "injury": 19.2,
+        "fever": 10.6,
+        "ent": 3.8,
+        "other": 35.9
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 29.9,
+        "mh": 5.4,
+        "gi": 18.4,
+        "injury": 4.1,
+        "fever": 10.2,
+        "ent": 2.0,
+        "other": 29.9
+      },
+      "1": {
+        "resp": 15.3,
+        "mh": 2.2,
+        "gi": 20.1,
+        "injury": 7.6,
+        "fever": 8.9,
+        "ent": 3.8,
+        "other": 42.0
+      },
+      "2": {
+        "resp": 12.2,
+        "mh": 4.4,
+        "gi": 14.9,
+        "injury": 16.3,
+        "fever": 6.7,
+        "ent": 2.5,
+        "other": 43.0
+      },
+      "3": {
+        "resp": 12.8,
+        "mh": 2.8,
+        "gi": 12.5,
+        "injury": 21.9,
+        "fever": 7.9,
+        "ent": 3.8,
+        "other": 38.3
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 28.6,
+        "mh": 0.5,
+        "gi": 23.2,
+        "injury": 9.2,
+        "fever": 10.3,
+        "ent": 3.8,
+        "other": 24.3
+      },
+      "1": {
+        "resp": 16.5,
+        "mh": 2.5,
+        "gi": 13.1,
+        "injury": 11.4,
+        "fever": 9.3,
+        "ent": 5.9,
+        "other": 41.1
+      },
+      "2": {
+        "resp": 10.4,
+        "mh": 2.6,
+        "gi": 14.6,
+        "injury": 22.8,
+        "fever": 6.9,
+        "ent": 3.5,
+        "other": 39.2
+      },
+      "3": {
+        "resp": 15.1,
+        "mh": 3.8,
+        "gi": 11.3,
+        "injury": 20.5,
+        "fever": 11.3,
+        "ent": 2.7,
+        "other": 35.3
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 26.7,
+        "mh": 3.7,
+        "gi": 16.6,
+        "injury": 6.4,
+        "fever": 10.2,
+        "ent": 4.3,
+        "other": 32.1
+      },
+      "1": {
+        "resp": 22.0,
+        "mh": 2.0,
+        "gi": 14.6,
+        "injury": 15.4,
+        "fever": 11.4,
+        "ent": 2.8,
+        "other": 31.9
+      },
+      "2": {
+        "resp": 10.3,
+        "mh": 2.9,
+        "gi": 12.1,
+        "injury": 23.6,
+        "fever": 10.7,
+        "ent": 3.9,
+        "other": 36.5
+      },
+      "3": {
+        "resp": 16.5,
+        "mh": 2.2,
+        "gi": 13.2,
+        "injury": 16.3,
+        "fever": 9.5,
+        "ent": 3.7,
+        "other": 38.5
+      }
+    }
+  },
+  "10": {
+    "0": {
+      "0": {
+        "resp": 30.4,
+        "mh": 2.4,
+        "gi": 20.2,
+        "injury": 5.4,
+        "fever": 8.9,
+        "ent": 3.6,
+        "other": 29.2
+      },
+      "1": {
+        "resp": 20.0,
+        "mh": 4.1,
+        "gi": 17.0,
+        "injury": 8.9,
+        "fever": 6.2,
+        "ent": 1.9,
+        "other": 41.9
+      },
+      "2": {
+        "resp": 13.7,
+        "mh": 5.5,
+        "gi": 15.4,
+        "injury": 17.0,
+        "fever": 9.1,
+        "ent": 2.3,
+        "other": 36.9
+      },
+      "3": {
+        "resp": 14.4,
+        "mh": 5.0,
+        "gi": 17.1,
+        "injury": 19.8,
+        "fever": 7.3,
+        "ent": 3.6,
+        "other": 32.9
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 31.2,
+        "mh": 3.2,
+        "gi": 29.9,
+        "injury": 2.5,
+        "fever": 9.6,
+        "ent": 5.1,
+        "other": 18.5
+      },
+      "1": {
+        "resp": 23.7,
+        "mh": 4.7,
+        "gi": 17.7,
+        "injury": 11.1,
+        "fever": 6.3,
+        "ent": 4.5,
+        "other": 31.9
+      },
+      "2": {
+        "resp": 12.6,
+        "mh": 4.4,
+        "gi": 17.4,
+        "injury": 15.2,
+        "fever": 6.8,
+        "ent": 3.6,
+        "other": 40.0
+      },
+      "3": {
+        "resp": 12.9,
+        "mh": 5.0,
+        "gi": 16.7,
+        "injury": 16.5,
+        "fever": 9.4,
+        "ent": 3.2,
+        "other": 36.3
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 30.3,
+        "mh": 2.3,
+        "gi": 22.3,
+        "injury": 4.6,
+        "fever": 13.7,
+        "ent": 1.1,
+        "other": 25.7
+      },
+      "1": {
+        "resp": 17.4,
+        "mh": 3.2,
+        "gi": 16.9,
+        "injury": 14.2,
+        "fever": 9.2,
+        "ent": 3.2,
+        "other": 35.9
+      },
+      "2": {
+        "resp": 12.3,
+        "mh": 6.7,
+        "gi": 16.8,
+        "injury": 14.0,
+        "fever": 7.6,
+        "ent": 2.8,
+        "other": 39.8
+      },
+      "3": {
+        "resp": 16.5,
+        "mh": 5.4,
+        "gi": 16.2,
+        "injury": 15.7,
+        "fever": 8.9,
+        "ent": 2.8,
+        "other": 34.5
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 32.7,
+        "mh": 2.9,
+        "gi": 14.0,
+        "injury": 3.5,
+        "fever": 13.5,
+        "ent": 4.7,
+        "other": 28.7
+      },
+      "1": {
+        "resp": 16.8,
+        "mh": 4.6,
+        "gi": 16.8,
+        "injury": 10.4,
+        "fever": 7.0,
+        "ent": 2.6,
+        "other": 41.7
+      },
+      "2": {
+        "resp": 13.1,
+        "mh": 4.6,
+        "gi": 19.8,
+        "injury": 14.1,
+        "fever": 6.9,
+        "ent": 3.1,
+        "other": 38.5
+      },
+      "3": {
+        "resp": 13.6,
+        "mh": 4.7,
+        "gi": 15.8,
+        "injury": 19.1,
+        "fever": 11.4,
+        "ent": 3.1,
+        "other": 32.2
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 28.3,
+        "mh": 4.2,
+        "gi": 21.7,
+        "injury": 5.4,
+        "fever": 12.7,
+        "ent": 3.0,
+        "other": 24.7
+      },
+      "1": {
+        "resp": 14.8,
+        "mh": 3.4,
+        "gi": 16.8,
+        "injury": 14.4,
+        "fever": 8.6,
+        "ent": 3.1,
+        "other": 38.8
+      },
+      "2": {
+        "resp": 13.0,
+        "mh": 3.9,
+        "gi": 15.7,
+        "injury": 20.2,
+        "fever": 5.4,
+        "ent": 3.3,
+        "other": 38.6
+      },
+      "3": {
+        "resp": 13.9,
+        "mh": 4.5,
+        "gi": 13.9,
+        "injury": 19.0,
+        "fever": 9.2,
+        "ent": 4.0,
+        "other": 35.3
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 34.3,
+        "mh": 1.7,
+        "gi": 14.4,
+        "injury": 11.0,
+        "fever": 8.3,
+        "ent": 4.4,
+        "other": 26.0
+      },
+      "1": {
+        "resp": 17.9,
+        "mh": 2.0,
+        "gi": 19.4,
+        "injury": 9.9,
+        "fever": 9.9,
+        "ent": 6.3,
+        "other": 34.5
+      },
+      "2": {
+        "resp": 12.2,
+        "mh": 1.8,
+        "gi": 12.2,
+        "injury": 21.2,
+        "fever": 7.0,
+        "ent": 3.6,
+        "other": 42.1
+      },
+      "3": {
+        "resp": 15.7,
+        "mh": 4.0,
+        "gi": 14.6,
+        "injury": 20.8,
+        "fever": 6.9,
+        "ent": 0.9,
+        "other": 37.2
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 35.9,
+        "mh": 1.0,
+        "gi": 14.8,
+        "injury": 7.7,
+        "fever": 8.1,
+        "ent": 7.2,
+        "other": 25.4
+      },
+      "1": {
+        "resp": 21.3,
+        "mh": 2.6,
+        "gi": 14.3,
+        "injury": 10.3,
+        "fever": 7.4,
+        "ent": 5.9,
+        "other": 38.2
+      },
+      "2": {
+        "resp": 15.3,
+        "mh": 2.3,
+        "gi": 14.4,
+        "injury": 17.0,
+        "fever": 7.6,
+        "ent": 4.7,
+        "other": 38.6
+      },
+      "3": {
+        "resp": 16.1,
+        "mh": 3.8,
+        "gi": 18.6,
+        "injury": 17.1,
+        "fever": 7.3,
+        "ent": 4.1,
+        "other": 33.0
+      }
+    }
+  },
+  "11": {
+    "0": {
+      "0": {
+        "resp": 35.4,
+        "mh": 4.0,
+        "gi": 27.3,
+        "injury": 5.1,
+        "fever": 6.1,
+        "ent": 3.0,
+        "other": 19.2
+      },
+      "1": {
+        "resp": 30.7,
+        "mh": 2.0,
+        "gi": 17.8,
+        "injury": 6.6,
+        "fever": 4.9,
+        "ent": 5.1,
+        "other": 32.9
+      },
+      "2": {
+        "resp": 18.2,
+        "mh": 5.0,
+        "gi": 18.4,
+        "injury": 11.6,
+        "fever": 10.0,
+        "ent": 3.9,
+        "other": 32.9
+      },
+      "3": {
+        "resp": 20.9,
+        "mh": 3.7,
+        "gi": 16.8,
+        "injury": 12.2,
+        "fever": 12.1,
+        "ent": 3.6,
+        "other": 30.7
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 40.1,
+        "mh": 2.3,
+        "gi": 15.3,
+        "injury": 3.4,
+        "fever": 13.0,
+        "ent": 4.0,
+        "other": 22.0
+      },
+      "1": {
+        "resp": 26.5,
+        "mh": 3.2,
+        "gi": 16.5,
+        "injury": 8.2,
+        "fever": 8.2,
+        "ent": 5.8,
+        "other": 31.5
+      },
+      "2": {
+        "resp": 15.6,
+        "mh": 5.4,
+        "gi": 15.6,
+        "injury": 14.6,
+        "fever": 7.7,
+        "ent": 2.9,
+        "other": 38.1
+      },
+      "3": {
+        "resp": 16.7,
+        "mh": 3.8,
+        "gi": 17.0,
+        "injury": 14.7,
+        "fever": 9.4,
+        "ent": 4.9,
+        "other": 33.5
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 33.1,
+        "mh": 1.8,
+        "gi": 17.5,
+        "injury": 7.2,
+        "fever": 8.4,
+        "ent": 7.2,
+        "other": 24.7
+      },
+      "1": {
+        "resp": 24.3,
+        "mh": 4.2,
+        "gi": 17.6,
+        "injury": 9.4,
+        "fever": 6.7,
+        "ent": 2.5,
+        "other": 35.4
+      },
+      "2": {
+        "resp": 20.7,
+        "mh": 3.1,
+        "gi": 15.4,
+        "injury": 13.7,
+        "fever": 7.6,
+        "ent": 3.4,
+        "other": 35.9
+      },
+      "3": {
+        "resp": 23.8,
+        "mh": 5.0,
+        "gi": 12.3,
+        "injury": 12.3,
+        "fever": 9.3,
+        "ent": 3.5,
+        "other": 33.7
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 37.9,
+        "mh": 3.1,
+        "gi": 19.6,
+        "injury": 4.5,
+        "fever": 9.4,
+        "ent": 2.2,
+        "other": 23.2
+      },
+      "1": {
+        "resp": 22.7,
+        "mh": 3.4,
+        "gi": 16.0,
+        "injury": 10.4,
+        "fever": 9.0,
+        "ent": 3.4,
+        "other": 35.3
+      },
+      "2": {
+        "resp": 20.1,
+        "mh": 5.0,
+        "gi": 15.3,
+        "injury": 11.5,
+        "fever": 8.3,
+        "ent": 3.6,
+        "other": 36.2
+      },
+      "3": {
+        "resp": 20.7,
+        "mh": 2.8,
+        "gi": 16.3,
+        "injury": 13.3,
+        "fever": 10.4,
+        "ent": 3.6,
+        "other": 33.0
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 40.2,
+        "mh": 2.1,
+        "gi": 17.8,
+        "injury": 4.1,
+        "fever": 10.4,
+        "ent": 5.8,
+        "other": 19.5
+      },
+      "1": {
+        "resp": 24.2,
+        "mh": 2.0,
+        "gi": 22.2,
+        "injury": 7.9,
+        "fever": 4.7,
+        "ent": 5.0,
+        "other": 34.1
+      },
+      "2": {
+        "resp": 17.2,
+        "mh": 4.6,
+        "gi": 14.0,
+        "injury": 14.8,
+        "fever": 7.7,
+        "ent": 3.9,
+        "other": 37.8
+      },
+      "3": {
+        "resp": 20.4,
+        "mh": 4.4,
+        "gi": 14.0,
+        "injury": 14.5,
+        "fever": 10.9,
+        "ent": 3.6,
+        "other": 32.2
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 43.8,
+        "mh": 1.2,
+        "gi": 15.4,
+        "injury": 3.8,
+        "fever": 10.4,
+        "ent": 3.8,
+        "other": 21.5
+      },
+      "1": {
+        "resp": 24.4,
+        "mh": 2.6,
+        "gi": 13.5,
+        "injury": 10.6,
+        "fever": 9.8,
+        "ent": 4.0,
+        "other": 35.1
+      },
+      "2": {
+        "resp": 17.7,
+        "mh": 2.1,
+        "gi": 16.3,
+        "injury": 18.0,
+        "fever": 6.8,
+        "ent": 3.9,
+        "other": 35.3
+      },
+      "3": {
+        "resp": 19.9,
+        "mh": 1.7,
+        "gi": 14.6,
+        "injury": 13.3,
+        "fever": 10.5,
+        "ent": 5.1,
+        "other": 34.9
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 32.8,
+        "mh": 1.3,
+        "gi": 19.8,
+        "injury": 3.4,
+        "fever": 15.9,
+        "ent": 4.7,
+        "other": 22.0
+      },
+      "1": {
+        "resp": 26.8,
+        "mh": 0.6,
+        "gi": 17.6,
+        "injury": 10.9,
+        "fever": 8.9,
+        "ent": 4.5,
+        "other": 30.7
+      },
+      "2": {
+        "resp": 19.9,
+        "mh": 2.5,
+        "gi": 14.7,
+        "injury": 12.7,
+        "fever": 11.0,
+        "ent": 3.9,
+        "other": 35.2
+      },
+      "3": {
+        "resp": 24.3,
+        "mh": 3.9,
+        "gi": 15.1,
+        "injury": 13.7,
+        "fever": 10.5,
+        "ent": 3.9,
+        "other": 28.7
+      }
+    }
+  },
+  "12": {
+    "0": {
+      "0": {
+        "resp": 35.9,
+        "mh": 3.6,
+        "gi": 16.2,
+        "injury": 4.5,
+        "fever": 13.3,
+        "ent": 5.2,
+        "other": 21.4
+      },
+      "1": {
+        "resp": 31.6,
+        "mh": 2.5,
+        "gi": 16.7,
+        "injury": 6.6,
+        "fever": 10.5,
+        "ent": 5.2,
+        "other": 26.9
+      },
+      "2": {
+        "resp": 27.8,
+        "mh": 3.4,
+        "gi": 15.5,
+        "injury": 9.6,
+        "fever": 8.8,
+        "ent": 3.1,
+        "other": 31.9
+      },
+      "3": {
+        "resp": 26.6,
+        "mh": 3.5,
+        "gi": 15.2,
+        "injury": 11.5,
+        "fever": 10.9,
+        "ent": 4.5,
+        "other": 27.8
+      }
+    },
+    "1": {
+      "0": {
+        "resp": 37.0,
+        "mh": 2.1,
+        "gi": 18.0,
+        "injury": 2.5,
+        "fever": 16.5,
+        "ent": 4.9,
+        "other": 19.0
+      },
+      "1": {
+        "resp": 32.9,
+        "mh": 1.6,
+        "gi": 18.7,
+        "injury": 6.6,
+        "fever": 8.8,
+        "ent": 4.5,
+        "other": 26.9
+      },
+      "2": {
+        "resp": 23.9,
+        "mh": 3.7,
+        "gi": 16.3,
+        "injury": 12.1,
+        "fever": 11.2,
+        "ent": 3.7,
+        "other": 29.0
+      },
+      "3": {
+        "resp": 28.2,
+        "mh": 2.9,
+        "gi": 12.3,
+        "injury": 10.4,
+        "fever": 10.4,
+        "ent": 5.3,
+        "other": 30.6
+      }
+    },
+    "2": {
+      "0": {
+        "resp": 37.8,
+        "mh": 1.1,
+        "gi": 16.5,
+        "injury": 4.3,
+        "fever": 12.9,
+        "ent": 7.2,
+        "other": 20.1
+      },
+      "1": {
+        "resp": 32.6,
+        "mh": 1.5,
+        "gi": 16.2,
+        "injury": 5.3,
+        "fever": 10.1,
+        "ent": 4.5,
+        "other": 29.8
+      },
+      "2": {
+        "resp": 24.4,
+        "mh": 2.4,
+        "gi": 15.4,
+        "injury": 9.8,
+        "fever": 10.1,
+        "ent": 4.7,
+        "other": 33.2
+      },
+      "3": {
+        "resp": 27.6,
+        "mh": 3.2,
+        "gi": 15.9,
+        "injury": 11.8,
+        "fever": 10.3,
+        "ent": 3.8,
+        "other": 27.2
+      }
+    },
+    "3": {
+      "0": {
+        "resp": 32.6,
+        "mh": 1.4,
+        "gi": 23.9,
+        "injury": 4.1,
+        "fever": 14.2,
+        "ent": 5.5,
+        "other": 18.3
+      },
+      "1": {
+        "resp": 31.1,
+        "mh": 1.0,
+        "gi": 19.9,
+        "injury": 7.7,
+        "fever": 10.3,
+        "ent": 5.3,
+        "other": 24.9
+      },
+      "2": {
+        "resp": 24.0,
+        "mh": 4.6,
+        "gi": 11.4,
+        "injury": 11.0,
+        "fever": 10.8,
+        "ent": 4.0,
+        "other": 34.2
+      },
+      "3": {
+        "resp": 26.4,
+        "mh": 3.2,
+        "gi": 15.1,
+        "injury": 10.3,
+        "fever": 13.0,
+        "ent": 4.0,
+        "other": 28.0
+      }
+    },
+    "4": {
+      "0": {
+        "resp": 39.4,
+        "mh": 2.4,
+        "gi": 18.5,
+        "injury": 4.3,
+        "fever": 11.8,
+        "ent": 4.3,
+        "other": 19.3
+      },
+      "1": {
+        "resp": 32.9,
+        "mh": 1.6,
+        "gi": 16.5,
+        "injury": 6.6,
+        "fever": 10.1,
+        "ent": 4.9,
+        "other": 27.3
+      },
+      "2": {
+        "resp": 24.1,
+        "mh": 3.2,
+        "gi": 13.2,
+        "injury": 11.9,
+        "fever": 12.2,
+        "ent": 4.4,
+        "other": 31.1
+      },
+      "3": {
+        "resp": 26.3,
+        "mh": 2.2,
+        "gi": 14.9,
+        "injury": 10.9,
+        "fever": 12.5,
+        "ent": 3.5,
+        "other": 29.6
+      }
+    },
+    "5": {
+      "0": {
+        "resp": 35.9,
+        "mh": 1.1,
+        "gi": 19.9,
+        "injury": 2.8,
+        "fever": 11.4,
+        "ent": 6.8,
+        "other": 22.1
+      },
+      "1": {
+        "resp": 34.2,
+        "mh": 0.6,
+        "gi": 16.5,
+        "injury": 5.4,
+        "fever": 8.4,
+        "ent": 3.6,
+        "other": 31.2
+      },
+      "2": {
+        "resp": 27.6,
+        "mh": 1.7,
+        "gi": 13.3,
+        "injury": 10.4,
+        "fever": 11.0,
+        "ent": 5.1,
+        "other": 30.9
+      },
+      "3": {
+        "resp": 28.4,
+        "mh": 4.2,
+        "gi": 14.6,
+        "injury": 10.4,
+        "fever": 12.5,
+        "ent": 3.7,
+        "other": 26.2
+      }
+    },
+    "6": {
+      "0": {
+        "resp": 37.7,
+        "mh": 1.3,
+        "gi": 16.9,
+        "injury": 3.2,
+        "fever": 13.6,
+        "ent": 3.6,
+        "other": 23.7
+      },
+      "1": {
+        "resp": 32.4,
+        "mh": 0.5,
+        "gi": 12.9,
+        "injury": 6.6,
+        "fever": 14.4,
+        "ent": 4.4,
+        "other": 29.0
+      },
+      "2": {
+        "resp": 29.9,
+        "mh": 0.8,
+        "gi": 14.0,
+        "injury": 10.1,
+        "fever": 11.8,
+        "ent": 3.8,
+        "other": 29.5
+      },
+      "3": {
+        "resp": 28.2,
+        "mh": 2.8,
+        "gi": 18.1,
+        "injury": 12.7,
+        "fever": 9.9,
+        "ent": 5.9,
+        "other": 22.4
+      }
+    }
+  }
+};
+
+const SURGE_EMS_PCT = {
+  1: {0:[8.0,3.7,5.1,7.8],1:[9.0,6.9,7.3,6.6],2:[5.3,4.8,6.5,6.5],3:[6.2,4.4,4.4,5.1],4:[2.8,3.9,4.4,6.5],5:[9.2,4.4,3.9,5.4],6:[5.1,3.6,4.7,8.1]},
+  2: {0:[5.2,4.3,5.9,5.7],1:[10.3,4.9,6.5,6.4],2:[6.4,3.5,4.7,4.0],3:[9.1,3.9,4.9,5.0],4:[6.0,4.8,4.2,7.3],5:[10.0,4.6,8.5,5.4],6:[7.8,5.0,2.4,5.0]},
+  3: {0:[8.6,5.5,6.0,5.4],1:[10.7,5.0,7.2,6.0],2:[7.2,3.7,6.4,4.3],3:[9.1,4.5,3.9,5.4],4:[9.9,3.5,5.1,4.9],5:[9.0,2.3,4.0,6.0],6:[6.9,1.7,4.8,5.1]},
+  4: {0:[8.7,4.3,6.6,4.9],1:[8.3,4.0,8.5,4.5],2:[7.9,5.5,3.3,5.7],3:[11.2,4.6,6.2,7.1],4:[6.9,4.3,4.9,6.0],5:[9.2,4.4,3.5,6.5],6:[9.9,4.9,5.1,6.7]},
+  5: {0:[9.1,4.9,8.0,6.6],1:[11.0,4.3,8.3,6.4],2:[11.8,4.4,5.8,5.9],3:[9.6,5.2,5.3,5.6],4:[7.9,3.9,4.8,6.0],5:[10.5,3.3,5.6,5.4],6:[6.3,0.8,5.4,6.8]},
+  6: {0:[7.7,5.6,6.8,6.2],1:[7.9,9.0,5.7,4.1],2:[12.8,3.1,7.4,6.6],3:[11.2,6.4,6.6,6.7],4:[8.1,5.0,8.3,5.0],5:[7.7,3.1,6.0,6.3],6:[9.3,3.7,4.7,7.4]},
+  7: {0:[12.6,5.7,7.1,7.0],1:[7.6,7.1,8.7,5.0],2:[12.5,5.5,5.5,6.9],3:[11.0,3.4,6.7,8.4],4:[12.8,3.1,5.2,5.3],5:[12.6,4.2,5.9,7.7],6:[8.2,5.2,6.1,7.6]},
+  8: {0:[5.2,5.0,6.1,4.9],1:[6.3,4.2,3.6,4.6],2:[9.8,3.5,7.9,5.8],3:[10.2,2.8,5.1,6.9],4:[10.1,3.1,5.5,4.6],5:[11.0,5.9,5.8,4.7],6:[11.6,5.8,6.6,5.4]},
+  9: {0:[6.5,6.2,6.4,4.1],1:[8.3,6.3,7.6,5.7],2:[8.6,3.4,7.1,6.8],3:[11.3,7.4,5.7,7.9],4:[15.6,1.9,6.1,6.4],5:[8.6,3.4,7.3,9.1],6:[14.4,4.3,6.4,5.5]},
+  10:{0:[9.5,7.3,6.8,6.4],1:[8.9,7.1,6.1,6.2],2:[6.9,4.7,8.5,7.3],3:[11.1,6.7,6.6,7.5],4:[14.5,4.5,5.6,8.2],5:[13.3,4.8,4.1,7.1],6:[9.1,6.2,5.5,5.3]},
+  11:{0:[10.1,5.4,7.1,4.4],1:[9.0,3.2,5.3,5.8],2:[8.4,5.2,6.4,5.6],3:[13.8,4.2,4.8,6.3],4:[7.5,5.2,5.1,7.0],5:[7.3,5.2,6.1,5.1],6:[7.3,5.1,4.8,5.3]},
+  12:{0:[7.4,5.4,7.1,5.9],1:[5.6,4.9,6.4,7.0],2:[8.6,4.5,6.4,4.8],3:[7.3,5.3,5.3,7.7],4:[4.7,4.2,5.1,7.1],5:[5.3,2.7,5.3,5.5],6:[5.8,4.1,4.4,4.1]},
+};
+const SURGE_TRANSPORT_PCT = {
+  1: {0:[5.2,0.5,0.8,1.3],1:[5.2,0.5,1.0,1.4],2:[3.9,1.0,0.8,0.9],3:[4.0,1.0,0.7,1.2],4:[5.6,0.3,0.6,1.8],5:[3.9,0.7,0.7,1.4],6:[2.3,0.3,1.1,1.6]},
+  2: {0:[1.7,1.3,0.7,1.1],1:[3.9,0.8,0.9,1.8],2:[5.0,0.5,0.8,1.5],3:[7.0,0.5,0.3,1.5],4:[2.0,1.3,0.8,1.0],5:[2.8,2.1,0.9,2.4],6:[2.4,1.5,1.1,1.8]},
+  3: {0:[4.1,0.8,0.5,1.8],1:[6.3,0.5,0.8,0.9],2:[4.6,0.7,1.0,1.8],3:[3.0,0.5,0.7,1.7],4:[5.5,0.7,0.3,1.0],5:[3.3,0.3,1.7,1.8],6:[2.4,1.0,1.4,1.6]},
+  4: {0:[3.3,1.0,0.5,0.9],1:[4.6,1.2,1.1,1.8],2:[5.8,0.8,1.5,1.1],3:[2.1,0.9,0.7,0.9],4:[2.0,1.2,1.5,1.0],5:[2.9,0.4,0.5,1.7],6:[2.8,1.1,1.3,1.2]},
+  5: {0:[6.7,0.8,0.7,2.1],1:[3.8,0.8,0.7,1.6],2:[7.4,1.0,0.8,1.5],3:[6.4,1.2,0.9,1.7],4:[8.9,1.0,1.2,1.2],5:[6.2,0.7,1.2,1.6],6:[5.2,0.4,0.2,2.6]},
+  6: {0:[5.5,0.7,1.0,1.1],1:[3.7,0.4,1.4,1.5],2:[4.7,1.0,0.4,1.3],3:[6.6,0.7,0.9,1.5],4:[4.3,1.4,1.0,1.4],5:[1.4,2.7,1.2,2.2],6:[3.4,1.3,1.3,1.3]},
+  7: {0:[3.8,1.1,0.7,1.8],1:[5.9,1.3,1.0,2.5],2:[4.5,2.3,1.5,1.0],3:[3.4,0.5,0.9,1.1],4:[5.4,1.8,1.2,2.1],5:[3.4,0.5,0.8,1.9],6:[2.6,0.8,0.6,1.0]},
+  8: {0:[5.2,1.0,0.8,1.4],1:[4.4,1.2,1.6,2.0],2:[5.9,0.0,1.1,0.8],3:[3.8,1.6,0.9,0.9],4:[2.9,1.0,1.4,2.2],5:[3.8,1.4,0.9,1.9],6:[2.6,1.3,1.1,2.0]},
+  9: {0:[4.7,0.5,1.6,1.7],1:[5.4,0.3,1.8,1.1],2:[5.5,1.7,0.6,1.7],3:[3.8,1.7,1.6,1.9],4:[4.1,2.9,1.1,1.3],5:[4.3,0.4,1.5,1.8],6:[4.8,0.8,0.8,1.5]},
+  10:{0:[3.6,0.5,0.9,1.2],1:[5.7,0.3,0.9,2.0],2:[4.0,0.8,0.9,2.0],3:[4.1,1.4,1.0,1.6],4:[4.2,0.7,1.2,1.3],5:[2.8,3.6,0.9,2.7],6:[7.2,1.5,0.9,2.8]},
+  11:{0:[4.0,0.7,0.8,1.0],1:[5.6,1.0,1.0,1.3],2:[8.4,1.5,0.8,1.2],3:[4.0,0.6,1.1,2.0],4:[3.3,0.9,0.7,1.7],5:[3.8,0.9,1.6,1.7],6:[3.4,0.6,1.3,1.2]},
+  12:{0:[2.3,1.2,1.6,2.0],1:[3.5,1.4,1.0,2.1],2:[5.0,1.8,0.3,2.0],3:[6.0,0.7,0.7,1.4],4:[4.7,1.2,0.9,1.5],5:[3.9,1.8,0.5,2.4],6:[4.5,0.7,1.4,1.5]},
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SURGE PROFILE — age-band + CC mix forecast (zero staff input)
+// Hour-block aware: overnight(0-6), morning(7-11), afternoon(12-17), evening(18-23)
+// 6 CC categories + forward/back navigation
+// Derived from 146,164 visits (2023-2025).
+// ═══════════════════════════════════════════════════════════════════════════
+
+var _surgeProfileOffset = 0; // hours offset from now: 0=current, +6=6h ahead, -6=6h back
+
+function getHourBlock(h) {
+  if (h < 7) return 0;   // overnight
+  if (h < 12) return 1;  // morning
+  if (h < 18) return 2;  // afternoon
+  return 3;              // evening
+}
+
+const HOUR_BLOCK_LABELS = ['Overnight (00–06)', 'Morning (07–11)', 'Afternoon (12–17)', 'Evening (18–23)'];
+const HOUR_BLOCK_SHORT  = ['OVERNIGHT', 'MORNING', 'AFTERNOON', 'EVENING'];
+
+function stepSurgeProfile(delta) {
+  _surgeProfileOffset += delta;
+  // Clamp to -24h .. +24h
+  if (_surgeProfileOffset < -24) _surgeProfileOffset = -24;
+  if (_surgeProfileOffset > 24) _surgeProfileOffset = 24;
+  var el = document.getElementById('surge-profile-content');
+  if (el) {
+    var now = new Date();
+    var target = new Date(now.getTime() + _surgeProfileOffset * 3600000);
+    var m = target.getMonth() + 1;
+    var d = (target.getDay() + 6) % 7; // Mon=0
+    var h = target.getHours();
+    var result = getSurgeProfile(m, d, h, _surgeProfileOffset);
+    el.innerHTML = result.html;
+  }
+}
+
+function resetSurgeProfile() {
+  _surgeProfileOffset = 0;
+  stepSurgeProfile(0);
+}
+
+function getSurgeProfile(month, dow, hour, offsetHours) {
+  if (typeof hour === 'undefined') hour = new Date().getHours();
+  if (typeof offsetHours === 'undefined') offsetHours = 0;
+
+  var m = String(month), d = String(dow);
+  var hb = getHourBlock(hour);
+  var hbStr = String(hb);
+
+  var bandLabels = { infant: '< 1 yr', toddler: '1\u20134 yr', school: '5\u201312 yr', teen: '13\u201317 yr' };
+  var bandColors = { infant: '#ff4d6d', toddler: '#ff9a3c', school: '#60a5fa', teen: '#a78bfa' };
+  var ccLabels  = { resp: 'Respiratory', gi: 'GI', injury: 'Injury', mh: 'Mental Health', fever: 'Fever', ent: 'ENT', other: 'Other' };
+  var ccColors  = { resp: '#39d98a', gi: '#ffd166', injury: '#ff9a3c', mh: '#a78bfa', fever: '#ff4d6d', ent: '#60a5fa', other: '#2a2e42' };
+  var ccOrder   = ['resp', 'gi', 'injury', 'fever', 'ent', 'mh', 'other'];
+
+  var profile = (SURGE_PROFILE[m] && SURGE_PROFILE[m][d] && SURGE_PROFILE[m][d][hbStr]) || null;
+  var ccMix   = (SURGE_CC_MIX[m] && SURGE_CC_MIX[m][d] && SURGE_CC_MIX[m][d][hbStr]) || null;
+
+  // Arrival mode: EMS % and Transport % for this cell
+  var emsMi = parseInt(m), emsDi = parseInt(d);
+  var emsPct = 6.0; // overall mean fallback
+  var transPct = 1.6; // overall mean fallback
+  if (SURGE_EMS_PCT[emsMi] && SURGE_EMS_PCT[emsMi][emsDi]) {
+    emsPct = SURGE_EMS_PCT[emsMi][emsDi][hb] || 6.0;
+  }
+  if (SURGE_TRANSPORT_PCT[emsMi] && SURGE_TRANSPORT_PCT[emsMi][emsDi]) {
+    transPct = SURGE_TRANSPORT_PCT[emsMi][emsDi][hb] || 1.6;
+  }
+  var povPct = Math.round((100 - emsPct - transPct) * 10) / 10;
+  emsPct = Math.round(emsPct * 10) / 10;
+  transPct = Math.round(transPct * 10) / 10;
+
+  if (!profile || !ccMix) return { html: '<div style="font-size:11px;color:var(--muted);">Insufficient data for this time window.</div>', narrative: '' };
+
+  // ── Time label + navigation ──
+  var target = new Date(Date.now() + offsetHours * 3600000);
+  var dayLabel = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][target.getDay()];
+  var monthLabel = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][target.getMonth()+1];
+  var timeLabel = dayLabel + ' ' + monthLabel + ' ' + target.getDate() + ' \u00b7 ' + HOUR_BLOCK_LABELS[hb];
+  var isNow = (offsetHours === 0);
+
+  var navHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'
+    + '<button onclick="stepSurgeProfile(-6)" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-family:\'Space Mono\',monospace;font-size:11px;padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'">\u25C0 \u22126h</button>'
+    + '<div style="text-align:center;">'
+    + '<div style="font-family:\'Space Mono\',monospace;font-size:12px;color:' + (isNow ? 'var(--accent)' : 'var(--text)') + ';font-weight:600;">' + (isNow ? '\u25CF NOW' : timeLabel) + '</div>'
+    + '<div style="font-size:9px;color:var(--muted);margin-top:2px;">' + HOUR_BLOCK_SHORT[hb] + ' SHIFT' + (isNow ? '' : ' \u00b7 <span style="cursor:pointer;color:var(--accent);text-decoration:underline;" onclick="resetSurgeProfile()">reset</span>') + '</div>'
+    + '</div>'
+    + '<button onclick="stepSurgeProfile(+6)" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-family:\'Space Mono\',monospace;font-size:11px;padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'">+6h \u25B6</button>'
+    + '</div>';
+
+  // ── Band stacked bar ──
+  var bandsArr = ['infant', 'toddler', 'school', 'teen'];
+  var bandBarHTML = '<div style="display:flex;height:18px;border-radius:3px;overflow:hidden;width:100%;">';
+  bandsArr.forEach(function(b) {
+    var pct = profile[b] || 0;
+    if (pct > 0) bandBarHTML += '<div style="width:'+pct+'%;background:'+bandColors[b]+';" title="'+bandLabels[b]+': '+pct+'%"></div>';
+  });
+  bandBarHTML += '</div>';
+
+  var bandLegend = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">';
+  bandsArr.forEach(function(b) {
+    var pct = profile[b] || 0;
+    bandLegend += '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
+      + '<div style="width:8px;height:8px;border-radius:2px;background:'+bandColors[b]+';"></div>'
+      + '<span style="color:var(--muted);">'+bandLabels[b]+'</span>'
+      + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+pct+'%</span>'
+      + '</div>';
+  });
+  bandLegend += '</div>';
+
+  // ── CC stacked bar ──
+  var ccBarHTML = '<div style="display:flex;height:18px;border-radius:3px;overflow:hidden;width:100%;">';
+  ccOrder.forEach(function(c) {
+    var pct = ccMix[c] || 0;
+    if (pct > 0) ccBarHTML += '<div style="width:'+pct+'%;background:'+ccColors[c]+';" title="'+ccLabels[c]+': '+pct+'%"></div>';
+  });
+  ccBarHTML += '</div>';
+
+  var ccLegend = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">';
+  ccOrder.forEach(function(c) {
+    var pct = ccMix[c] || 0;
+    if (pct >= 2.0) {
+      ccLegend += '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
+        + '<div style="width:8px;height:8px;border-radius:2px;background:'+ccColors[c]+';"></div>'
+        + '<span style="color:var(--muted);">'+ccLabels[c]+'</span>'
+        + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+pct+'%</span>'
+        + '</div>';
+    }
+  });
+  ccLegend += '</div>';
+
+  // ── Staffing narrative ──
+  var respPct = ccMix.resp || 0;
+  var mhPct = ccMix.mh || 0;
+  var feverPct = ccMix.fever || 0;
+  var injPct = ccMix.injury || 0;
+  var entPct = ccMix.ent || 0;
+  var infantPct = profile.infant || 0;
+
+  var signals = [];
+  if (respPct >= 20) signals.push('Respiratory-heavy (' + respPct + '%) \u2014 expect under-5 predominance. Nebulizer capacity, RSV isolation.');
+  if (feverPct >= 10 && infantPct >= 17) signals.push('Elevated febrile workups (' + feverPct + '%) with high infant share (' + infantPct + '%). Anticipate sepsis r/o, blood cultures, possible LPs.');
+  else if (feverPct >= 9) signals.push('Fever visits elevated (' + feverPct + '%). Plan for febrile workup volume.');
+  if (mhPct >= 8) signals.push('MH share elevated (' + mhPct + '%) \u2014 teen-driven. BH staffing, safe room availability, longer LOS expected.');
+  if (injPct >= 16) signals.push('Injury-heavy (' + injPct + '%) \u2014 ortho/suture capacity, imaging throughput.');
+  if (entPct >= 4) signals.push('ENT visits elevated (' + entPct + '%) \u2014 ear/throat complaints, anticipate rapid strep demand.');
+  if (emsPct >= 8) signals.push('EMS arrivals elevated (' + emsPct + '%) \u2014 reserve bay capacity for ambulance handoffs, expect higher acuity mix.');
+  else if (emsPct <= 3.5) signals.push('Low EMS volume expected (' + emsPct + '%) \u2014 walk-in dominant shift.');
+  if (transPct >= 4) signals.push('High transport team volume (' + transPct + '%) \u2014 expect interfacility transfers with handoff paperwork, likely higher acuity.');
+  else if (transPct >= 2.5) signals.push('Moderate transport team traffic (' + transPct + '%).');
+
+  var narrativeText;
+  if (signals.length === 0) {
+    narrativeText = 'Balanced visit mix. No single CC category dominates \u2014 standard staffing profile.';
+  } else {
+    narrativeText = signals.join(' ');
+  }
+
+  // ── Arrival mode bar (3 segments: EMS, Transport, Walk-in) ──
+  var emsColor = '#ff6b6b';
+  if (emsPct >= 8) { emsColor = '#ff4d6d'; } // hot red for elevated
+  else if (emsPct >= 6) { emsColor = '#ff9a3c'; } // orange for normal-high
+  else { emsColor = '#60a5fa'; } // blue for low/normal
+  var transColor = '#ffd166'; // amber for transport team
+  var povColor = '#2a2e42';
+
+  var arrivalBarHTML = '<div style="display:flex;height:18px;border-radius:3px;overflow:hidden;width:100%;">'
+    + '<div style="width:'+emsPct+'%;background:'+emsColor+';" title="EMS/Ambulance: '+emsPct+'%"></div>'
+    + '<div style="width:'+transPct+'%;background:'+transColor+';" title="Transport Team: '+transPct+'%"></div>'
+    + '<div style="width:'+povPct+'%;background:'+povColor+';" title="Walk-in/POV: '+povPct+'%"></div>'
+    + '</div>';
+
+  var arrivalLegend = '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px;">'
+    + '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
+    + '<div style="width:8px;height:8px;border-radius:2px;background:'+emsColor+';"></div>'
+    + '<span style="color:var(--muted);">EMS / Ambulance</span>'
+    + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+emsPct+'%</span>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
+    + '<div style="width:8px;height:8px;border-radius:2px;background:'+transColor+';"></div>'
+    + '<span style="color:var(--muted);">Transport Team</span>'
+    + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+transPct+'%</span>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:4px;font-size:10px;">'
+    + '<div style="width:8px;height:8px;border-radius:2px;background:'+povColor+';"></div>'
+    + '<span style="color:var(--muted);">Walk-in / POV</span>'
+    + '<span style="color:var(--text);font-family:\'Space Mono\',monospace;font-weight:600;">'+povPct+'%</span>'
+    + '</div>'
+    + '</div>';
+
+  var html = navHTML
+    + '<div class="surge-profile-grid">'
+    + '<div>'
+    + '<div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Expected Age Distribution</div>'
+    + bandBarHTML + bandLegend
+    + '</div>'
+    + '<div>'
+    + '<div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Expected Chief Complaint Mix</div>'
+    + ccBarHTML + ccLegend
+    + '</div>'
+    + '</div>'
+    + '<div style="margin-top:12px;">'
+    + '<div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Expected Arrival Method</div>'
+    + arrivalBarHTML + arrivalLegend
+    + '</div>'
+    + '<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:5px;">'
+    + '<div style="font-size:10px;color:var(--accent);font-family:\'Space Mono\',monospace;letter-spacing:1px;margin-bottom:3px;">STAFFING SIGNAL</div>'
+    + '<div style="font-size:12px;color:var(--text);line-height:1.5;">'+narrativeText+'</div>'
+    + '</div>';
+
+  return { html: html, narrative: narrativeText };
+}
+
 
 function setThreshold(t) {
   SURGE_THRESH = t;
@@ -4040,6 +9759,15 @@ function renderDashboard(iliData = null) {
           <span style="color:var(--orange);">■ 9–11</span> &nbsp;
           <span style="color:var(--red);">■ ≥12</span> &nbsp;arrivals/hr
         </div>
+      </div>
+    </div>
+
+    <!-- SURGE PROFILE -->
+    <div class="sdiv">Surge Profile</div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Expected Visit Composition</div><div class="badge badge-p">AGE · CC MIX · ARRIVAL MODE · 146K VISITS</div></div>
+      <div class="pb" id="surge-profile-content">
+        ${getSurgeProfile(month, dow, hour, 0).html}
       </div>
     </div>
 
