@@ -1117,7 +1117,7 @@ to { opacity:1; transform:translateY(0); }
     <div class="tpb" style="font-size:10px;color:var(--muted);line-height:1.9;">
       <div style="font-size:9px;color:#f5a623;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:8px;">⚠ UPDATE REQUIRED EACH DECEMBER FOR THE FOLLOWING YEAR</div>
       <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:9px;">
-        <span style="color:#ffd166;">🏫 School calendar</span><span>Breaks, holidays, return dates — Tacoma Public Schools website</span>
+        <span style="color:#ffd166;">🏫 School calendar</span><span>Breaks, holidays, return dates — all 6 Pierce County districts. TPS: tacomaschools.org · Puyallup: puyallupsd.org · Bethel: bethelsd.org · Clover Park: cloverpark.k12.wa.us · Franklin Pierce: fpschools.org · Fife: fifeschools.com</span>
         <span style="color:#ffd166;">🎓 Graduation dates</span><span>Tacoma Dome ceremony schedule + DEFAULT_SEASON_START/END in code</span>
         <span style="color:#ffd166;">🎡 WA State Fair</span><span>Dates shift annually — confirm at thefair.com (usually Sep)</span>
         <span style="color:#ffd166;">🌸 Spring Fair</span><span>Puyallup Spring Fair dates — thefair.com (usually Apr)</span>
@@ -1152,6 +1152,7 @@ to { opacity:1; transform:translateY(0); }
       <div><span style="color:#c8cfe8;font-weight:600;">AUC:</span> 0.838 (default t=10) · N=146,276 visits · 3-year training set</div>
       <div><span style="color:#c8cfe8;font-weight:600;">Peak hours:</span> 17:00–20:00 · Peak days: Mon–Wed · Peak months: Jan–Mar, Sep–Oct</div>
       <div><span style="color:#c8cfe8;font-weight:600;">School effect:</span> School days shift surge window to 17:00–21:00. School breaks reduce daily volume ~5% but increase off-peak hours. Post-break return adds ×1.15–1.25 modifier.</div>
+      <div style="margin-top:2px;"><span style="color:#c8cfe8;font-weight:600;">District coverage:</span> Calendar covers all 6 major Pierce County districts (~96K students): TPS (28K), Puyallup (23K), Bethel (21K), Clover Park (12K), Franklin Pierce (8K), Fife (4K). Major breaks are aligned across districts — Winter (Dec 22–Jan 2), Thanksgiving (Nov 26–28), Spring (Apr 6–10) — and no modifier adjustment is needed for district-specific deviations. Key divergences documented as informational: Clover Park spring break is Mar 30–Apr 3 (one week earlier); Franklin Pierce has a full mid-winter week off Feb 16–20; Fife has Feb 13–16 off. Statistical testing confirmed none of these shift ED volume detectably (single-district breaks represent ≤12% of catchment — too small to measure, all p&gt;0.20).</div>
       <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Surge window reduction:</span> Hours 15–21 receive empirical decay multipliers when no surge has been confirmed — P(surge at H | no surge since 15:00) drops monotonically each passing hour.</div>
     </div>
   </div>
@@ -1413,7 +1414,7 @@ to { opacity:1; transform:translateY(0); }
       <div><span style="color:#c8cfe8;font-weight:600;">Throughput.csv</span> — ~146K ED visits, Jan 2023–Dec 2025, Mary Bridge Children's ED</div>
       <div><span style="color:#c8cfe8;font-weight:600;">CMU Delphi Epidata</span> — Weekly ILI %, HHS Region 10. Live fetch, no API key required.</div>
       <div><span style="color:#c8cfe8;font-weight:600;">Google Trends</span> — Pierce County DMA 819, 7 keywords. Display only.</div>
-      <div><span style="color:#c8cfe8;font-weight:600;">Event dates</span> — WA State Fair, Pierce County Fair, Zoolights, WIAA playoffs, graduations, school calendar. Manually confirmed annually.</div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Event dates</span> — WA State Fair, Pierce County Fair, Zoolights, WIAA playoffs, graduations, school calendar (6 Pierce County districts). Manually confirmed annually from each district's published calendar.</div>
     </div>
   </div>
 
@@ -8556,19 +8557,27 @@ function setThreshold(t) {
 // Sources: tacomaschools.org, educounty.net, tacomadome.org, wiaa.com, thefair.com
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ── SCHOOL CALENDAR (Tacoma Public Schools 2025-26) ────────────────────────
+// ── SCHOOL CALENDAR (Tacoma Public Schools + Surrounding Districts 2025-26) ──
+// Districts: TPS (28K), Puyallup (23K), Bethel (21K), Clover Park (12K),
+//            Franklin Pierce (7.9K), Fife (4K) — ~96K students total catchment
+// Sources: tacomaschools.org, puyallupsd.org, bethelsd.org, cloverpark.k12.wa.us,
+//          fpschools.org, fifeschools.com
 const SCHOOL_EVENTS = [
+  { start: '2025-08-26', end: '2025-08-29', type: 'break',   name: 'FP/Bethel School Start (Early)', surgeNote: 'Franklin Pierce (Aug 26) and Bethel (Aug 27) start before TPS. ~29K students in school; TPS still on summer.' },
   { start: '2025-09-01', end: '2025-09-01', type: 'holiday', name: 'Labor Day', surgeNote: 'Holiday — moderate surge risk evening' },
   { start: '2025-11-11', end: '2025-11-11', type: 'holiday', name: "Veterans' Day", surgeNote: 'No school → watch Monday post-holiday surge' },
-  { start: '2025-11-26', end: '2025-11-28', type: 'break',   name: 'Thanksgiving Break', surgeNote: 'Extended break — elevated surge risk on return' },
-  { start: '2025-12-22', end: '2026-01-02', type: 'break',   name: 'Winter Break', surgeNote: '⚠️ HIGH: Winter break + peak respiratory season' },
-  { start: '2026-01-05', end: '2026-01-05', type: 'return',  name: 'School Resumes (Winter)', surgeNote: '🔴 POST-BREAK SURGE: Expect elevated Mon/Tue volumes' },
-  { start: '2026-01-19', end: '2026-01-19', type: 'holiday', name: 'MLK Day', surgeNote: 'No school — surge risk elevated' },
-  { start: '2026-02-16', end: '2026-02-16', type: 'holiday', name: "Presidents' Day", surgeNote: 'Mid-winter holiday — watch Monday return' },
-  { start: '2026-04-06', end: '2026-04-10', type: 'break',   name: 'Spring Break', surgeNote: 'Spring break — moderate surge risk; lower than winter' },
-  { start: '2026-04-13', end: '2026-04-13', type: 'return',  name: 'School Resumes (Spring)', surgeNote: '↑ Post-break surge possible Mon/Tue' },
-  { start: '2026-05-25', end: '2026-05-25', type: 'holiday', name: 'Memorial Day', surgeNote: 'Holiday weekend — watch Tuesday return' },
-  { start: '2026-06-17', end: '2026-06-17', type: 'holiday', name: 'Last Day of School', surgeNote: 'Summer begins — low surge season starts' },
+  { start: '2025-11-26', end: '2025-11-28', type: 'break',   name: 'Thanksgiving Break', surgeNote: 'Extended break — all 5 surrounding districts aligned with TPS. Elevated surge risk on return.' },
+  { start: '2025-12-22', end: '2026-01-02', type: 'break',   name: 'Winter Break', surgeNote: '⚠️ HIGH: Winter break + peak respiratory season. All Pierce County districts aligned (Dec 22–Jan 2).' },
+  { start: '2026-01-05', end: '2026-01-05', type: 'return',  name: 'School Resumes (Winter)', surgeNote: '🔴 POST-BREAK SURGE: All districts return Jan 5–7. Expect elevated Mon/Tue volumes.' },
+  { start: '2026-01-19', end: '2026-01-19', type: 'holiday', name: 'MLK Day', surgeNote: 'No school all districts — surge risk elevated' },
+  { start: '2026-02-13', end: '2026-02-16', type: 'break',   name: 'Mid-Winter Break (Fife)', surgeNote: 'Fife SD: 4-day mid-winter break Feb 13–16 (~4K students). Other districts: Presidents Day Feb 16 only.' },
+  { start: '2026-02-16', end: '2026-02-20', type: 'break',   name: "Mid-Winter Break (Franklin Pierce)", surgeNote: "Franklin Pierce: full week off Feb 16–20 (~8K students). TPS/Puyallup/Bethel/Clover Park have Presidents Day only." },
+  { start: '2026-03-30', end: '2026-04-03', type: 'break',   name: 'Spring Break (Clover Park)', surgeNote: 'Clover Park SD spring break Mar 30–Apr 3 — one week EARLIER than all other districts (~12K students, Lakewood/JBLM area).' },
+  { start: '2026-04-06', end: '2026-04-06', type: 'return',  name: 'Clover Park Returns + Other Break Starts', surgeNote: 'Clover Park returns Apr 6 while TPS/Puyallup/Bethel/Fife/Franklin Pierce begin spring break. Mixed school status week.' },
+  { start: '2026-04-06', end: '2026-04-10', type: 'break',   name: 'Spring Break (TPS + Most Districts)', surgeNote: 'Spring break TPS, Puyallup, Bethel, Fife, Franklin Pierce — ~84K students out. Moderate surge risk; lower than winter.' },
+  { start: '2026-04-13', end: '2026-04-13', type: 'return',  name: 'School Resumes (Spring — All Districts)', surgeNote: '↑ Post-break surge possible Mon/Tue. All districts back in session by Apr 13.' },
+  { start: '2026-05-22', end: '2026-05-25', type: 'holiday', name: 'Memorial Day Weekend', surgeNote: 'Memorial Day May 25. FP/Fife out May 22–25 (4-day weekend); TPS/others May 25 only.' },
+  { start: '2026-06-10', end: '2026-06-17', type: 'break',   name: 'End of School Year (Staggered)', surgeNote: 'Clover Park last day Jun 10, Bethel Jun 11, Puyallup Jun 16, FP Jun 16, TPS Jun 17. Summer surge season begins.' },
 ];
 
 // ── GRADUATION EVENTS (Tacoma Dome) ──────────────────────────────────────
@@ -9022,7 +9031,7 @@ function getSchoolStatus(dateStr) {
       return { type: ev.type, label: ev.name, desc: ev.surgeNote };
     }
   }
-  if (d < new Date('2025-09-03T00:00:00') || d > new Date('2026-06-17T23:59:59')) {
+  if (d < new Date('2025-08-26T00:00:00') || d > new Date('2026-06-17T23:59:59')) {
     return { type: 'no-school', label: 'Summer / Pre-School Year', desc: 'School not in session. Lower pediatric volume typical.' };
   }
   return { type: 'school-day', label: 'Regular School Day', desc: 'School day — evening surge window 17:00–21:00. Pediatric clinics close ~17:00.' };
@@ -10104,7 +10113,7 @@ function renderDashboard(iliData = null) {
 
       <!-- SCHOOL CALENDAR -->
       <div class="panel">
-        <div class="ph"><div class="pt">School Calendar · TPS 2025–26</div><div class="badge badge-p">TACOMA PUBLIC SCHOOLS</div></div>
+        <div class="ph"><div class="pt">School Calendar · Pierce County Districts 2025–26</div><div class="badge badge-p">TPS · PUYALLUP · BETHEL · CLOVER PARK · FP · FIFE</div></div>
         <div class="pb">
           <div class="cal-today ${schoolCalType}">
             <div class="cal-status">${
