@@ -959,6 +959,16 @@ to { opacity:1; transform:translateY(0); }
   </div>
 
   <div class="sdiv">24-Hour MH Visit Forecast</div>
+  <div class="panel">
+    <div class="ph"><div class="pt">P(≥1 MH Visit) · Next 24 Hours</div><div class="badge badge-p">POISSON · MH LOAD ADJUSTED</div></div>
+    <div class="pb">
+      <div id="mh-bars-inner" style="display:flex;gap:2px;align-items:flex-end;height:120px;padding-top:8px;overflow-x:auto;"></div>
+      <div style="margin-top:6px;font-size:9px;color:#8892b0;display:flex;gap:16px;">
+        <span><span style="color:#a78bfa;">■</span> Above daily threshold</span>
+        <span><span style="color:#39d98a;">■</span> Below threshold</span>
+      </div>
+    </div>
+  </div>
 
   <div class="row2b">
 
@@ -1293,29 +1303,31 @@ to { opacity:1; transform:translateY(0); }
   <div class="sdiv">Weather Outlook · Injury & CC Impact Model</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
-      <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Provides a 7-day weather forecast with empirically derived estimates of injury visit volume impact, displayed as a staffing advisory on the main dashboard. Fetches live from Open-Meteo (SEA-TAC coordinates: 47.4444, −122.3138) on each page load.</div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Provides a 7-day weather forecast with empirically derived estimates of injury visit volume impact, displayed as a staffing advisory on the main dashboard. Fetches live from Open-Meteo (SEA-TAC coordinates: 47.4444, −122.3138) on each page load; cached per hour to prevent flicker on re-render.</div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Key Finding</div>
-      <div>Anomalously sunny days — defined as above the within-month p75 sunshine threshold — are associated with elevated injury visit counts in <span style="color:#c8cfe8;">spring and fall only</span>. Summer is null (virtually no non-sunny comparison days). Winter is null (cold suppresses outdoor activity despite sunshine). Temperature alone has no independent injury signal after season is controlled.</div>
+      <div>Sunny days are associated with elevated injury visit counts in <span style="color:#c8cfe8;">spring (Mar–May) and select fall months (Sep, Nov) only</span>. Summer is null (virtually no non-sunny comparison days). Winter is null (cold suppresses outdoor activity despite sunshine). October is null at every threshold tested (max sunshine 11.1h — no significant RR). Temperature alone has no independent injury signal after season is controlled.</div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Empirical Signals (N=146,164 visits · 2023–2025)</div>
       <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 12px;font-size:9px;font-family:'Space Mono',monospace;">
-        <span style="color:#ff4d6d;">Spring Sunny &amp; Cool</span><span style="color:#c8cfe8;">+5.3 inj/day (+14%)</span><span>Strongest signal (p=0.002). Sunny but cool spring days — kids go outside unexpectedly after indoor stretch; cool temps drive high-energy play. Injury CC peaks 16–19:00.</span>
-        <span style="color:#ff9a3c;">Spring Sunny &amp; Warm</span><span style="color:#c8cfe8;">+2.8 inj/day (+7%)</span><span>Moderate signal (p=0.043). Evening window (17–20:00) injury share rises to 34–39% of visits vs ~32% baseline. Warm temps favor sustained outdoor activity.</span>
-        <span style="color:#ff9a3c;">Fall Sunny (either temp)</span><span style="color:#c8cfe8;">+2.2–2.6 inj/day (+6–7%)</span><span>Uniform across temp conditions in fall (both p&lt;0.04). No temperature differentiation — sunshine is the driver. Injury share elevated 16–22:00.</span>
-        <span style="color:#60a5fa;">Heavy Rain (&gt;0.5")</span><span style="color:#c8cfe8;">−1.0 inj/day</span><span>Suppresses outdoor activity — fewer voluntary injury presentations (r=−0.14, p&lt;0.001). Strongest weather signal in adjusted analysis.</span>
+        <span style="color:#ff4d6d;">Spring Sunny &amp; Cool</span><span style="color:#c8cfe8;">+5.3 inj/day (+14%)</span><span>Strongest signal. Sunny but cool spring day (>8h sunshine) — kids go outside unexpectedly; cool temps drive high-energy play. Injury CC peaks 16–19:00.</span>
+        <span style="color:#ff9a3c;">Spring Sunny &amp; Warm</span><span style="color:#c8cfe8;">+2.8 inj/day (+7%)</span><span>Moderate signal. Evening window (17–20:00) injury share rises. Warm temps favor sustained outdoor activity.</span>
+        <span style="color:#ff9a3c;">Sep Sunny (>11.5h)</span><span style="color:#c8cfe8;">+2.6 inj/day</span><span>RR=1.27, p=0.006. September-specific; Oct/Nov use separate thresholds.</span>
+        <span style="color:#ff9a3c;">Nov Sunny (>4h)</span><span style="color:#c8cfe8;">+2.6 inj/day</span><span>RR=1.33, p=0.010. Even moderate sunshine is anomalous in November — robust to DOW adjustment (p=0.013) and Thanksgiving exclusion (RR=1.39).</span>
+        <span style="color:#60a5fa;">Heavy Rain (&gt;0.5")</span><span style="color:#c8cfe8;">−1.0 inj/day</span><span>Suppresses outdoor activity — fewer voluntary injury presentations (r=−0.14, p&lt;0.001).</span>
         <span style="color:#60a5fa;">High Wind (≥18 mph)</span><span style="color:#c8cfe8;">−0.7 inj/day</span><span>Mild suppression — keeps families indoors (r=−0.07, p=0.024).</span>
-        <span style="color:var(--muted);">Summer sunny days</span><span style="color:var(--muted);">Null</span><span>No contrast group — only 34 non-sunny summer days over 3 years. Injury share at seasonal high regardless of weather.</span>
-        <span style="color:var(--muted);">Temperature alone (warm, not sunny)</span><span style="color:var(--muted);">Null</span><span>Dark &amp; warm vs dark &amp; cool: p=0.85–0.95. Sunshine is the mechanism, not temperature.</span>
+        <span style="color:var(--muted);">October sunny</span><span style="color:var(--muted);">Null</span><span>No significant threshold at any level (all p>0.20). Max possible sunshine in Oct = 11.1h — physically insufficient to drive detectable signal.</span>
+        <span style="color:var(--muted);">Summer sunny days</span><span style="color:var(--muted);">Null</span><span>No contrast group — only 34 non-sunny summer days over 3 years.</span>
+        <span style="color:var(--muted);">Temperature alone</span><span style="color:var(--muted);">Null</span><span>Dark &amp; warm vs dark &amp; cool: p=0.85–0.95. Sunshine is the mechanism, not temperature.</span>
       </div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Classification Logic</div>
-      <div>Each forecast day is classified using <span style="color:#c8cfe8;">within-month p75 thresholds</span> for both sunshine hours and max temperature, derived from SEA-TAC 2023–2025 historical data. A day is "anomalously sunny" only if it exceeds the p75 for that specific month — a sunny February (threshold: 8.6h) triggers the signal where a sunny July (threshold: 15.0h) does not. This prevents false positives from summer baseline sunshine being flagged as anomalous.</div>
+      <div>Each forecast day is classified using <span style="color:#c8cfe8;">empirically derived absolute sunshine-hour thresholds</span> (WX_SUN_THRESH), optimized by RR × −log10(p) score across all days in that season (not just clear days). Thresholds: Mar/Apr/May >8.0h, Sep >11.5h, Nov >4.0h. Oct removed — no detectable signal. Temperature threshold (WX_TEMP_P75) remains within-month p75 and is used only to differentiate warm vs cool within the sunny classification. Re-derivable via <code>refresh_models.py</code> as new data accumulates.</div>
 
-      <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">What the Signal Is — and Isn't</div>
-      <div style="line-height:1.7;">The effect is on <span style="color:#c8cfe8;">absolute injury count</span>, not injury rate. On anomalously sunny spring days, overall ED volume also rises slightly — injury share as a percentage of total visits shifts by ~2–3 percentage points. The clinical observation (more injuries on nice days) is correct; the signal was previously masked by over-adjustment and using rate rather than count as the outcome. The effect is not large enough to shift hourly surge probability — it diffuses across 15+ hours — but it does affect <span style="color:#c8cfe8;">evening case mix</span> (16:00–22:00 window) and is operationally relevant for ortho, suture, and imaging capacity planning.</div>
+      <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Threshold Derivation</div>
+      <div style="line-height:1.7;">Thresholds were derived by sweeping absolute sunshine hours in 0.5h steps and selecting the threshold maximising RR × −log10(p) (Mann-Whitney U, one-sided, p&lt;0.05 required). All-days analysis was used (not clear-days only) so that rainy days — which naturally have low sunshine and low injury rates — serve as implicit controls, increasing power. Per-month analysis was insufficient (n≈30/month); spring months were pooled. p75-based thresholds were replaced because they caused false on/off flicker as forecasts updated (9.87h vs 10.8h p75 threshold on Mar 30 was the observed trigger). The new absolute thresholds are more stable and statistically better calibrated.</div>
 
-      <div style="margin-top:8px;font-size:9px;color:#4a5568;">Analysis basis: partial Spearman correlation on within-month sunshine anomaly vs daily injury count, N=1,091 days. Season-stratified MWU tests. Investigation prompted by clinical observation that sunny days appear to bring more injuries — confirmed using anomaly approach after initial month-adjusted analysis incorrectly found null.</div>
+      <div style="margin-top:8px;font-size:9px;color:#4a5568;">Analysis basis: N=1,091 days × 3yr ERA5 reanalysis (SEA-TAC). RR × −log10(p) composite score. Season-stratified MWU tests. October analyzed separately — confirmed null. November analyzed separately — significant at >4h (DOW-adjusted). WX_SUN_THRESH patchable by refresh_models.py.</div>
     </div>
   </div>
 
@@ -2596,11 +2608,16 @@ const SURGE_BY_DOW = [0.22, 0.175, 0.178, 0.167, 0.142, 0.11, 0.136];
 // ═══════════════════════════════════════════════════════════════════════════
 // WEATHER OUTLOOK — 7-Day Forecast + Empirical Injury/CC Impact Model
 // Derived from 146,164 visits × Open-Meteo weather, 2023–2025
-// Impact thresholds: within-month p75 for sunshine and temperature
+// Impact thresholds: WX_SUN_THRESH empirically derived, WX_TEMP_P75 within-month p75
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Monthly p75 thresholds derived from SEA-TAC 2023-2025 data
-const WX_SUN_P75  = {1:7.8,2:8.6,3:10.8,4:12.9,5:14.0,6:15.2,7:15.0,8:13.7,9:12.0,10:9.9,11:7.8,12:6.5};
+// Empirically derived sunshine thresholds — absolute hours, optimized by RR×−log10(p) score.
+// All-days analysis (2023–2025 SEA-TAC ERA5 reanalysis), n per month shown.
+// Spring >8.0h: RR=1.30, p=0.0002 (n=273). Sep >11.5h: RR=1.27, p=0.006 (n=90).
+// Nov >4.0h: RR=1.33, p=0.010 (n=90); robust to DOW adjustment and Thanksgiving exclusion.
+// Oct: no significant threshold at any level (max sun=11.1h, all p>0.20) — modifier removed.
+const WX_SUN_THRESH = {3:8.0, 4:8.0, 5:8.0, 9:11.5, 11:4.0};
 const WX_TEMP_P75 = {1:48.3,2:49.4,3:55.1,4:59.9,5:70.2,6:75.5,7:84.7,8:82.4,9:74.2,10:63.5,11:54.0,12:52.7};
 
 function wxGetSeason(month) {
@@ -2613,7 +2630,7 @@ function wxGetSeason(month) {
 // Returns condition label and staffing narrative for a forecast day
 function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month) {
   const season    = wxGetSeason(month);
-  const sunHigh   = sunHrs  > WX_SUN_P75[month];
+  const sunHigh   = sunHrs  > (WX_SUN_THRESH[month] || 999);
   const tempHigh  = tempF   > WX_TEMP_P75[month];
   const heavyRain = precipIn >= 0.5;
   const modRain   = precipIn >= 0.1 && precipIn < 0.5;
@@ -2654,27 +2671,41 @@ function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month) {
     signals.push('High winds keep families indoors — injury volume slightly below baseline (r=−0.07, p=0.024).');
     ccNotes.push('Slightly reduced injury volume');
   }
-  // ── Sunny & warm (spring/fall) ──
-  else if (sunHigh && tempHigh && (season === 'spring' || season === 'fall')) {
+  // ── Sunny & warm (spring or Sep) ──
+  else if (sunHigh && tempHigh && (season === 'spring' || (season === 'fall' && month === 9))) {
     icon = '☀️'; label = 'Sunny & Warm'; color = '#fbbf24';
     injMod = season === 'spring' ? 2.8 : 2.2;
     const pct = season === 'spring' ? 7 : 6;
-    signals.push(`Anomalously sunny AND warm for ${month < 6 ? 'spring' : 'fall'} — injury share elevated +${pct}% above seasonal baseline. Injury CC peaks 17:00–20:00 (35–39% of visits vs ~32% baseline). Anticipate ortho/suture/imaging demand in evening window.`);
+    signals.push(`Sunny AND warm ${month < 6 ? 'spring' : 'September'} day (>${WX_SUN_THRESH[month]}h sunshine) — injury share elevated +${pct}% above seasonal baseline. Injury CC peaks 17:00–20:00. Anticipate ortho/suture/imaging demand in evening window.`);
     ccNotes.push(`+${injMod.toFixed(0)} inj/day expected`, 'Injury CC peaks 17–20:00');
+  }
+  // ── Sunny & warm November ──
+  else if (sunHigh && tempHigh && season === 'fall' && month === 11) {
+    icon = '☀️'; label = 'Warm & Sunny November'; color = '#fbbf24';
+    injMod = 2.6;
+    signals.push(`Warm AND sunny November day (>${WX_SUN_THRESH[month]}h sunshine) — injury elevated (RR=1.33, p=0.010). Unusually warm late-fall days extend outdoor activity window.`);
+    ccNotes.push('+3 inj/day expected', 'Injury CC elevated');
   }
   // ── Sunny & cool (spring — strongest signal) ──
   else if (sunHigh && !tempHigh && season === 'spring') {
     icon = '🌤'; label = 'Sunny & Cool'; color = '#34d399';
     injMod = 5.3;
-    signals.push('Anomalously sunny but cool spring day — STRONGEST injury signal (+14% above baseline, p=0.002). Kids go outside unexpectedly after indoor stretch; cool temps drive high-energy play (bikes, sports, running). Injury CC peaks 16:00–19:00. Plan ortho/suture/imaging capacity ahead of evening shift.');
+    signals.push(`Sunny but cool spring day (>${WX_SUN_THRESH[month]}h sunshine) — STRONGEST injury signal (RR=1.30, p=0.0002, all-days analysis n=273). Kids go outside after indoor stretch; cool temps drive high-energy play. Injury CC peaks 16:00–19:00. Plan ortho/suture/imaging capacity ahead of evening shift.`);
     ccNotes.push('+5 inj/day expected', 'Highest-risk weather pattern');
   }
-  // ── Sunny & cool (fall) ──
-  else if (sunHigh && !tempHigh && season === 'fall') {
+  // ── Sunny & cool (Sep only — Oct/Nov handled separately below) ──
+  else if (sunHigh && !tempHigh && season === 'fall' && month === 9) {
     icon = '🌤'; label = 'Sunny & Cool'; color = '#34d399';
     injMod = 2.6;
-    signals.push('Sunny fall day above seasonal norm — injury volume elevated ~7% (p=0.018). Lacerations, falls, and sports injuries peak 16:00–21:00. Moderate advisory: ensure evening ortho/suture coverage.');
+    signals.push(`Sunny September day (>${WX_SUN_THRESH[month]}h sunshine) — injury volume elevated (RR=1.27, p=0.006). Lacerations, falls, and sports injuries peak 16:00–21:00. Ensure evening ortho/suture coverage.`);
     ccNotes.push('+3 inj/day expected', 'Injury CC elevated 16–21:00');
+  }
+  // ── Sunny November (low threshold — even 4h is anomalous) ──
+  else if (sunHigh && season === 'fall' && month === 11) {
+    icon = '🌤'; label = 'Sunny November'; color = '#34d399';
+    injMod = 2.6;
+    signals.push(`Sunny November day (>${WX_SUN_THRESH[month]}h sunshine) — injury volume elevated (RR=1.33, p=0.010, DOW-adjusted). Even moderate sun drives outdoor activity in late fall when baseline is very low. Robust to Thanksgiving exclusion (RR=1.39).`);
+    ccNotes.push('+3 inj/day expected', 'Sunny fall day — injury elevated');
   }
   // ── Summer sunny (null — already baseline) ──
   else if (sunHigh && season === 'summer') {
@@ -2713,23 +2744,79 @@ function wxTempColor(tempF) {
   return '#a5c8ff';
 }
 
+var _wxCache = null;       // cached Open-Meteo response
+var _wxCacheHour = -1;    // hour the cache was populated
+var _wxTodaySignal = null; // today's wx injury signal — read by renderDashboard for hero card
+
+function renderHeroWxAdvisory() {
+  var el = document.getElementById('hero-wx-advisory');
+  if (!el) return;
+  var wx = _wxTodaySignal;
+  if (!wx || Math.abs(wx.injMod) < 1) { el.innerHTML = ''; return; }
+  var isHigh  = wx.injMod > 3;
+  var isMod   = wx.injMod > 1;
+  var col     = isHigh ? '#ff4d6d' : isMod ? '#ff9a3c' : '#60a5fa';
+  var icon    = isHigh ? '⚠️' : isMod ? '▲' : '▼';
+  var heading = isHigh ? 'INJURY ADVISORY' : isMod ? 'INJURY WATCH' : 'REDUCED INJURY LOAD';
+  var dir     = wx.injMod > 0 ? '+' + wx.injMod.toFixed(0) : wx.injMod.toFixed(0);
+  el.innerHTML =
+    '<div style="margin-top:10px;padding:8px 10px;border-radius:5px;background:rgba(255,255,255,0.03);border:1px solid '+col+';border-left:3px solid '+col+';">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+        '<span style="font-size:9px;font-family:\'Space Mono\',monospace;font-weight:700;color:'+col+';letter-spacing:1px;">'+icon+' '+heading+'</span>' +
+        '<span style="font-size:9px;color:var(--muted);">'+wx.icon+' '+wx.label+' · '+dir+' inj/day · peak '+wx.peakHrs+'</span>' +
+      '</div>' +
+      '<div style="font-size:10px;color:var(--text);line-height:1.5;">'+wx.ccNotes.join(' · ')+'</div>' +
+    '</div>';
+}
+
+function renderHeroStaffingSignal() {
+  var el = document.getElementById('hero-staffing-signal');
+  if (!el) return;
+  var now = new Date();
+  var month = now.getMonth() + 1;
+  var dow   = (now.getDay() + 6) % 7;  // Mon=0
+  var hour  = now.getHours();
+  var result;
+  try { result = getSurgeProfile(month, dow, hour, 0); } catch(e) { return; }
+  var narrative = (result && result.narrative) ? result.narrative.trim() : '';
+  if (!narrative || narrative.length < 5 || narrative.indexOf('Balanced') === 0 || narrative.indexOf('Insufficient') === 0) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML =
+    '<div style="margin-top:8px;padding:8px 10px;border-radius:5px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-left:3px solid var(--accent);">' +
+      '<div style="font-size:9px;font-family:\'Space Mono\',monospace;font-weight:700;color:var(--accent);letter-spacing:1px;margin-bottom:4px;">📋 STAFFING SIGNAL</div>' +
+      '<div style="font-size:10px;color:var(--text);line-height:1.6;">'+narrative+'</div>' +
+    '</div>';
+}
+
 async function renderWeatherOutlook() {
   const el = document.getElementById('weather-outlook-content');
   if (!el) return;
 
   try {
     const today = new Date();
-    const end   = new Date(today); end.setDate(today.getDate() + 6);
-    const fmt   = d => d.toISOString().split('T')[0];
+    const curHour = today.getHours();
 
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=47.4444&longitude=-122.3138`
-      + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,windspeed_10m_max,sunshine_duration`
-      + `&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph`
-      + `&precipitation_unit=inch&start_date=${fmt(today)}&end_date=${fmt(end)}`;
+    // Use cached data if we already fetched this hour
+    let d;
+    if (_wxCache && _wxCacheHour === curHour) {
+      d = _wxCache;
+    } else {
+      const end = new Date(today); end.setDate(today.getDate() + 6);
+      const fmt = dd => dd.toISOString().split('T')[0];
 
-    const resp = await fetch(url);
-    const data = await resp.json();
-    const d    = data.daily;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=47.4444&longitude=-122.3138`
+        + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,windspeed_10m_max,sunshine_duration`
+        + `&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph`
+        + `&precipitation_unit=inch&start_date=${fmt(today)}&end_date=${fmt(end)}`;
+
+      const resp = await fetch(url);
+      const data = await resp.json();
+      d = data.daily;
+      _wxCache = d;
+      _wxCacheHour = curHour;
+    }
 
     const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const monNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -2755,7 +2842,7 @@ async function renderWeatherOutlook() {
       const mday = `${monNames[month]} ${dt.getDate()}`;
       const tc   = wxTempColor(tempMax);
 
-      if (i === 0) { topSignal = wx; topDay = mday; }
+      if (i === 0) { topSignal = wx; topDay = mday; _wxTodaySignal = wx; renderHeroWxAdvisory(); }
 
       const isToday = i === 0;
 
@@ -9194,6 +9281,7 @@ let iliData = null;
   _cachedIliData = iliData;
   _initialRenderDone = true;
   renderDashboard(iliData);
+  renderHeroStaffingSignal();
   renderWeatherOutlook();
 }
 
@@ -9923,6 +10011,8 @@ function renderDashboard(iliData = null) {
         <div class="surge-prob">${(heroProb*100).toFixed(1)}% surge probability</div>
         <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:'Space Mono',monospace;">Current hour · ${String(hour).padStart(2,'0')}:00–${String((hour+1)%24).padStart(2,'0')}:00 · ${heroModel==='persistence'?'<span style="color:#ff4d6d;">⬤ empirical survival</span>':heroModel==='survival'?'<span style="color:#00e5c3;">⬤ surge window reduction</span>':'calendar model'}</div>
         ${(SURGE_FLAG_ACTIVE && SURGE_CONFIRMED_HOUR !== null && isSurgeZeroHour(SURGE_CONFIRMED_HOUR, SURGE_THRESH)) ? '<div style="font-size:10px;color:#f5a623;margin-top:3px;">&#9888; No prior events at this hour/threshold in 2023&ndash;2025 dataset &mdash; persistence model has insufficient empirical basis. Confirm data accuracy.</div>' : (SURGE_FLAG_ACTIVE && SURGE_CONFIRMED_HOUR !== null && SURGE_CONFIRMED_HOUR >= 21) ? '<div style="font-size:10px;color:#f5a623;margin-top:3px;">&#9888; surge logged &mdash; low persistence expected</div>' : ''}
+        <div id="hero-wx-advisory"></div>
+        <div id="hero-staffing-signal"></div>
       </div>
       <div class="surge-detail">
         <div class="surge-headline">Prediction Rationale</div>
@@ -10215,6 +10305,7 @@ function renderDashboard(iliData = null) {
 
   // Restore current status panel state after re-render
   // (panel now lives inside mainContent so gets wiped on each render)
+  renderHeroStaffingSignal();
   (function syncCurrentStatus(){
     // Surge flag buttons
     var noBtn  = document.getElementById('surge-flag-no');
