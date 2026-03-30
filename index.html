@@ -2633,106 +2633,86 @@ function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month) {
   const sunHigh   = sunHrs  > (WX_SUN_THRESH[month] || 999);
   const tempHigh  = tempF   > WX_TEMP_P75[month];
   const heavyRain = precipIn >= 0.5;
-  const modRain   = precipIn >= 0.1 && precipIn < 0.5;
-  const highWind  = windMph >= 18;
-  const hasSnow   = snowIn  > 0.05;
 
   let signals = [];
-  let injMod  = 0;   // expected change in injury visits/day
-  let ccNotes = [];  // CC-specific advisory strings
-  let icon    = '🌤';
+  let injMod  = 0;
+  let ccNotes = [];
+  let icon    = '⛅';
   let label   = 'Typical';
   let color   = 'var(--muted)';
 
-  // ── Snow ──
-  if (hasSnow) {
-    icon = '❄️'; label = 'Snow'; color = '#a5c8ff';
-    injMod -= 2.0;
-    signals.push('Snow / ice → falls risk elevated; however outdoor activity suppressed. Expect fewer voluntary ED visits, but trauma from slips.');
-    ccNotes.push('Slip/fall injuries possible');
-  }
-  // ── Heavy rain ──
-  else if (heavyRain) {
-    icon = '🌧'; label = 'Heavy Rain'; color = '#60a5fa';
-    injMod -= 1.0;
-    signals.push('Heavy rain (>0.5") suppresses outdoor activity — expect ~1 fewer injury visit vs baseline (r=−0.14, p<0.001). Lower MVA/sports injury load.');
-    ccNotes.push('Reduced outdoor injury volume');
-  }
-  // ── Moderate rain ──
-  else if (modRain) {
-    icon = '🌦'; label = 'Rain'; color = '#93c5fd';
-    injMod -= 0.4;
-    signals.push('Moderate rain — mild suppression of outdoor activity. Injury volume near baseline.');
-  }
-  // ── High wind ──
-  else if (highWind && !sunHigh) {
-    icon = '💨'; label = 'Windy'; color = '#fbbf24';
-    injMod -= 0.7;
-    signals.push('High winds keep families indoors — injury volume slightly below baseline (r=−0.07, p=0.024).');
-    ccNotes.push('Slightly reduced injury volume');
-  }
-  // ── Sunny & warm (spring or Sep) ──
-  else if (sunHigh && tempHigh && (season === 'spring' || (season === 'fall' && month === 9))) {
-    icon = '☀️'; label = 'Sunny & Warm'; color = '#fbbf24';
-    injMod = season === 'spring' ? 2.8 : 2.2;
-    const pct = season === 'spring' ? 7 : 6;
-    signals.push(`Sunny AND warm ${month < 6 ? 'spring' : 'September'} day (>${WX_SUN_THRESH[month]}h sunshine) — injury share elevated +${pct}% above seasonal baseline. Injury CC peaks 17:00–20:00. Anticipate ortho/suture/imaging demand in evening window.`);
-    ccNotes.push(`+${injMod.toFixed(0)} inj/day expected`, 'Injury CC peaks 17–20:00');
-  }
-  // ── Sunny & warm November ──
-  else if (sunHigh && tempHigh && season === 'fall' && month === 11) {
-    icon = '☀️'; label = 'Warm & Sunny November'; color = '#fbbf24';
-    injMod = 2.6;
-    signals.push(`Warm AND sunny November day (>${WX_SUN_THRESH[month]}h sunshine) — injury elevated (RR=1.33, p=0.010). Unusually warm late-fall days extend outdoor activity window.`);
-    ccNotes.push('+3 inj/day expected', 'Injury CC elevated');
-  }
-  // ── Sunny & cool (spring — strongest signal) ──
-  else if (sunHigh && !tempHigh && season === 'spring') {
-    icon = '🌤'; label = 'Sunny & Cool'; color = '#34d399';
-    injMod = 5.3;
-    signals.push(`Sunny but cool spring day (>${WX_SUN_THRESH[month]}h sunshine) — STRONGEST injury signal (RR=1.30, p=0.0002, all-days analysis n=273). Kids go outside after indoor stretch; cool temps drive high-energy play. Injury CC peaks 16:00–19:00. Plan ortho/suture/imaging capacity ahead of evening shift.`);
-    ccNotes.push('+5 inj/day expected', 'Highest-risk weather pattern');
-  }
-  // ── Sunny & cool (Sep only — Oct/Nov handled separately below) ──
-  else if (sunHigh && !tempHigh && season === 'fall' && month === 9) {
-    icon = '🌤'; label = 'Sunny & Cool'; color = '#34d399';
-    injMod = 2.6;
-    signals.push(`Sunny September day (>${WX_SUN_THRESH[month]}h sunshine) — injury volume elevated (RR=1.27, p=0.006). Lacerations, falls, and sports injuries peak 16:00–21:00. Ensure evening ortho/suture coverage.`);
-    ccNotes.push('+3 inj/day expected', 'Injury CC elevated 16–21:00');
-  }
-  // ── Sunny November (low threshold — even 4h is anomalous) ──
-  else if (sunHigh && season === 'fall' && month === 11) {
-    icon = '🌤'; label = 'Sunny November'; color = '#34d399';
-    injMod = 2.6;
-    signals.push(`Sunny November day (>${WX_SUN_THRESH[month]}h sunshine) — injury volume elevated (RR=1.33, p=0.010, DOW-adjusted). Even moderate sun drives outdoor activity in late fall when baseline is very low. Robust to Thanksgiving exclusion (RR=1.39).`);
-    ccNotes.push('+3 inj/day expected', 'Sunny fall day — injury elevated');
-  }
-  // ── Summer sunny (null — already baseline) ──
-  else if (sunHigh && season === 'summer') {
-    icon = '☀️'; label = 'Sunny'; color = '#fde68a';
-    injMod = 0;
-    signals.push('Summer sunshine — injury volume at seasonal baseline (virtually all summer days are sunny; no anomaly signal). Injury share remains ~30–31% of visits throughout day.');
-  }
-  // ── Warm but not sunny ──
-  else if (tempHigh && !sunHigh) {
-    icon = '⛅'; label = 'Warm & Cloudy'; color = '#d1d5db';
-    injMod = 0;
-    signals.push('Warm but not anomalously sunny — temperature alone has no independent injury signal after season is controlled (p=0.85). Expect baseline injury volume.');
-  }
-  // ── Winter sunny ──
-  else if (sunHigh && season === 'winter') {
-    icon = '🌤'; label = 'Sunny'; color = '#d1d5db';
-    injMod = 0;
-    signals.push('Sunny winter day — no meaningful injury elevation; cold temperatures keep outdoor activity at normal winter levels. Standard injury baseline.');
-  }
-  // ── Default ──
-  else {
-    icon = '⛅'; label = 'Typical'; color = 'var(--muted)';
-    injMod = 0;
-    signals.push('No weather-related CC impact expected. Standard visit mix.');
+  if (sunHigh) {
+    // ── Sunny days: rain suppresses the positive modifier ──
+    if (heavyRain) {
+      // Sunny but rainy — mixed day. Signal is attenuated.
+      // Within sunny (>8h) days, heavy rain RR=1.30 dry vs rainy (p=0.002) — rain suppresses back toward baseline.
+      icon = '🌦'; label = 'Sunny / Rain'; color = '#93c5fd';
+      injMod = 0;
+      signals.push(`Sunshine hours above threshold (>${WX_SUN_THRESH[month]}h) but heavy rain (${precipIn.toFixed(1)}") suppresses outdoor activity. Mixed day — injury volume near baseline.`);
+    }
+    // ── Sunny & warm (spring or Sep) ──
+    else if (tempHigh && (season === 'spring' || (season === 'fall' && month === 9))) {
+      icon = '☀️'; label = 'Sunny & Warm'; color = '#fbbf24';
+      injMod = season === 'spring' ? 2.8 : 2.2;
+      const pct = season === 'spring' ? 7 : 6;
+      signals.push(`Sunny AND warm ${month < 6 ? 'spring' : 'September'} day (>${WX_SUN_THRESH[month]}h sunshine) — injury share elevated +${pct}% above seasonal baseline. Injury CC peaks 17:00–20:00. Anticipate ortho/suture/imaging demand in evening window.`);
+      ccNotes.push(`+${injMod.toFixed(0)} inj/day expected`, 'Injury CC peaks 17–20:00');
+    }
+    // ── Sunny & warm November ──
+    else if (tempHigh && season === 'fall' && month === 11) {
+      icon = '☀️'; label = 'Warm & Sunny November'; color = '#fbbf24';
+      injMod = 2.6;
+      signals.push(`Warm AND sunny November day (>${WX_SUN_THRESH[month]}h sunshine) — injury elevated (RR=1.33, p=0.010). Unusually warm late-fall days extend outdoor activity window.`);
+      ccNotes.push('+3 inj/day expected', 'Injury CC elevated');
+    }
+    // ── Sunny & cool spring ──
+    else if (!tempHigh && season === 'spring') {
+      icon = '🌤'; label = 'Sunny & Cool'; color = '#34d399';
+      injMod = 5.3;
+      signals.push(`Sunny but cool spring day (>${WX_SUN_THRESH[month]}h sunshine) — STRONGEST injury signal (RR=1.30, p=0.0002). Kids go outside after indoor stretch; cool temps drive high-energy play. Injury CC peaks 16:00–19:00. Plan ortho/suture/imaging capacity ahead of evening shift.`);
+      ccNotes.push('+5 inj/day expected', 'Highest-risk weather pattern');
+    }
+    // ── Sunny & cool September ──
+    else if (!tempHigh && season === 'fall' && month === 9) {
+      icon = '🌤'; label = 'Sunny & Cool'; color = '#34d399';
+      injMod = 2.6;
+      signals.push(`Sunny September day (>${WX_SUN_THRESH[month]}h sunshine) — injury volume elevated (RR=1.27, p=0.006). Lacerations, falls, and sports injuries peak 16:00–21:00. Ensure evening ortho/suture coverage.`);
+      ccNotes.push('+3 inj/day expected', 'Injury CC elevated 16–21:00');
+    }
+    // ── Sunny November ──
+    else if (season === 'fall' && month === 11) {
+      icon = '🌤'; label = 'Sunny November'; color = '#34d399';
+      injMod = 2.6;
+      signals.push(`Sunny November day (>${WX_SUN_THRESH[month]}h sunshine) — injury volume elevated (RR=1.33, p=0.010, DOW-adjusted). Even moderate sun drives outdoor activity in late fall. Robust to Thanksgiving exclusion (RR=1.39).`);
+      ccNotes.push('+3 inj/day expected', 'Sunny fall day — injury elevated');
+    }
+    // ── Summer sunny (null) ──
+    else if (season === 'summer') {
+      icon = '☀️'; label = 'Sunny'; color = '#fde68a';
+      signals.push('Summer sunshine — injury volume at seasonal baseline. No anomaly signal.');
+    }
+    // ── Winter sunny (null) ──
+    else {
+      icon = '🌤'; label = 'Sunny'; color = '#d1d5db';
+      signals.push('Sunny winter day — cold temperatures keep outdoor activity at normal winter levels. Standard injury baseline.');
+    }
+  } else {
+    // ── Not sunny — no injury modifier regardless of rain/wind/snow ──
+    // Within-class analysis shows rain does not further suppress injuries
+    // on days that are already not sunny (p=0.58 full year, p=0.58 spring).
+    if (precipIn >= 0.5) {
+      icon = '🌧'; label = 'Rain'; color = '#60a5fa';
+    } else if (snowIn > 0.05) {
+      icon = '❄️'; label = 'Snow'; color = '#a5c8ff';
+    } else if (windMph >= 18) {
+      icon = '💨'; label = 'Windy'; color = '#fbbf24';
+    } else {
+      icon = '⛅'; label = 'Typical'; color = 'var(--muted)';
+    }
+    signals.push('No weather-related injury impact expected. Standard visit mix.');
   }
 
-  return { icon, label, color, injMod, signals, ccNotes, sunHigh, tempHigh, heavyRain, highWind, hasSnow,
+  return { icon, label, color, injMod, signals, ccNotes, sunHigh, tempHigh, heavyRain: precipIn>=0.5, highWind: windMph>=18, hasSnow: snowIn>0.05,
     peakHrs: injMod > 3 ? '16–19:00' : injMod > 1 && tempHigh ? '17–20:00' : injMod > 1 ? '16–21:00' : 'all hours' };
 }
 
