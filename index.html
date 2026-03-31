@@ -1190,7 +1190,7 @@ to { opacity:1; transform:translateY(0); }
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
       <div><span style="color:#c8cfe8;font-weight:600;">Source:</span> CMU Delphi Epidata API · HHS Region 10 weekly ILI % · live fetch, no API key</div>
-      <div><span style="color:#c8cfe8;font-weight:600;">Correlation:</span> r=+0.65, p&lt;0.0001 with daily surge rate</div>
+      <div><span style="color:#c8cfe8;font-weight:600;">Correlation:</span> r=+0.65 raw (r=+0.49 partial, controlling for month), p&lt;0.0001 with weekly surge rate. Independent signal confirmed: ΔR²=+0.011 AUC on 2025 holdout beyond calendar alone.</div>
       <div><span style="color:#c8cfe8;font-weight:600;">Formula:</span> modifier = exp(0.1232 × (ILI% − 1.0)), capped ×0.85–×2.5</div>
       <div style="margin-top:4px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-family:'Space Mono',monospace;">
         <span style="color:#39d98a;">ILI &lt;1%</span><span>Low — ×0.85–×1.0</span>
@@ -1198,6 +1198,7 @@ to { opacity:1; transform:translateY(0); }
         <span style="color:#ff9a3c;">ILI 2–3.5%</span><span>Elevated — ×1.13–×1.30</span>
         <span style="color:#ff4d6d;">ILI &gt;3.5%</span><span>High/Very High — ×1.30–×2.5</span>
       </div>
+      <div style="margin-top:4px;font-size:9px;color:#4a5568;">Applied to: hourly 24h surge forecast and 7-day outlook only — the current week's live ILI value is a genuine real-time signal. Not applied to the 90-day calendar, where CENSUS_DOW_MONTH already embeds seasonal ILI patterns and no future weekly ILI value is available.</div>
     </div>
   </div>
 
@@ -1323,12 +1324,12 @@ to { opacity:1; transform:translateY(0); }
       </div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Classification Logic</div>
-      <div>Days are first classified by sunshine hours. <span style="color:#c8cfe8;">Today in spring (Mar–May)</span> uses intraday accumulation: if ≥2.0h of sunshine has been recorded by 11:00, the injury advisory fires — giving ~5 hours of lead time before the injury peak (16–19:00). Future spring days use the forecast daily total vs WX_SUN_THRESH (>8.0h). Sep and Nov use the forecast daily total at all times (no robust intraday threshold found). If not sunny → no injury modifier regardless of rain, wind, or snow. If sunny → positive modifier by season and temperature, attenuated to zero if heavy rain (≥0.5") is present. Temperature threshold (WX_TEMP_P75, within-month p75) differentiates warm vs cool only within sunny spring/Sep days. Both WX_SUN_THRESH and the intraday threshold are re-derivable via <code>refresh_models.py</code>.</div>
+      <div>Days are classified by sunshine hours vs <span style="color:#c8cfe8;">WX_SUN_THRESH (>8.0h for spring)</span>. For today in spring (Mar–May), a two-phase approach is used: before noon, the forecast daily total is compared against the >8h threshold — the same as all future days. After noon, observed hourly accumulation from the ERA5 archive replaces the forecast, since by then it is more reliable. This avoids the forecast daily total (e.g. 5h predicted) incorrectly triggering the advisory at 07:00 when 0h has actually accumulated. Sep and Nov use the forecast daily total at all times. If not sunny → no injury modifier regardless of rain, wind, or snow. If sunny → positive modifier by season and temperature, attenuated to zero if heavy rain (≥0.5") is present. Temperature threshold (WX_TEMP_P75, within-month p75) differentiates warm vs cool only within sunny spring/Sep days. WX_SUN_THRESH re-derivable via <code>refresh_models.py</code>.</div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Threshold Derivation</div>
-      <div style="line-height:1.7;">Daily thresholds optimised by RR × −log10(p) (Mann-Whitney U, one-sided) sweeping 0.5h steps across all days — in PNW spring, low-sunshine days are almost always rainy, making sunny vs non-sunny the correct operational split. Spring months pooled (n=273); Sep and Nov swept individually. Oct excluded — confirmed null at all levels. Rain as an independent suppressor is null on non-sunny days (p=0.58); modelled only as an attenuator within sunny days. <span style="color:#c8cfe8;">Intraday spring threshold</span> derived separately: for each candidate cutoff hour (08–14) and accumulation level (0.5–10h steps), injury% on days above vs below was tested (MWU, one-sided). Best result: by 11:00 >2.0h accumulated (RR=1.336, p&lt;0.0001, n=273). This approach was adopted because the forecast API provides a predicted daily total that can be inaccurate for the current day — using observed accumulation by 11:00 gives a stable, actionable signal. Re-derivable via <code>refresh_models.py</code> as new data accumulates.</div>
+      <div style="line-height:1.7;">Thresholds optimised by RR × −log10(p) (Mann-Whitney U, one-sided) sweeping 0.5h steps across all days — in PNW spring, low-sunshine days are almost always rainy, making sunny vs non-sunny the correct operational split. Spring months pooled (n=273); Sep and Nov swept individually. Oct excluded — confirmed null at all levels. Rain as an independent suppressor is null on non-sunny days (p=0.58); modelled only as an attenuator within sunny days. The before/after noon switchover for today's spring classification was adopted after finding that the forecast API daily total can be unreliable for the current day — a 5h daily forecast at 07:00 would incorrectly fire the advisory when no sunshine has yet occurred. Re-derivable via <code>refresh_models.py</code> as new data accumulates.</div>
 
-      <div style="margin-top:8px;font-size:9px;color:#4a5568;">Analysis basis: N=1,091 days × 3yr ERA5 reanalysis (SEA-TAC 47.4444, −122.3138). RR × −log10(p) composite score. Spring daily: RR=1.30, p=0.0002. Spring intraday (by 11:00 >2.0h): RR=1.336, p&lt;0.0001. Sep: RR=1.27, p=0.006. Nov: RR=1.33, p=0.010. Rain suppression within sunny: RR=1.30, p=0.002. WX_SUN_THRESH = {Mar/Apr/May: >8.0h, Sep: >11.5h, Nov: >4.0h}. Spring intraday = by 11:00 >2.0h.</div>
+      <div style="margin-top:8px;font-size:9px;color:#4a5568;">Analysis basis: N=1,091 days × 3yr ERA5 reanalysis (SEA-TAC 47.4444, −122.3138). RR × −log10(p) composite score. Spring: RR=1.30, p=0.0002. Sep: RR=1.27, p=0.006. Nov: RR=1.33, p=0.010. Rain suppression within sunny: RR=1.30, p=0.002. WX_SUN_THRESH = {Mar/Apr/May: >8.0h, Sep: >11.5h, Nov: >4.0h}. Today in spring: forecast before noon, observed accumulation after noon, both vs >8.0h.</div>
     </div>
   </div>
 
@@ -1366,6 +1367,16 @@ to { opacity:1; transform:translateY(0); }
   </div>
 
   <!-- Community Illness Trends -->
+  <div class="sdiv">90-Day Forecast Calendar</div>
+  <div class="panel">
+    <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <div><span style="color:#c8cfe8;font-weight:600;">Census baseline:</span> CENSUS_DOW_MONTH — empirical mean and SD of daily visits per DOW × month cell, derived from 3 years of Throughput data (n=146,276 visits). This table already embeds all seasonal variation including ILI-driven winter peaks. Applying ILI_SEASONAL on top would double-count seasonality — e.g. January Monday mean = 147.6 visits in the data, but ILI_SEASONAL[1]=1.34 would inflate it to 198 (+50 visits, +34%). ILI_SEASONAL is therefore <span style="color:#c8cfe8;">not applied</span> to the 90-day census or surge estimates.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Surge probability:</span> Empirical heatmap (HM_BY_THRESH) at the peak hour (19:00) for the day's DOW. Also embeds seasonality — ILI_SEASONAL not applied here either.</div>
+      <div style="margin-top:4px;"><span style="color:#c8cfe8;font-weight:600;">Applied modifiers:</span> School calendar (break/holiday/return), local events, post-event lag, graduation. These represent genuine deviations from the DOW×month baseline that are not already captured in the census table.</div>
+      <div style="margin-top:4px;font-size:9px;color:#4a5568;">Live ILI (real-time weekly value) is not available for future weeks and is not applied to the 90-day calendar. It is applied to the hourly forecast and 7-day outlook where the current week's ILI is known.</div>
+    </div>
+  </div>
+
   <div class="sdiv">Community Illness Trends Modifier</div>
   <div class="panel">
     <div class="pb" style="font-size:10px;color:var(--muted);line-height:1.8;">
@@ -2629,13 +2640,9 @@ function wxGetSeason(month) {
 }
 
 // Returns condition label and staffing narrative for a forecast day
-// sunThreshOverride: if set, replaces WX_SUN_THRESH[month] for sunHigh determination
-//   Used for today in spring where intraday accumulation threshold (>2.0h by 11:00)
-//   is more accurate than the forecast daily total.
-function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month, sunThreshOverride) {
+function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month) {
   const season    = wxGetSeason(month);
-  const thresh    = sunThreshOverride !== null && sunThreshOverride !== undefined
-                    ? sunThreshOverride : (WX_SUN_THRESH[month] || 999);
+  const thresh    = WX_SUN_THRESH[month] || 999;
   const sunHigh   = sunHrs > thresh;
   const tempHigh  = tempF   > WX_TEMP_P75[month];
   const heavyRain = precipIn >= 0.5;
@@ -2733,7 +2740,6 @@ function wxTempColor(tempF) {
 var _wxCache = null;       // cached Open-Meteo response
 var _wxCacheHour = -1;    // hour the cache was populated
 var _wxTodaySignal = null; // today's wx injury signal — read by renderDashboard for hero card
-var _wxSpringIntradayThresh = null; // {thresh, cumSunHrs} — set for today in spring, null otherwise
 
 function renderHeroWxAdvisory() {
   var el = document.getElementById('hero-wx-advisory');
@@ -2802,12 +2808,14 @@ async function renderWeatherOutlook() {
       const data = await resp.json();
       d = data.daily;
 
-      // For today (i=0) in spring (Mar-May): use hourly sunshine accumulation
-      // rather than forecast daily total. Threshold validated at by-11:00 >2.0h
-      // (RR=1.336, p<0.0001, n=273 spring days). Gives ~5h lead before injury peak.
-      // For Sep/Nov: keep forecast daily total (no robust intraday threshold found).
+      // For today (i=0) in spring (Mar-May): two-phase approach.
+      // Before noon: use forecast daily total vs WX_SUN_THRESH (>8h) — same as all future days.
+      //              No archive fetch needed; forecast is the best available signal.
+      // After noon:  switch to observed hourly accumulation — by then it's more accurate
+      //              than the forecast and the advisory has operational lead time remaining.
       const todayMonth = today.getMonth() + 1;
-      if ([3,4,5].includes(todayMonth)) {
+      d._intradayCumSun = undefined;
+      if ([3,4,5].includes(todayMonth) && curHour >= 12) {
         try {
           const archUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=47.4444&longitude=-122.3138`
             + `&hourly=sunshine_duration`
@@ -2818,18 +2826,19 @@ async function renderWeatherOutlook() {
           const archResp = await fetch(archUrl, { signal: controller.signal });
           clearTimeout(archTimer);
           const archData = await archResp.json();
-          // Compute cumulative sunshine by current hour
           let cumSun = 0;
           for (let hi = 0; hi < archData.hourly.time.length; hi++) {
             const hh = new Date(archData.hourly.time[hi]).getHours();
             cumSun += (archData.hourly.sunshine_duration[hi] || 0) / 3600;
             if (hh >= curHour) break;
           }
-          // Use max of: accumulated so far vs forecast (accumulated can only grow)
-          if (cumSun * 3600 > (d.sunshine_duration[0] || 0)) {
-            d.sunshine_duration[0] = cumSun * 3600;
-          }
-          // Also update precip with observed (daily archive)
+          d._intradayCumSun = cumSun;
+        } catch(e) { /* silently ignore */ }
+      }
+
+      // Update today's precip with observed if higher than forecast (spring only)
+      if ([3,4,5].includes(todayMonth)) {
+        try {
           const archPrecipUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=47.4444&longitude=-122.3138`
             + `&daily=precipitation_sum&timezone=America%2FLos_Angeles&precipitation_unit=inch`
             + `&start_date=${fmt(today)}&end_date=${fmt(today)}`;
@@ -2842,13 +2851,8 @@ async function renderWeatherOutlook() {
           if (archPrecip > (d.precipitation_sum[0] || 0)) {
             d.precipitation_sum[0] = archPrecip;
           }
-        } catch(e) { /* archive fetch optional — silently ignore */ }
+        } catch(e) { /* silently ignore */ }
       }
-
-      // Store the intraday spring threshold for wxClassifyDay
-      // Spring: by 11:00, >2.0h accumulated (replaces daily >8h for today only)
-      d._springIntradayThreshHour = 11;
-      d._springIntradayThresh     = 2.0;
 
       _wxCache = d;
       _wxCacheHour = curHour;
@@ -2872,15 +2876,15 @@ async function renderWeatherOutlook() {
       const wind    = d.windspeed_10m_max[i]  || 0;
       const snow    = d.snowfall_sum[i]        || 0;
 
-      // For today in spring: use intraday accumulation (by 11:00, >2.0h).
-      // For future days and non-spring: use forecast daily total vs WX_SUN_THRESH.
+      // For today in spring: before noon use forecast daily total vs WX_SUN_THRESH (>8h).
+      // After noon switch to observed accumulation — more reliable than forecast by then.
+      // All other days: forecast daily total vs WX_SUN_THRESH unchanged.
       let sunHrs = (d.sunshine_duration[i] || 0) / 3600;
-      let sunThreshOverride = null;
-      if (i === 0 && [3,4,5].includes(month)) {
-        sunThreshOverride = 2.0; // by-11:00 threshold; sunHrs already set to cumulative
+      if (i === 0 && [3,4,5].includes(month) && d._intradayCumSun !== undefined) {
+        sunHrs = d._intradayCumSun; // use observed accumulation after noon
       }
 
-      const wx   = wxClassifyDay(sunHrs, tempMax, precip, wind, snow, month, sunThreshOverride);
+      const wx   = wxClassifyDay(sunHrs, tempMax, precip, wind, snow, month);
       const dow  = dayNames[dt.getDay()];
       const mday = `${monNames[month]} ${dt.getDate()}`;
       const tc   = wxTempColor(tempMax);
@@ -9394,8 +9398,11 @@ function render90DayCalendar() {
       var dateStr = d.toISOString().slice(0,10);
 
       // Census estimate
+      // Note: ILI_SEASONAL removed — CENSUS_DOW_MONTH already embeds seasonal volume
+      // from the training data. Applying ILI_SEASONAL on top double-counts seasonality
+      // (e.g. January inflated by +50 visits / +34%). School, event, and post-event
+      // modifiers are legitimate adjustments on top of the empirical baseline.
       var cenRow = (CENSUS_DOW_MONTH[dow] || {})[month] || {m:134,s:22};
-      var iliMod = ILI_SEASONAL[month] || 1.0;
       var school = getSchoolStatus(dateStr);
       var schAdj = (school.type==='break'||school.type==='holiday') ? 0.939
                   : school.type==='return' ? 1.08
@@ -9404,8 +9411,8 @@ function render90DayCalendar() {
       var postMod= getPostEventModifier(dateStr, SURGE_THRESH).modifier;
       var gradMod= getGraduationModifier(dateStr).modifier;
 
-      // Census: base × ILI seasonal × school adj × event
-      var censMult = iliMod * schAdj
+      // Census: base × school adj × event (no ILI seasonal — already in base)
+      var censMult = schAdj
                    * (evMod < 0.95 ? 0.923 : evMod > 1.02 ? 0.983 : 1.0)
                    * postMod * gradMod;
       var census   = Math.round(cenRow.m * censMult);
@@ -9413,10 +9420,12 @@ function render90DayCalendar() {
       var censHi   = Math.round((cenRow.m + cenRow.s) * censMult);
 
       // Surge probability: HM_BY_THRESH[thresh][hour][dow]
+      // HM_BY_THRESH also already embeds seasonality via the empirical heatmap,
+      // so ILI_SEASONAL is similarly removed here.
       var hmTable    = HM_BY_THRESH[String(SURGE_THRESH)] || HM_BY_THRESH['10'];
       var baseSurge  = (hmTable[19] || [])[dow] || 0.15;
       var schoolMod  = school.type==='return'?1.15:school.type==='school-day'?1.06:0.85;
-      var surgePct   = Math.min(0.95, baseSurge * iliMod * schoolMod
+      var surgePct   = Math.min(0.95, baseSurge * schoolMod
                        * evMod * postMod * gradMod);
 
       // Risk tier
@@ -10338,7 +10347,7 @@ function renderDashboard(iliData = null) {
     <div class="panel">
       <div class="ph">
         <div class="pt">Surge Risk & Expected Census · 90 Days</div>
-        <div class="badge badge-b">CALENDAR MODEL · SEASONAL ILI BASELINE</div>
+        <div class="badge badge-b">CALENDAR MODEL · EMPIRICAL CENSUS BASELINE</div>
       </div>
       <div class="pb">
         <div id="cal90-content" style="font-size:10px;color:var(--muted);">Loading…</div>
@@ -10792,29 +10801,51 @@ document.querySelectorAll('.tstepper[data-id]').forEach(function(el){
 
 // ── Surge panel ─────────────────────────────────────────────────────────────
 function resetSurgeInputs(){
-  // Reset all surge tab steppers to 0
-  document.querySelectorAll('.tstepper[data-sfid]').forEach(function(el){
-    var inp=el.querySelector('.tsval');
-    if(inp)inp.value=0;
+  // Reset surge tab steppers (use data-id, not data-sfid)
+  ['in_mpedocs','in_arrivals'].forEach(function(id){
+    var inp = document.querySelector('.tstepper[data-id="'+id+'"] .tsval');
+    if(inp) inp.value = 0;
   });
-  // Reset state
-  S.in_arrivals=0;
-  SURGE_VOL=SURGE_THRESH;
-  // Reset displays
-  var ids=['sf-d-wr','sf-d-tp'];
-  ids.forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=0;});
+  // Reset mPEDOCS WR/TP — exist in both tabs (data-id and data-sfid)
+  ['mp_wr','mp_tp'].forEach(function(id){
+    var inp1 = document.querySelector('.tstepper[data-id="'+id+'"] .tsval');
+    var inp2 = document.querySelector('.tstepper[data-sfid="'+id+'"] .tsval');
+    if(inp1) inp1.value = 0;
+    if(inp2) inp2.value = 0;
+  });
+  // Sync display spans for WR/TP
+  var dwr = document.getElementById('d-mp-wr'); if(dwr) dwr.textContent = 0;
+  var dtp = document.getElementById('d-mp-tp'); if(dtp) dtp.textContent = 0;
+  // Reset hour stepper to current hour
+  var hourInp = document.querySelector('.tstepper[data-id="in_hour"] .tsval');
+  if(hourInp) hourInp.value = new Date().getHours();
+
+  // Reset state object
+  S.in_mpedocs  = 60;
+  S.in_arrivals = 0;
+  S.in_hour     = new Date().getHours();
+  S.in_mh_load  = 0;
+  SURGE_VOL     = SURGE_THRESH;
+
+  // Reset display spans
+  ['d-mpedocs','d-arrivals','d-hour'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.textContent = id==='d-hour' ? new Date().getHours() : 0;
+  });
+
+  // Reset MH load slider
+  var mhSl = document.getElementById('mh-load-slider');
+  if(mhSl){ mhSl.value = 0; updateMHLoad(); }
+
   // Reset surge flag
   setSurgeFlag(false);
-  // Recalculate
+
+  // Recalculate everything
   sfCalcMpedocs();
-  // Sync arrivals to Now tab
-  var arrInp=document.querySelector('.tstepper[data-id="in_arrivals"] .tsval');
-  var arrD=document.getElementById('d-arrivals');
-  if(arrInp)arrInp.value=0;
-  if(arrD)arrD.textContent=0;
   updateSurgeBacktimeUI();
   updateForecastBars();
   renderMpedocs();
+  renderDashboard(window._cachedIliData || null);
 }
 
 // Respiratory load → 7-day surge modifier
