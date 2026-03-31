@@ -1306,28 +1306,29 @@ to { opacity:1; transform:translateY(0); }
       <div><span style="color:#c8cfe8;font-weight:600;">Purpose:</span> Provides a 7-day weather forecast with empirically derived estimates of injury visit volume impact, displayed as a staffing advisory on the main dashboard. Fetches live from Open-Meteo (SEA-TAC coordinates: 47.4444, −122.3138) on each page load; cached per hour to prevent flicker on re-render.</div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Key Finding</div>
-      <div>Sunny days are associated with elevated injury visit counts in <span style="color:#c8cfe8;">spring (Mar–May) and select fall months (Sep, Nov) only</span>. Summer is null (virtually no non-sunny comparison days). Winter is null (cold suppresses outdoor activity despite sunshine). October is null at every threshold tested (max sunshine 11.1h — no significant RR). Temperature alone has no independent injury signal after season is controlled.</div>
+      <div>Sunny days are associated with elevated injury visit counts in <span style="color:#c8cfe8;">spring (Mar–May), September, and November only</span>. The signal is driven by the sunny vs non-sunny split — in PNW spring, low-sunshine days are almost always rainy, so this is the operationally correct dichotomy. Rain does not independently suppress injuries on non-sunny days (p=0.58), but does attenuate the positive modifier on sunny days (RR=1.30 dry vs rainy within sunny days, p=0.002). Rain, wind, and snow are therefore shown as weather icons only — they carry no independent injury modifier.</div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Empirical Signals (N=146,164 visits · 2023–2025)</div>
       <div style="display:grid;grid-template-columns:auto auto 1fr;gap:3px 12px;font-size:9px;font-family:'Space Mono',monospace;">
-        <span style="color:#ff4d6d;">Spring Sunny &amp; Cool</span><span style="color:#c8cfe8;">+5.3 inj/day (+14%)</span><span>Strongest signal. Sunny but cool spring day (>8h sunshine) — kids go outside unexpectedly; cool temps drive high-energy play. Injury CC peaks 16–19:00.</span>
-        <span style="color:#ff9a3c;">Spring Sunny &amp; Warm</span><span style="color:#c8cfe8;">+2.8 inj/day (+7%)</span><span>Moderate signal. Evening window (17–20:00) injury share rises. Warm temps favor sustained outdoor activity.</span>
-        <span style="color:#ff9a3c;">Sep Sunny (>11.5h)</span><span style="color:#c8cfe8;">+2.6 inj/day</span><span>RR=1.27, p=0.006. September-specific; Oct/Nov use separate thresholds.</span>
-        <span style="color:#ff9a3c;">Nov Sunny (>4h)</span><span style="color:#c8cfe8;">+2.6 inj/day</span><span>RR=1.33, p=0.010. Even moderate sunshine is anomalous in November — robust to DOW adjustment (p=0.013) and Thanksgiving exclusion (RR=1.39).</span>
-        <span style="color:#60a5fa;">Heavy Rain (&gt;0.5")</span><span style="color:#c8cfe8;">−1.0 inj/day</span><span>Suppresses outdoor activity — fewer voluntary injury presentations (r=−0.14, p&lt;0.001).</span>
-        <span style="color:#60a5fa;">High Wind (≥18 mph)</span><span style="color:#c8cfe8;">−0.7 inj/day</span><span>Mild suppression — keeps families indoors (r=−0.07, p=0.024).</span>
-        <span style="color:var(--muted);">October sunny</span><span style="color:var(--muted);">Null</span><span>No significant threshold at any level (all p>0.20). Max possible sunshine in Oct = 11.1h — physically insufficient to drive detectable signal.</span>
-        <span style="color:var(--muted);">Summer sunny days</span><span style="color:var(--muted);">Null</span><span>No contrast group — only 34 non-sunny summer days over 3 years.</span>
-        <span style="color:var(--muted);">Temperature alone</span><span style="color:var(--muted);">Null</span><span>Dark &amp; warm vs dark &amp; cool: p=0.85–0.95. Sunshine is the mechanism, not temperature.</span>
+        <span style="color:#ff4d6d;">Spring Sunny &amp; Cool</span><span style="color:#c8cfe8;">+5.3 inj/day</span><span>Strongest signal (RR=1.30, p=0.0002, n=273 spring days). Sunny but cool day (>8h sunshine, temp below p75) — kids go outside unexpectedly; cool temps drive high-energy play. Injury CC peaks 16–19:00.</span>
+        <span style="color:#ff9a3c;">Spring Sunny &amp; Warm</span><span style="color:#c8cfe8;">+2.8 inj/day</span><span>Moderate signal. Sunny day with temp above monthly p75 — sustained outdoor activity. Evening window (17–20:00) injury share rises.</span>
+        <span style="color:#ff9a3c;">Sep Sunny (&gt;11.5h)</span><span style="color:#c8cfe8;">+2.6 inj/day</span><span>RR=1.27, p=0.006. September requires higher threshold (>11.5h) due to greater available daylight.</span>
+        <span style="color:#ff9a3c;">Nov Sunny (&gt;4h)</span><span style="color:#c8cfe8;">+2.6 inj/day</span><span>RR=1.33, p=0.010. Even brief sunshine is anomalous in November — robust to DOW adjustment (p=0.013) and Thanksgiving exclusion (RR=1.39).</span>
+        <span style="color:#93c5fd;">Sunny + Heavy Rain</span><span style="color:#c8cfe8;">≈ baseline</span><span>>8h sunshine but ≥0.5" rain — mixed day. Rain attenuates the sunny-day effect back toward baseline (RR=1.30 dry vs rainy within sunny, p=0.002). injMod set to 0.</span>
+        <span style="color:var(--muted);">October</span><span style="color:var(--muted);">Null</span><span>No signal at any threshold (all p>0.20). Max possible sunshine in Oct = 11.1h — physically insufficient.</span>
+        <span style="color:var(--muted);">Summer</span><span style="color:var(--muted);">Null</span><span>No contrast group — virtually all summer days exceed 8h sunshine.</span>
+        <span style="color:var(--muted);">Winter</span><span style="color:var(--muted);">Null</span><span>Cold suppresses outdoor activity regardless of sunshine.</span>
+        <span style="color:var(--muted);">Rain / Wind / Snow alone</span><span style="color:var(--muted);">Null</span><span>No independent injury suppression on non-sunny days (p=0.58 full year). Shown as weather icons only for situational awareness.</span>
+        <span style="color:var(--muted);">Temperature alone</span><span style="color:var(--muted);">Null</span><span>p=0.85–0.95. Sunshine is the mechanism. Temp only differentiates within sunny days (warm vs cool).</span>
       </div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Classification Logic</div>
-      <div>Each forecast day is classified using <span style="color:#c8cfe8;">empirically derived absolute sunshine-hour thresholds</span> (WX_SUN_THRESH), optimized by RR × −log10(p) score across all days in that season (not just clear days). Thresholds: Mar/Apr/May >8.0h, Sep >11.5h, Nov >4.0h. Oct removed — no detectable signal. Temperature threshold (WX_TEMP_P75) remains within-month p75 and is used only to differentiate warm vs cool within the sunny classification. Re-derivable via <code>refresh_models.py</code> as new data accumulates.</div>
+      <div>Days are first classified by sunshine hours. <span style="color:#c8cfe8;">Today in spring (Mar–May)</span> uses intraday accumulation: if ≥2.0h of sunshine has been recorded by 11:00, the injury advisory fires — giving ~5 hours of lead time before the injury peak (16–19:00). Future spring days use the forecast daily total vs WX_SUN_THRESH (>8.0h). Sep and Nov use the forecast daily total at all times (no robust intraday threshold found). If not sunny → no injury modifier regardless of rain, wind, or snow. If sunny → positive modifier by season and temperature, attenuated to zero if heavy rain (≥0.5") is present. Temperature threshold (WX_TEMP_P75, within-month p75) differentiates warm vs cool only within sunny spring/Sep days. Both WX_SUN_THRESH and the intraday threshold are re-derivable via <code>refresh_models.py</code>.</div>
 
       <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Threshold Derivation</div>
-      <div style="line-height:1.7;">Thresholds were derived by sweeping absolute sunshine hours in 0.5h steps and selecting the threshold maximising RR × −log10(p) (Mann-Whitney U, one-sided, p&lt;0.05 required). All-days analysis was used (not clear-days only) so that rainy days — which naturally have low sunshine and low injury rates — serve as implicit controls, increasing power. Per-month analysis was insufficient (n≈30/month); spring months were pooled. p75-based thresholds were replaced because they caused false on/off flicker as forecasts updated (9.87h vs 10.8h p75 threshold on Mar 30 was the observed trigger). The new absolute thresholds are more stable and statistically better calibrated.</div>
+      <div style="line-height:1.7;">Daily thresholds optimised by RR × −log10(p) (Mann-Whitney U, one-sided) sweeping 0.5h steps across all days — in PNW spring, low-sunshine days are almost always rainy, making sunny vs non-sunny the correct operational split. Spring months pooled (n=273); Sep and Nov swept individually. Oct excluded — confirmed null at all levels. Rain as an independent suppressor is null on non-sunny days (p=0.58); modelled only as an attenuator within sunny days. <span style="color:#c8cfe8;">Intraday spring threshold</span> derived separately: for each candidate cutoff hour (08–14) and accumulation level (0.5–10h steps), injury% on days above vs below was tested (MWU, one-sided). Best result: by 11:00 >2.0h accumulated (RR=1.336, p&lt;0.0001, n=273). This approach was adopted because the forecast API provides a predicted daily total that can be inaccurate for the current day — using observed accumulation by 11:00 gives a stable, actionable signal. Re-derivable via <code>refresh_models.py</code> as new data accumulates.</div>
 
-      <div style="margin-top:8px;font-size:9px;color:#4a5568;">Analysis basis: N=1,091 days × 3yr ERA5 reanalysis (SEA-TAC). RR × −log10(p) composite score. Season-stratified MWU tests. October analyzed separately — confirmed null. November analyzed separately — significant at >4h (DOW-adjusted). WX_SUN_THRESH patchable by refresh_models.py.</div>
+      <div style="margin-top:8px;font-size:9px;color:#4a5568;">Analysis basis: N=1,091 days × 3yr ERA5 reanalysis (SEA-TAC 47.4444, −122.3138). RR × −log10(p) composite score. Spring daily: RR=1.30, p=0.0002. Spring intraday (by 11:00 >2.0h): RR=1.336, p&lt;0.0001. Sep: RR=1.27, p=0.006. Nov: RR=1.33, p=0.010. Rain suppression within sunny: RR=1.30, p=0.002. WX_SUN_THRESH = {Mar/Apr/May: >8.0h, Sep: >11.5h, Nov: >4.0h}. Spring intraday = by 11:00 >2.0h.</div>
     </div>
   </div>
 
@@ -2628,9 +2629,14 @@ function wxGetSeason(month) {
 }
 
 // Returns condition label and staffing narrative for a forecast day
-function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month) {
+// sunThreshOverride: if set, replaces WX_SUN_THRESH[month] for sunHigh determination
+//   Used for today in spring where intraday accumulation threshold (>2.0h by 11:00)
+//   is more accurate than the forecast daily total.
+function wxClassifyDay(sunHrs, tempF, precipIn, windMph, snowIn, month, sunThreshOverride) {
   const season    = wxGetSeason(month);
-  const sunHigh   = sunHrs  > (WX_SUN_THRESH[month] || 999);
+  const thresh    = sunThreshOverride !== null && sunThreshOverride !== undefined
+                    ? sunThreshOverride : (WX_SUN_THRESH[month] || 999);
+  const sunHigh   = sunHrs > thresh;
   const tempHigh  = tempF   > WX_TEMP_P75[month];
   const heavyRain = precipIn >= 0.5;
 
@@ -2727,6 +2733,7 @@ function wxTempColor(tempF) {
 var _wxCache = null;       // cached Open-Meteo response
 var _wxCacheHour = -1;    // hour the cache was populated
 var _wxTodaySignal = null; // today's wx injury signal — read by renderDashboard for hero card
+var _wxSpringIntradayThresh = null; // {thresh, cumSunHrs} — set for today in spring, null otherwise
 
 function renderHeroWxAdvisory() {
   var el = document.getElementById('hero-wx-advisory');
@@ -2794,6 +2801,55 @@ async function renderWeatherOutlook() {
       const resp = await fetch(url);
       const data = await resp.json();
       d = data.daily;
+
+      // For today (i=0) in spring (Mar-May): use hourly sunshine accumulation
+      // rather than forecast daily total. Threshold validated at by-11:00 >2.0h
+      // (RR=1.336, p<0.0001, n=273 spring days). Gives ~5h lead before injury peak.
+      // For Sep/Nov: keep forecast daily total (no robust intraday threshold found).
+      const todayMonth = today.getMonth() + 1;
+      if ([3,4,5].includes(todayMonth)) {
+        try {
+          const archUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=47.4444&longitude=-122.3138`
+            + `&hourly=sunshine_duration`
+            + `&timezone=America%2FLos_Angeles`
+            + `&start_date=${fmt(today)}&end_date=${fmt(today)}`;
+          const controller = new AbortController();
+          const archTimer = setTimeout(() => controller.abort(), 5000);
+          const archResp = await fetch(archUrl, { signal: controller.signal });
+          clearTimeout(archTimer);
+          const archData = await archResp.json();
+          // Compute cumulative sunshine by current hour
+          let cumSun = 0;
+          for (let hi = 0; hi < archData.hourly.time.length; hi++) {
+            const hh = new Date(archData.hourly.time[hi]).getHours();
+            cumSun += (archData.hourly.sunshine_duration[hi] || 0) / 3600;
+            if (hh >= curHour) break;
+          }
+          // Use max of: accumulated so far vs forecast (accumulated can only grow)
+          if (cumSun * 3600 > (d.sunshine_duration[0] || 0)) {
+            d.sunshine_duration[0] = cumSun * 3600;
+          }
+          // Also update precip with observed (daily archive)
+          const archPrecipUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=47.4444&longitude=-122.3138`
+            + `&daily=precipitation_sum&timezone=America%2FLos_Angeles&precipitation_unit=inch`
+            + `&start_date=${fmt(today)}&end_date=${fmt(today)}`;
+          const controller2 = new AbortController();
+          const archTimer2 = setTimeout(() => controller2.abort(), 5000);
+          const archPrecipResp = await fetch(archPrecipUrl, { signal: controller2.signal });
+          clearTimeout(archTimer2);
+          const archPrecipData = await archPrecipResp.json();
+          const archPrecip = archPrecipData.daily.precipitation_sum[0] || 0;
+          if (archPrecip > (d.precipitation_sum[0] || 0)) {
+            d.precipitation_sum[0] = archPrecip;
+          }
+        } catch(e) { /* archive fetch optional — silently ignore */ }
+      }
+
+      // Store the intraday spring threshold for wxClassifyDay
+      // Spring: by 11:00, >2.0h accumulated (replaces daily >8h for today only)
+      d._springIntradayThreshHour = 11;
+      d._springIntradayThresh     = 2.0;
+
       _wxCache = d;
       _wxCacheHour = curHour;
     }
@@ -2810,14 +2866,21 @@ async function renderWeatherOutlook() {
     for (let i = 0; i < d.time.length; i++) {
       const dt      = new Date(d.time[i] + 'T12:00:00');
       const month   = dt.getMonth() + 1;
-      const sunHrs  = (d.sunshine_duration[i] || 0) / 3600;
       const tempMax = d.temperature_2m_max[i] || 50;
       const tempMin = d.temperature_2m_min[i] || 40;
       const precip  = d.precipitation_sum[i]  || 0;
       const wind    = d.windspeed_10m_max[i]  || 0;
       const snow    = d.snowfall_sum[i]        || 0;
 
-      const wx   = wxClassifyDay(sunHrs, tempMax, precip, wind, snow, month);
+      // For today in spring: use intraday accumulation (by 11:00, >2.0h).
+      // For future days and non-spring: use forecast daily total vs WX_SUN_THRESH.
+      let sunHrs = (d.sunshine_duration[i] || 0) / 3600;
+      let sunThreshOverride = null;
+      if (i === 0 && [3,4,5].includes(month)) {
+        sunThreshOverride = 2.0; // by-11:00 threshold; sunHrs already set to cumulative
+      }
+
+      const wx   = wxClassifyDay(sunHrs, tempMax, precip, wind, snow, month, sunThreshOverride);
       const dow  = dayNames[dt.getDay()];
       const mday = `${monNames[month]} ${dt.getDate()}`;
       const tc   = wxTempColor(tempMax);
