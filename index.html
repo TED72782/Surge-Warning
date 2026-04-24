@@ -11686,6 +11686,36 @@ setInterval(function() { _wxCacheHour = -1; renderWeatherOutlook(); }, 30 * 60 *
 // Auto-refresh AQI every 60 minutes
 setInterval(function() { _aqiCacheHour = -1; renderAQIOutlook(); }, 60 * 60 * 1000);
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MBED COORDINATOR BRIDGE
+// Responds to postMessage queries from the MBED Central Coordinator so it can
+// read the current surge probability + level without recomputing anything.
+// Purely additive — reads window._lastSurgeProb (set by renderSurgeDashboard)
+// and surgeLevel() (defined in this file). No logic changes elsewhere.
+// ═══════════════════════════════════════════════════════════════════════════
+window.addEventListener('message', function(ev) {
+  try {
+    if (!ev.data || ev.data.type !== 'mbed_coord_query') return;
+    var p = (typeof window._lastSurgeProb === 'number') ? window._lastSurgeProb : null;
+    var levelInfo = null;
+    if (p !== null && typeof surgeLevel === 'function') {
+      var li = surgeLevel(p);
+      levelInfo = { level: li.level, label: li.label };
+    }
+    var resp = {
+      type: 'mbed_coord_response',
+      prob: p,
+      level: levelInfo ? levelInfo.level : null,
+      label: levelInfo ? levelInfo.label : null,
+      ts: Date.now(),
+      ready: (p !== null)
+    };
+    if (ev.source && typeof ev.source.postMessage === 'function') {
+      ev.source.postMessage(resp, '*');
+    }
+  } catch(e) { /* silent — bridge failures must not affect Surge Watch */ }
+});
+
 </script>
 </body>
 </html>
