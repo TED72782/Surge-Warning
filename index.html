@@ -9139,6 +9139,37 @@ function renderDashboard(iliData = null) {
   const surgeProb = computeSurgeProb(hour, dow, month, schoolStatus, localEventMod, gradInfo.modifier, iliMod, postEventMod);
   window._lastSurgeProb = surgeProb; window._lastIliMod = iliMod;
 
+  // Epidemic modifier for MBED Coordinator: product of all live "today vs
+  // historical" adjustments. 1.0 means today is at structural baseline;
+  // values above are hotter (flu season, events, school, community illness);
+  // below are quieter. Sim should scale its arrival rate by this to
+  // surge-adjust Optimizer runs.
+  // Notes:
+  //   * schoolMod is re-derived here (it's a local inside computeSurgeProb).
+  //   * communityMod is only included when the user has toggled on
+  //     COMMUNITY_ILL_MOD_ON in Surge Watch. When OFF, getCommunityIllnessMod()
+  //     returns 1.0 so it's a no-op.
+  (function(){
+    var _sMod = 1.0;
+    if (schoolStatus.type === 'holiday' || schoolStatus.type === 'break') _sMod = 1.15;
+    else if (schoolStatus.type === 'return') _sMod = 1.20;
+    else if (schoolStatus.type === 'weekend') _sMod = 0.85;
+    if (schoolStatus.type === 'return' && dow === 0) _sMod = 1.30;
+    var _commMod = 1.0;
+    try { if (typeof getCommunityIllnessMod === 'function') _commMod = getCommunityIllnessMod(); }
+    catch(e) { _commMod = 1.0; }
+    window._lastEpidemicMod = _sMod * (localEventMod||1) * (gradInfo.modifier||1) * (iliMod||1) * (postEventMod||1) * (_commMod||1);
+    window._lastEpidemicDetail = {
+      school:     _sMod,
+      local:      localEventMod||1,
+      grad:       gradInfo.modifier||1,
+      ili:        iliMod||1,
+      postEv:     postEventMod||1,
+      community:  _commMod||1,
+      communityOn: (typeof COMMUNITY_ILL_MOD_ON !== 'undefined') ? !!COMMUNITY_ILL_MOD_ON : false,
+    };
+  })();
+
   // If persistence model is active, use survival lookup for hero card (h+1)
   let heroProb = surgeProb;
   let heroModel = 'calendar';
@@ -11695,20 +11726,56 @@ setInterval(function() { _aqiCacheHour = -1; renderAQIOutlook(); }, 60 * 60 * 10
 // ═══════════════════════════════════════════════════════════════════════════
 window.addEventListener('message', function(ev) {
   try {
-    if (!ev.data || ev.data.type !== 'mbed_coord_query') return;
-    var p = (typeof window._lastSurgeProb === 'number') ? window._lastSurgeProb : null;
+    if (!ev.data) return;
+
+    // Handler: set community illness modifier state in this embedded Surge Watch
+    // instance. Idempotent — only toggles if state differs.
+    if (ev.data.type === 'mbed_coord_set_community') {
+      var desired = !!ev.data.on;
+      if (typeof COMMUNITY_ILL_MOD_ON !== 'undefined'
+          && typeof toggleCommunityIllMod === 'function'
+          && COMMUNITY_ILL_MOD_ON !== desired) {
+        try { toggleCommunityIllMod(); } catch(e) {}
+      }
+      // Ack with current state + a fresh query-style response so Coordinator
+      // can immediately see the updated mod reflected.
+      var p = (typeof window._lastSurgeProb === 'number') ? window._lastSurgeProb : null;
+      var eMod = (typeof window._lastEpidemicMod === 'number') ? window._lastEpidemicMod : null;
+      var eDetail = window._lastEpidemicDetail || null;
+      if (ev.source && typeof ev.source.postMessage === 'function') {
+        ev.source.postMessage({
+          type: 'mbed_coord_response',
+          prob: p,
+          level: (p !== null && typeof surgeLevel === 'function') ? surgeLevel(p).level : null,
+          label: (p !== null && typeof surgeLevel === 'function') ? surgeLevel(p).label : null,
+          epidemicMod: eMod,
+          epidemicDetail: eDetail,
+          ts: Date.now(),
+          ready: (p !== null)
+        }, '*');
+      }
+      return;
+    }
+
+    // Handler: standard query
+    if (ev.data.type !== 'mbed_coord_query') return;
+    var p2 = (typeof window._lastSurgeProb === 'number') ? window._lastSurgeProb : null;
+    var eMod2 = (typeof window._lastEpidemicMod === 'number') ? window._lastEpidemicMod : null;
+    var eDetail2 = window._lastEpidemicDetail || null;
     var levelInfo = null;
-    if (p !== null && typeof surgeLevel === 'function') {
-      var li = surgeLevel(p);
+    if (p2 !== null && typeof surgeLevel === 'function') {
+      var li = surgeLevel(p2);
       levelInfo = { level: li.level, label: li.label };
     }
     var resp = {
       type: 'mbed_coord_response',
-      prob: p,
+      prob: p2,
       level: levelInfo ? levelInfo.level : null,
       label: levelInfo ? levelInfo.label : null,
+      epidemicMod: eMod2,
+      epidemicDetail: eDetail2,
       ts: Date.now(),
-      ready: (p !== null)
+      ready: (p2 !== null)
     };
     if (ev.source && typeof ev.source.postMessage === 'function') {
       ev.source.postMessage(resp, '*');
